@@ -1,0 +1,1207 @@
+[gd_scene format=3 uid="uid://c6a8p11k4nav3"]
+
+[ext_resource type="Script" uid="uid://cfbf8cr6umqbs" path="res://scripts/classroom.gd" id="1_class"]
+[ext_resource type="PackedScene" uid="uid://bvx42n5lqk7j8" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://dcyv3c5rrbj4d" path="res://scripts/note.gd" id="3_note"]
+[ext_resource type="Script" uid="uid://cimvuatckhdm1" path="res://scripts/character_npc.gd" id="4_npc"]
+[ext_resource type="AudioStream" uid="uid://bp7v8eedxuteb" path="res://audio/ambience.wav" id="5_ambience"]
+[ext_resource type="AudioStream" uid="uid://eyascybiesui" path="res://audio/power_cut.wav" id="6_power_cut"]
+[ext_resource type="AudioStream" uid="uid://bqr3abs580wf3" path="res://audio/flicker.wav" id="7_flicker"]
+[ext_resource type="Texture2D" uid="uid://bxfaeaie3mh1d" path="res://textures/blood_scratches.png" id="8_scratches"]
+[ext_resource type="Texture2D" uid="uid://cfe5trycrxa3c" path="res://textures/bhangarh_map_bg.png" id="9_map_bg"]
+[ext_resource type="Texture2D" uid="uid://bspcdmkmuhodv" path="res://textures/kripal_bodycam.png" id="10_bodycam"]
+[ext_resource type="AudioStream" uid="uid://b5emd1i5d1yia" path="res://audio/door_creak.wav" id="11_door_creak"]
+[ext_resource type="AudioStream" uid="uid://b46l3eklxe0kb" path="res://audio/radar_ping.wav" id="12_radar_ping"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
+sky_top_color = Color(0.45, 0.6, 0.8, 1)
+sky_horizon_color = Color(0.75, 0.8, 0.85, 1)
+ground_bottom_color = Color(0.2, 0.22, 0.25, 1)
+ground_horizon_color = Color(0.75, 0.8, 0.85, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+ambient_light_source = 2
+ambient_light_color = Color(0.35, 0.35, 0.4, 1)
+ambient_light_energy = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_Floor"]
+albedo_color = Color(0.38, 0.38, 0.42, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Mat_Wall"]
+albedo_color = Color(0.88, 0.86, 0.8, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_WallLower"]
+albedo_color = Color(0.2, 0.32, 0.25, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_WindowBars"]
+albedo_color = Color(0.15, 0.15, 0.18, 1)
+metallic = 0.9
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_DarkWood"]
+albedo_color = Color(0.32, 0.18, 0.08, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_Door"]
+albedo_color = Color(0.42, 0.24, 0.12, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_DoorHandle"]
+albedo_color = Color(0.85, 0.8, 0.6, 1)
+metallic = 0.9
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_Blackboard"]
+albedo_color = Color(0.08, 0.18, 0.12, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_Wood"]
+albedo_color = Color(0.48, 0.28, 0.14, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_MetalLegs"]
+albedo_color = Color(0.18, 0.18, 0.2, 1)
+metallic = 0.85
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_Kripal"]
+albedo_color = Color(0.18, 0.2, 0.22, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_Scratches"]
+transparency = 1
+albedo_texture = ExtResource("8_scratches")
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_Paper"]
+albedo_color = Color(0.96, 0.94, 0.88, 1)
+roughness = 0.9
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_note"]
+size = Vector3(0.5, 0.2, 0.5)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_npc"]
+radius = 0.45
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil"]
+albedo_color = Color(0.12, 0.12, 0.15, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_EMF_Glow"]
+albedo_color = Color(0.1, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(0.2, 1, 0.3, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_Aashutosh"]
+albedo_color = Color(0.55, 0.15, 0.18, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_TubeEmission"]
+emission_enabled = true
+emission = Color(1, 1, 0.95, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialogue"]
+bg_color = Color(0.08, 0.08, 0.1, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.5, 0.15, 0.15, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Mission"]
+bg_color = Color(0.08, 0.05, 0.05, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.2, 0.2, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ActionBtn"]
+bg_color = Color(0.75, 0.15, 0.15, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.45, 0.45, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ActionBtnHover"]
+bg_color = Color(0.95, 0.25, 0.25, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.85, 0.3, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_MapFrame"]
+bg_color = Color(0.05, 0.07, 0.12, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.5, 0.8, 0.85)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BodycamFrame"]
+bg_color = Color(0.04, 0.05, 0.06, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.2, 0.2, 0.85)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="Classroom" type="Node3D" unique_id=405003882]
+script = ExtResource("1_class")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=695422907]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=270750649]
+transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, -10, 8, 0)
+light_color = Color(1, 0.96, 0.88, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Audio" type="Node" parent="." unique_id=1622359934]
+
+[node name="AmbienceAudio" type="AudioStreamPlayer" parent="Audio" unique_id=1418613138]
+stream = ExtResource("5_ambience")
+volume_db = -2.0
+
+[node name="PowerCutAudio" type="AudioStreamPlayer" parent="Audio" unique_id=918382510]
+stream = ExtResource("6_power_cut")
+volume_db = 2.0
+
+[node name="FlickerAudio" type="AudioStreamPlayer" parent="Audio" unique_id=1240111504]
+stream = ExtResource("7_flicker")
+
+[node name="VoiceAudio" type="AudioStreamPlayer" parent="Audio" unique_id=304293519]
+volume_db = 4.0
+
+[node name="HeartbeatAudio" type="AudioStreamPlayer" parent="Audio" unique_id=1577399163]
+
+[node name="RadioAudio" type="AudioStreamPlayer" parent="Audio" unique_id=1428674770]
+volume_db = -2.0
+
+[node name="DoorAudio" type="AudioStreamPlayer" parent="Audio" unique_id=1747608426]
+stream = ExtResource("11_door_creak")
+volume_db = 2.0
+
+[node name="RadarAudio" type="AudioStreamPlayer" parent="Audio" unique_id=2143711002]
+stream = ExtResource("12_radar_ping")
+volume_db = -2.0
+
+[node name="RoomGeometry" type="Node3D" parent="." unique_id=1191577411]
+
+[node name="Floor" type="CSGBox3D" parent="RoomGeometry" unique_id=556180959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+use_collision = true
+size = Vector3(16, 0.2, 14)
+material = SubResource("Mat_Floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="RoomGeometry" unique_id=1444302496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
+use_collision = true
+size = Vector3(16, 0.2, 14)
+material = SubResource("Mat_Wall")
+
+[node name="FrontWall" type="CSGBox3D" parent="RoomGeometry" unique_id=733066201]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, -7)
+use_collision = true
+size = Vector3(16, 3.7, 0.2)
+material = SubResource("Mat_Wall")
+
+[node name="FrontWall_LowerPanel" type="CSGBox3D" parent="RoomGeometry" unique_id=2005240454]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -6.9)
+size = Vector3(16, 1.1, 0.05)
+material = SubResource("Mat_WallLower")
+
+[node name="BackWall" type="CSGBox3D" parent="RoomGeometry" unique_id=410099445]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 7)
+use_collision = true
+size = Vector3(16, 3.7, 0.2)
+material = SubResource("Mat_Wall")
+
+[node name="BackWall_LowerPanel" type="CSGBox3D" parent="RoomGeometry" unique_id=1021235176]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 6.9)
+size = Vector3(16, 1.1, 0.05)
+material = SubResource("Mat_WallLower")
+
+[node name="RightWall_Front" type="CSGBox3D" parent="RoomGeometry" unique_id=129064524]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.85, -1.6)
+use_collision = true
+size = Vector3(0.2, 3.7, 10.8)
+material = SubResource("Mat_Wall")
+
+[node name="RightWall_Back" type="CSGBox3D" parent="RoomGeometry" unique_id=1585743021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.85, 6.1)
+use_collision = true
+size = Vector3(0.2, 3.7, 1.8)
+material = SubResource("Mat_Wall")
+
+[node name="RightWall_AboveDoor" type="CSGBox3D" parent="RoomGeometry" unique_id=1641991559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3.1, 4.5)
+use_collision = true
+size = Vector3(0.2, 1.2, 1.4)
+material = SubResource("Mat_Wall")
+
+[node name="RightWall_Lower_Front" type="CSGBox3D" parent="RoomGeometry" unique_id=1365585381]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.9, 0.55, -1.6)
+size = Vector3(0.05, 1.1, 10.8)
+material = SubResource("Mat_WallLower")
+
+[node name="RightWall_Lower_Back" type="CSGBox3D" parent="RoomGeometry" unique_id=656251243]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.9, 0.55, 6.1)
+size = Vector3(0.05, 1.1, 1.8)
+material = SubResource("Mat_WallLower")
+
+[node name="LeftWall_Lower" type="CSGBox3D" parent="RoomGeometry" unique_id=964524700]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.55, 0)
+use_collision = true
+size = Vector3(0.2, 1.1, 14)
+material = SubResource("Mat_WallLower")
+
+[node name="LeftWall_Upper" type="CSGBox3D" parent="RoomGeometry" unique_id=888494519]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.25, 0)
+use_collision = true
+size = Vector3(0.2, 0.9, 14)
+material = SubResource("Mat_Wall")
+
+[node name="LeftWall_Pillar_Front" type="CSGBox3D" parent="RoomGeometry" unique_id=1834698171]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.85, -6)
+use_collision = true
+size = Vector3(0.25, 3.7, 2)
+material = SubResource("Mat_Wall")
+
+[node name="LeftWall_Pillar_Mid1" type="CSGBox3D" parent="RoomGeometry" unique_id=880833889]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.85, -2)
+use_collision = true
+size = Vector3(0.25, 3.7, 1)
+material = SubResource("Mat_Wall")
+
+[node name="LeftWall_Pillar_Mid2" type="CSGBox3D" parent="RoomGeometry" unique_id=1328545272]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.85, 2)
+use_collision = true
+size = Vector3(0.25, 3.7, 1)
+material = SubResource("Mat_Wall")
+
+[node name="LeftWall_Pillar_Back" type="CSGBox3D" parent="RoomGeometry" unique_id=370880656]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.85, 6)
+use_collision = true
+size = Vector3(0.25, 3.7, 2)
+material = SubResource("Mat_Wall")
+
+[node name="WindowsWithGrills" type="Node3D" parent="." unique_id=1433637405]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.95, 0)
+
+[node name="Bar1" type="CSGBox3D" parent="WindowsWithGrills" unique_id=1176886719]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.5)
+size = Vector3(0.04, 1.6, 0.04)
+material = SubResource("Mat_WindowBars")
+
+[node name="Bar2" type="CSGBox3D" parent="WindowsWithGrills" unique_id=918350323]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.8)
+size = Vector3(0.04, 1.6, 0.04)
+material = SubResource("Mat_WindowBars")
+
+[node name="Bar3" type="CSGBox3D" parent="WindowsWithGrills" unique_id=451407325]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.1)
+size = Vector3(0.04, 1.6, 0.04)
+material = SubResource("Mat_WindowBars")
+
+[node name="Bar4" type="CSGBox3D" parent="WindowsWithGrills" unique_id=1101368899]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.8)
+size = Vector3(0.04, 1.6, 0.04)
+material = SubResource("Mat_WindowBars")
+
+[node name="Bar5" type="CSGBox3D" parent="WindowsWithGrills" unique_id=1454281517]
+size = Vector3(0.04, 1.6, 0.04)
+material = SubResource("Mat_WindowBars")
+
+[node name="Bar6" type="CSGBox3D" parent="WindowsWithGrills" unique_id=1042742880]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.8)
+size = Vector3(0.04, 1.6, 0.04)
+material = SubResource("Mat_WindowBars")
+
+[node name="Bar7" type="CSGBox3D" parent="WindowsWithGrills" unique_id=1362351081]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.1)
+size = Vector3(0.04, 1.6, 0.04)
+material = SubResource("Mat_WindowBars")
+
+[node name="Bar8" type="CSGBox3D" parent="WindowsWithGrills" unique_id=154011653]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.8)
+size = Vector3(0.04, 1.6, 0.04)
+material = SubResource("Mat_WindowBars")
+
+[node name="Bar9" type="CSGBox3D" parent="WindowsWithGrills" unique_id=2139204455]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.5)
+size = Vector3(0.04, 1.6, 0.04)
+material = SubResource("Mat_WindowBars")
+
+[node name="Doorway" type="Node3D" parent="." unique_id=1978117257]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.85, 0, 4.5)
+
+[node name="DoorFrame" type="CSGBox3D" parent="Doorway" unique_id=1287543233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+size = Vector3(0.28, 2.5, 1.3)
+material = SubResource("Mat_DarkWood")
+
+[node name="DoorHinge" type="Node3D" parent="Doorway" unique_id=808281007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.55)
+
+[node name="DoorPanel" type="CSGBox3D" parent="Doorway/DoorHinge" unique_id=1704934957]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -0.55)
+size = Vector3(0.18, 2.35, 1.15)
+material = SubResource("Mat_Door")
+
+[node name="DoorHandle" type="CSGBox3D" parent="Doorway/DoorHinge" unique_id=1108497788]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 1.15, -1)
+size = Vector3(0.1, 0.06, 0.18)
+material = SubResource("Mat_DoorHandle")
+
+[node name="DoorPrompt" type="Label3D" parent="Doorway" unique_id=1562286243]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -0.25, 1.6, 0)
+visible = false
+modulate = Color(1, 0.85, 0.2, 1)
+text = "📍 क्लासरूम का दरवाजा खोलो [E]"
+font_size = 22
+outline_size = 6
+
+[node name="OutsideVerandah" type="Node3D" parent="Doorway" unique_id=1215266166]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0, 0)
+
+[node name="PorchFloor" type="CSGBox3D" parent="Doorway/OutsideVerandah" unique_id=1662332157]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+use_collision = true
+size = Vector3(3.2, 0.2, 3.2)
+material = SubResource("Mat_Floor")
+
+[node name="PorchPillar" type="CSGBox3D" parent="Doorway/OutsideVerandah" unique_id=898490071]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 1.5, -1.4)
+use_collision = true
+size = Vector3(0.35, 3, 0.35)
+material = SubResource("Mat_Wall")
+
+[node name="NoticeBoard" type="CSGBox3D" parent="." unique_id=702163575]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.88, 2.1, 0)
+size = Vector3(0.05, 1.4, 2.4)
+material = SubResource("Mat_DarkWood")
+
+[node name="NoticeText" type="Label3D" parent="NoticeBoard" unique_id=467589261]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -0.04, 0, 0)
+text = "RAJASTHAN TOURISM
+WARNING:
+ENTRY INTO BHANGARH RUINS
+AFTER SUNSET IS STRICTLY
+PROHIBITED BY LAW (A.S.I.)"
+font_size = 18
+outline_size = 3
+
+[node name="BlackboardArea" type="Node3D" parent="." unique_id=1666340319]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6.85)
+
+[node name="BlackboardFrame" type="CSGBox3D" parent="BlackboardArea" unique_id=1439424348]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+size = Vector3(5.2, 2, 0.08)
+material = SubResource("Mat_DarkWood")
+
+[node name="BoardSurface" type="CSGBox3D" parent="BlackboardArea" unique_id=2041051511]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0.04)
+size = Vector3(5, 1.8, 0.04)
+material = SubResource("Mat_Blackboard")
+
+[node name="ChalkLedge" type="CSGBox3D" parent="BlackboardArea" unique_id=1970130350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0.08)
+size = Vector3(5, 0.06, 0.12)
+material = SubResource("Mat_DarkWood")
+
+[node name="BoardText" type="Label3D" parent="BlackboardArea" unique_id=691034546]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.35, 0.07)
+text = "PARANORMAL INVESTIGATION CLUB
+Date: 21 Nov 2026   Class: XII-A
+Case: Unexplained EMF Spikes in Rajasthan"
+font_size = 20
+outline_size = 0
+
+[node name="TeacherPlatform" type="Node3D" parent="." unique_id=323815416]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5.2)
+
+[node name="Dais" type="CSGBox3D" parent="TeacherPlatform" unique_id=907403343]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(3.5, 0.2, 1.8)
+material = SubResource("Mat_DarkWood")
+
+[node name="TeacherTable" type="CSGBox3D" parent="TeacherPlatform" unique_id=1838794542]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0.2)
+use_collision = true
+size = Vector3(1.8, 0.9, 0.8)
+material = SubResource("Mat_Wood")
+
+[node name="Furniture" type="Node3D" parent="." unique_id=319867603]
+
+[node name="Desks" type="Node3D" parent="Furniture" unique_id=182931958]
+
+[node name="Desk_Sahil" type="Node3D" parent="Furniture/Desks" unique_id=940470992]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0, -2.5)
+
+[node name="Top" type="CSGBox3D" parent="Furniture/Desks/Desk_Sahil" unique_id=241890641]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+use_collision = true
+size = Vector3(1.6, 0.06, 0.6)
+material = SubResource("Mat_Wood")
+
+[node name="Bench" type="CSGBox3D" parent="Furniture/Desks/Desk_Sahil" unique_id=2090271141]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0.6)
+use_collision = true
+size = Vector3(1.6, 0.05, 0.3)
+material = SubResource("Mat_Wood")
+
+[node name="Legs" type="CSGBox3D" parent="Furniture/Desks/Desk_Sahil" unique_id=1677145631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.2)
+size = Vector3(1.5, 0.7, 0.8)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Desk_Aashutosh" type="Node3D" parent="Furniture/Desks" unique_id=604162012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0, 1.2)
+
+[node name="Top" type="CSGBox3D" parent="Furniture/Desks/Desk_Aashutosh" unique_id=1075424579]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+use_collision = true
+size = Vector3(1.6, 0.06, 0.6)
+material = SubResource("Mat_Wood")
+
+[node name="Bench" type="CSGBox3D" parent="Furniture/Desks/Desk_Aashutosh" unique_id=391519164]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0.6)
+use_collision = true
+size = Vector3(1.6, 0.05, 0.3)
+material = SubResource("Mat_Wood")
+
+[node name="Legs" type="CSGBox3D" parent="Furniture/Desks/Desk_Aashutosh" unique_id=923939257]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.2)
+size = Vector3(1.5, 0.7, 0.8)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Desk_Kripal" type="Node3D" parent="Furniture/Desks" unique_id=1078267357]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0, -2.5)
+
+[node name="Top" type="CSGBox3D" parent="Furniture/Desks/Desk_Kripal" unique_id=856203541]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+use_collision = true
+size = Vector3(1.6, 0.06, 0.6)
+material = SubResource("Mat_Wood")
+
+[node name="Bench" type="CSGBox3D" parent="Furniture/Desks/Desk_Kripal" unique_id=1685357368]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0.6)
+use_collision = true
+size = Vector3(1.6, 0.05, 0.3)
+material = SubResource("Mat_Wood")
+
+[node name="Legs" type="CSGBox3D" parent="Furniture/Desks/Desk_Kripal" unique_id=1526611893]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.2)
+size = Vector3(1.5, 0.7, 0.8)
+material = SubResource("Mat_MetalLegs")
+
+[node name="SchoolBag" type="CSGBox3D" parent="Furniture/Desks/Desk_Kripal" unique_id=710356393]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, -0.4, 0.9, 0)
+size = Vector3(0.35, 0.3, 0.2)
+material = SubResource("Mat_Kripal")
+
+[node name="ClawScratches" type="CSGBox3D" parent="Furniture/Desks/Desk_Kripal" unique_id=613765802]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.755, 0)
+size = Vector3(0.5, 0.01, 0.5)
+material = SubResource("Mat_Scratches")
+
+[node name="ChitNote" type="StaticBody3D" parent="Furniture/Desks/Desk_Kripal" unique_id=1005608799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0.77, 0)
+script = ExtResource("3_note")
+
+[node name="PaperMesh" type="CSGBox3D" parent="Furniture/Desks/Desk_Kripal/ChitNote" unique_id=1737883019]
+size = Vector3(0.28, 0.02, 0.35)
+material = SubResource("Mat_Paper")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/Desks/Desk_Kripal/ChitNote" unique_id=1643585968]
+shape = SubResource("BoxShape3D_note")
+
+[node name="Desk_LeftRow2" type="Node3D" parent="Furniture/Desks" unique_id=879578113]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0, 1.2)
+
+[node name="Top" type="CSGBox3D" parent="Furniture/Desks/Desk_LeftRow2" unique_id=213727161]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+use_collision = true
+size = Vector3(1.6, 0.06, 0.6)
+material = SubResource("Mat_Wood")
+
+[node name="Bench" type="CSGBox3D" parent="Furniture/Desks/Desk_LeftRow2" unique_id=1084630779]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0.6)
+use_collision = true
+size = Vector3(1.6, 0.05, 0.3)
+material = SubResource("Mat_Wood")
+
+[node name="Legs" type="CSGBox3D" parent="Furniture/Desks/Desk_LeftRow2" unique_id=1580996993]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.2)
+size = Vector3(1.5, 0.7, 0.8)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Characters" type="Node3D" parent="." unique_id=1203942341]
+
+[node name="Sahil" type="StaticBody3D" parent="Characters" unique_id=1284196487]
+transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, 2.2, 0, -2.2)
+script = ExtResource("4_npc")
+dialogue_before = "I checked all the EMF meters. Everything is calibrated for our next investigation. Let's finish packing."
+dialogue_after = "MY EMF METER WENT OFF THE CHARTS! The whole room spiked to Level 5! Where did Kripal disappear to?!"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Characters/Sahil" unique_id=1756674192]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_npc")
+
+[node name="Body" type="CSGBox3D" parent="Characters/Sahil" unique_id=374242888]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+size = Vector3(0.55, 1.25, 0.38)
+material = SubResource("Mat_Sahil")
+
+[node name="Head" type="CSGBox3D" parent="Characters/Sahil" unique_id=121057743]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, 0)
+size = Vector3(0.35, 0.35, 0.35)
+
+[node name="EMFMeter" type="CSGBox3D" parent="Characters/Sahil" unique_id=1268351175]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 1.05, 0.25)
+size = Vector3(0.12, 0.22, 0.08)
+material = SubResource("Mat_EMF_Glow")
+
+[node name="NameTag" type="Label3D" parent="Characters/Sahil" unique_id=928560041]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)
+billboard = 1
+text = "SAHIL
+[The Analyst / Support]"
+font_size = 18
+outline_size = 4
+
+[node name="Aashutosh" type="StaticBody3D" parent="Characters" unique_id=853218656]
+transform = Transform3D(0.707, 0, -0.707, 0, 1, 0, 0.707, 0, 0.707, 2.2, 0, 1.5)
+script = ExtResource("4_npc")
+character_name = "Aashutosh"
+dialogue_before = "I packed the extra motion sensors and cameras in my backpack. Kripal said he felt something weird all day."
+dialogue_after = "HE WAS JUST SITTING RIGHT THERE! How could he vanish in 5 seconds?! Look at his desk... there's a paper left behind!"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Characters/Aashutosh" unique_id=1992897774]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_npc")
+
+[node name="Body" type="CSGBox3D" parent="Characters/Aashutosh" unique_id=738134204]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+size = Vector3(0.52, 1.22, 0.36)
+material = SubResource("Mat_Aashutosh")
+
+[node name="Head" type="CSGBox3D" parent="Characters/Aashutosh" unique_id=1563309277]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+size = Vector3(0.35, 0.35, 0.35)
+
+[node name="Headphones" type="CSGBox3D" parent="Characters/Aashutosh" unique_id=1971053065]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0.05)
+size = Vector3(0.42, 0.1, 0.38)
+material = SubResource("Mat_MetalLegs")
+
+[node name="NameTag" type="Label3D" parent="Characters/Aashutosh" unique_id=1964780275]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)
+billboard = 1
+text = "AASHUTOSH
+[The Explorer / Fighter]"
+font_size = 18
+outline_size = 4
+
+[node name="Kripal" type="StaticBody3D" parent="Characters" unique_id=324924528]
+transform = Transform3D(-0.259, 0, 0.966, 0, 1, 0, -0.966, 0, -0.259, -3.2, 0, -1.9)
+script = ExtResource("4_npc")
+character_name = "Kripal"
+dialogue_before = "The thermal camera has been detecting random temperature drops in this classroom all afternoon... look outside, it's getting dark fast."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Characters/Kripal" unique_id=821483570]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_npc")
+
+[node name="Body" type="CSGBox3D" parent="Characters/Kripal" unique_id=1786380304]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+size = Vector3(0.5, 1.2, 0.35)
+material = SubResource("Mat_Kripal")
+
+[node name="Head" type="CSGBox3D" parent="Characters/Kripal" unique_id=1445893082]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+size = Vector3(0.35, 0.35, 0.35)
+
+[node name="ThermalCam" type="CSGBox3D" parent="Characters/Kripal" unique_id=2050195356]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1, 0.25)
+size = Vector3(0.15, 0.18, 0.18)
+material = SubResource("Mat_MetalLegs")
+
+[node name="NameTag" type="Label3D" parent="Characters/Kripal" unique_id=1574742833]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)
+billboard = 1
+text = "KRIPAL
+[The Detective / Scout]"
+font_size = 18
+outline_size = 4
+
+[node name="CeilingFans" type="Node3D" parent="." unique_id=34944014]
+
+[node name="Fan1" type="Node3D" parent="CeilingFans" unique_id=1529689595]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, -2.5)
+
+[node name="Rod" type="CSGBox3D" parent="CeilingFans/Fan1" unique_id=82706498]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
+size = Vector3(0.06, 0.6, 0.06)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Center" type="CSGBox3D" parent="CeilingFans/Fan1" unique_id=2127205544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+size = Vector3(0.3, 0.12, 0.3)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Blades" type="Node3D" parent="CeilingFans/Fan1" unique_id=1411843631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+
+[node name="Blade1" type="CSGBox3D" parent="CeilingFans/Fan1/Blades" unique_id=1838757432]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, 0)
+size = Vector3(1.1, 0.02, 0.2)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Blade2" type="CSGBox3D" parent="CeilingFans/Fan1/Blades" unique_id=688728712]
+transform = Transform3D(-0.5, 0, 0.866, 0, 1, 0, -0.866, 0, -0.5, -0.3, 0, 0.52)
+size = Vector3(1.1, 0.02, 0.2)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Blade3" type="CSGBox3D" parent="CeilingFans/Fan1/Blades" unique_id=131656065]
+transform = Transform3D(-0.5, 0, -0.866, 0, 1, 0, 0.866, 0, -0.5, -0.3, 0, -0.52)
+size = Vector3(1.1, 0.02, 0.2)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Fan2" type="Node3D" parent="CeilingFans" unique_id=1095742553]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 2.5)
+
+[node name="Rod" type="CSGBox3D" parent="CeilingFans/Fan2" unique_id=716037751]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
+size = Vector3(0.06, 0.6, 0.06)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Center" type="CSGBox3D" parent="CeilingFans/Fan2" unique_id=1658388379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+size = Vector3(0.3, 0.12, 0.3)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Blades" type="Node3D" parent="CeilingFans/Fan2" unique_id=909005976]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+
+[node name="Blade1" type="CSGBox3D" parent="CeilingFans/Fan2/Blades" unique_id=798913691]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, 0)
+size = Vector3(1.1, 0.02, 0.2)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Blade2" type="CSGBox3D" parent="CeilingFans/Fan2/Blades" unique_id=1032804436]
+transform = Transform3D(-0.5, 0, 0.866, 0, 1, 0, -0.866, 0, -0.5, -0.3, 0, 0.52)
+size = Vector3(1.1, 0.02, 0.2)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Blade3" type="CSGBox3D" parent="CeilingFans/Fan2/Blades" unique_id=1420352335]
+transform = Transform3D(-0.5, 0, -0.866, 0, 1, 0, 0.866, 0, -0.5, -0.3, 0, -0.52)
+size = Vector3(1.1, 0.02, 0.2)
+material = SubResource("Mat_MetalLegs")
+
+[node name="Lights" type="Node3D" parent="." unique_id=927524556]
+
+[node name="TubeLight1" type="OmniLight3D" parent="Lights" unique_id=1827378874]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3, -2.5)
+light_color = Color(0.96, 0.98, 1, 1)
+light_energy = 2.0
+omni_range = 10.0
+
+[node name="TubeLight2" type="OmniLight3D" parent="Lights" unique_id=2054625639]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3, 2.5)
+light_color = Color(0.96, 0.98, 1, 1)
+light_energy = 2.0
+omni_range = 10.0
+
+[node name="TubeFixture1" type="Node3D" parent="Lights" unique_id=2120963102]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -2.5)
+
+[node name="Base" type="CSGBox3D" parent="Lights/TubeFixture1" unique_id=2119124636]
+size = Vector3(0.18, 0.08, 1.8)
+material = SubResource("Mat_MetalLegs")
+
+[node name="BulbMesh" type="CSGBox3D" parent="Lights/TubeFixture1" unique_id=1842722240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+size = Vector3(0.08, 0.06, 1.7)
+material = SubResource("Mat_TubeEmission")
+
+[node name="TubeFixture2" type="Node3D" parent="Lights" unique_id=119286850]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 2.5)
+
+[node name="Base" type="CSGBox3D" parent="Lights/TubeFixture2" unique_id=1758997958]
+size = Vector3(0.18, 0.08, 1.8)
+material = SubResource("Mat_MetalLegs")
+
+[node name="BulbMesh" type="CSGBox3D" parent="Lights/TubeFixture2" unique_id=1054625763]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+size = Vector3(0.08, 0.06, 1.7)
+material = SubResource("Mat_TubeEmission")
+
+[node name="SpeakerSpotlight" type="SpotLight3D" parent="Lights" unique_id=1839956472]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -1.8, 3.4, -2.1)
+light_color = Color(1, 0.9, 0.5, 1)
+light_energy = 3.0
+spot_range = 8.0
+spot_angle = 50.0
+
+[node name="Player" parent="." unique_id=1598171405 instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 4)
+
+[node name="EventUI" type="CanvasLayer" parent="." unique_id=1708250450]
+
+[node name="Subtitle" type="Label" parent="EventUI" unique_id=256818015]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -400.0
+offset_top = 35.0
+offset_right = 400.0
+offset_bottom = 85.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+text = "School is over. Talk to Sahil, Aashutosh, and Kripal..."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="DialogueBox" type="PanelContainer" parent="EventUI" unique_id=744836784]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -460.0
+offset_top = -180.0
+offset_right = 460.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dialogue")
+
+[node name="MarginContainer" type="MarginContainer" parent="EventUI/DialogueBox" unique_id=421069992]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 15
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EventUI/DialogueBox/MarginContainer" unique_id=1454477923]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 20
+
+[node name="PortraitFrame" type="PanelContainer" parent="EventUI/DialogueBox/MarginContainer/HBoxContainer" unique_id=1171048960]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Portrait" type="TextureRect" parent="EventUI/DialogueBox/MarginContainer/HBoxContainer/PortraitFrame" unique_id=1208083790]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="EventUI/DialogueBox/MarginContainer/HBoxContainer" unique_id=1604256819]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="SpeakerName" type="Label" parent="EventUI/DialogueBox/MarginContainer/HBoxContainer/VBoxContainer" unique_id=661665042]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "SAHIL (The Analyst)"
+
+[node name="DialogueContent" type="Label" parent="EventUI/DialogueBox/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1268669756]
+custom_minimum_size = Vector2(0, 55)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 16
+text = "Dialogue content will display here..."
+autowrap_mode = 2
+
+[node name="AdvanceTip" type="Label" parent="EventUI/DialogueBox/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1770499015]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.65, 0.7, 1)
+theme_override_font_sizes/font_size = 13
+text = "[CLICK or Press E / SPACE to Continue ▶]"
+horizontal_alignment = 2
+
+[node name="ChapterCard" type="ColorRect" parent="EventUI" unique_id=1931936629]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.02, 0.02, 0.96)
+
+[node name="Margin" type="MarginContainer" parent="EventUI/ChapterCard" unique_id=1221327795]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 40
+
+[node name="VBox" type="VBoxContainer" parent="EventUI/ChapterCard/Margin" unique_id=537672444]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="GameTitle" type="Label" parent="EventUI/ChapterCard/Margin/VBox" unique_id=1175066018]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.15, 0.15, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 36
+text = "हॉरर मिशन (HORROR MISSION)"
+horizontal_alignment = 1
+
+[node name="ChapterTitle" type="Label" parent="EventUI/ChapterCard/Margin/VBox" unique_id=15707840]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 26
+text = "★ अध्याय १: भानगढ़ किले का खूनी श्राप ★"
+horizontal_alignment = 1
+
+[node name="HSep" type="HSeparator" parent="EventUI/ChapterCard/Margin/VBox" unique_id=235231656]
+layout_mode = 2
+
+[node name="MissionBox" type="PanelContainer" parent="EventUI/ChapterCard/Margin/VBox" unique_id=388592746]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Mission")
+
+[node name="MissionMargin" type="MarginContainer" parent="EventUI/ChapterCard/Margin/VBox/MissionBox" unique_id=1337182620]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 20
+
+[node name="MissionVBox" type="VBoxContainer" parent="EventUI/ChapterCard/Margin/VBox/MissionBox/MissionMargin" unique_id=1730747832]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MissionHeading" type="Label" parent="EventUI/ChapterCard/Margin/VBox/MissionBox/MissionMargin/MissionVBox" unique_id=891039063]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+text = "🔴 मिशन विवरण (MISSION BRIEFING):"
+
+[node name="MissionContent" type="Label" parent="EventUI/ChapterCard/Margin/VBox/MissionBox/MissionMargin/MissionVBox" unique_id=1954991620]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.92, 1)
+theme_override_font_sizes/font_size = 16
+text = "• कृपाल को क्लासरूम से किसी अलौकिक साये ने भानगढ़ के शापित खंडहरों में खींच लिया है!
+• डेस्क पर पंजे के खूनी निशान और 'फाइंड मी एट भानगढ़' का खौफनाक संदेश मिला है।
+• साहिल और आशुतोष के साथ क्लासरूम का मुख्य गेट खोलो और बाहर खड़ी गाड़ी की तरफ बढ़ो!"
+autowrap_mode = 2
+
+[node name="ContinueBtn" type="Button" parent="EventUI/ChapterCard/Margin/VBox" unique_id=206121147]
+custom_minimum_size = Vector2(360, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_ActionBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ActionBtnHover")
+text = "🚪 गेट खोलो और बाहर निकलो (SPACE या CLICK)"
+
+[node name="BhangarhMapUI" type="ColorRect" parent="EventUI" unique_id=1688447409]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.03, 0.05, 0.97)
+
+[node name="Margin" type="MarginContainer" parent="EventUI/BhangarhMapUI" unique_id=1717068757]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="EventUI/BhangarhMapUI/Margin" unique_id=2125839998]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TopHeader" type="HBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox" unique_id=339446846]
+layout_mode = 2
+
+[node name="TitleBox" type="VBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader" unique_id=1766294844]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MapTitle" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader/TitleBox" unique_id=1126392705]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 23
+text = "📍 राजस्थान अन्वेषण मिशन — भानगढ़ किला (BHANGARH INVESTIGATION MAP)"
+
+[node name="MapSub" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader/TitleBox" unique_id=129403705]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "भारतीय पुरातत्व सर्वेक्षण (A.S.I.) निषिद्ध क्षेत्र • सूर्यास्त के बाद प्रवेश पर मृत्यु का श्राप"
+
+[node name="TelemetryPills" type="HBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader" unique_id=515595384]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PillEMF" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader/TelemetryPills" unique_id=359726684]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ईएमएफ: 5.8 mG ⚠️ ख़तरा]"
+
+[node name="PillTemp" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader/TelemetryPills" unique_id=79442751]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "[तापमान: -4°C ❄️]"
+
+[node name="PillGPS" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader/TelemetryPills" unique_id=576268179]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "[जीपीएस: सक्रिय 📡]"
+
+[node name="MainContentHBox" type="HBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox" unique_id=42760378]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="MapPanel" type="PanelContainer" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox" unique_id=1141416574]
+custom_minimum_size = Vector2(700, 410)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_MapFrame")
+
+[node name="MapTexture" type="TextureRect" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/MapPanel" unique_id=766504123]
+layout_mode = 2
+texture = ExtResource("9_map_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="MarkerOverlay" type="Control" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/MapPanel/MapTexture" unique_id=1264931709]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="KripalBeacon" type="Control" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/MapPanel/MapTexture/MarkerOverlay" unique_id=1176021272]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.2
+anchor_right = 0.5
+anchor_bottom = 0.2
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PingRing" type="ColorRect" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/MapPanel/MapTexture/MarkerOverlay/KripalBeacon" unique_id=2022946010]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -22.0
+offset_top = -22.0
+offset_right = 22.0
+offset_bottom = 22.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(22, 22)
+color = Color(1, 0.1, 0.1, 0.45)
+
+[node name="PinDot" type="ColorRect" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/MapPanel/MapTexture/MarkerOverlay/KripalBeacon" unique_id=159395064]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0.15, 0.15, 1)
+
+[node name="LocationLabel" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/MapPanel/MapTexture/MarkerOverlay/KripalBeacon" unique_id=601141324]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 24.0
+offset_top = -22.0
+offset_right = 290.0
+offset_bottom = 26.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 17
+text = "📍 कृपाल की अंतिम लोकेशन
+(तांत्रिक की गुफा / गहरा खंडहर) [CLICK]"
+
+[node name="BeaconButton" type="Button" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/MapPanel/MapTexture/MarkerOverlay/KripalBeacon" unique_id=1099648860]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -30.0
+offset_top = -30.0
+offset_right = 310.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+
+[node name="BodycamPanel" type="PanelContainer" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox" unique_id=213563880]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_BodycamFrame")
+
+[node name="BodycamVBox" type="VBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel" unique_id=1603744358]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BodycamHeader" type="HBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox" unique_id=1788574571]
+layout_mode = 2
+
+[node name="LiveDot" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox/BodycamHeader" unique_id=2135715101]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 18
+text = "●"
+
+[node name="LiveTitle" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox/BodycamHeader" unique_id=1372235701]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 16
+text = "लाइव फीड: कृपाल का व्यू (KRIPAL'S VIEW)"
+
+[node name="BodycamImage" type="TextureRect" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox" unique_id=1285685540]
+custom_minimum_size = Vector2(360, 210)
+layout_mode = 2
+texture = ExtResource("10_bodycam")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BodycamDetails" type="VBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox" unique_id=167485406]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="StatusLine1" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox/BodycamDetails" unique_id=96988195]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "• स्थिति: लापता / खूनी साये द्वारा अपहृत"
+
+[node name="StatusLine2" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox/BodycamDetails" unique_id=1405966325]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "• स्थान: भानगढ़ राजमहल के गहरे तहखाने"
+
+[node name="StatusLine3" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox/BodycamDetails" unique_id=326334818]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "• ऑडियो: भयानक सांसें और चीखें सुनाई दे रही हैं!"
+
+[node name="BottomBar" type="HBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox" unique_id=1605520275]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="DialogueFeed" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/BottomBar" unique_id=1070436961]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 16
+text = "साहिल: \"नक्शा देखो! कृपाल का जीपीएस सिग्नल भानगढ़ किले के सबसे गहरे खंडहरों से आ रहा है... वो वहीं कहीं फंसा है!\""
+autowrap_mode = 2
+
+[node name="EnterBhangarhBtn" type="Button" parent="EventUI/BhangarhMapUI/Margin/VBox/BottomBar" unique_id=1286173738]
+custom_minimum_size = Vector2(280, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_ActionBtn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ActionBtnHover")
+text = "🚗 भानगढ़ के लिए निकलें ➔"
