@@ -27,6 +27,10 @@ extends Node3D
 @onready var footstep_audio = $Audio/FootstepAudio
 @onready var scream_audio = $Audio/ScreamAudio
 @onready var heartbeat_audio = $Audio/HeartbeatAudio
+@onready var drag_audio = $Audio/DragAudio
+@onready var drag_voice_audio = $Audio/DragVoiceAudio
+@onready var boom_audio = $Audio/BoomAudio
+@onready var gasp_audio = $Audio/GaspAudio
 
 # --- UI ELEMENTS ---
 @onready var cutscene_ui = $CutsceneUI
@@ -38,8 +42,9 @@ extends Node3D
 @onready var subtitle = $CutsceneUI/Subtitle
 @onready var jumpscare_overlay = $CutsceneUI/JumpscareOverlay
 @onready var ghost_face = $CutsceneUI/JumpscareOverlay/GhostFace
-@onready var signal_lost_card = $CutsceneUI/SignalLostCard
-@onready var continue_btn = $CutsceneUI/SignalLostCard/Margin/VBox/ContinueBtn
+@onready var chapter_card = $CutsceneUI/ChapterCard
+@onready var continue_btn = $CutsceneUI/ChapterCard/Margin/VBox/BtnBox/ContinueBtn
+@onready var replay_btn = $CutsceneUI/ChapterCard/Margin/VBox/BtnBox/ReplayBtn
 
 # Audio preloads
 var voice_wake_1 = preload("res://audio/kripal_wake_1.mp3")
@@ -76,7 +81,7 @@ func _ready():
 	
 	# Initial UI Setup
 	jumpscare_overlay.visible = false
-	signal_lost_card.visible = false
+	chapter_card.visible = false
 	ghost_entity.visible = false
 	hud_container.visible = false
 	objective_banner.visible = false
@@ -86,6 +91,7 @@ func _ready():
 	
 	if continue_btn:
 		continue_btn.pressed.connect(on_continue_clicked)
+	if replay_btn: replay_btn.pressed.connect(on_replay_clicked)
 	if view_toggle_btn:
 		view_toggle_btn.pressed.connect(toggle_view)
 
@@ -406,6 +412,7 @@ func execute_jumpscare():
 
 	# 2D Screen Jumpscare face flashes and screams
 	jumpscare_overlay.visible = true
+	jumpscare_overlay.modulate.a = 1.0
 	ghost_face.scale = Vector2(0.8, 0.8)
 	var face_tw = create_tween()
 	face_tw.tween_property(ghost_face, "scale", Vector2(1.7, 1.7), 0.25).set_trans(Tween.TRANS_BACK)
@@ -414,29 +421,123 @@ func execute_jumpscare():
 	if scream_audio:
 		scream_audio.play()
 
-	# Camera violently crashes down to the stone floor
-	var drop_tw = create_tween().set_parallel(true)
-	drop_tw.tween_property(camera, "position:y", -1.2, 0.35)
-	drop_tw.tween_property(camera, "rotation_degrees:z", 55.0, 0.35)
-	
-	# Flashlight violently flickers out into pitch darkness
-	await get_tree().create_timer(0.18).timeout
+	# Flashlight violently flickers
+	await get_tree().create_timer(0.20).timeout
 	if flashlight: flashlight.visible = false
-	await get_tree().create_timer(0.1).timeout
-	if flashlight: flashlight.visible = true
 	await get_tree().create_timer(0.08).timeout
-	if flashlight: flashlight.visible = false
+	if flashlight: flashlight.visible = true
+	await get_tree().create_timer(0.12).timeout
 
-	await get_tree().create_timer(2.8).timeout
+	# --- STAGE 1: KRIPAL COLLAPSES & BEHOSH (FAINTING) ---
+	# Fade out 2D jumpscare overlay
+	var face_fade = create_tween()
+	face_fade.tween_property(jumpscare_overlay, "modulate:a", 0.0, 0.25)
 
-	# Cut to black & Signal Lost Card
+	# Gasp audio as Kripal gets struck down
+	if gasp_audio:
+		gasp_audio.play()
+
+	subtitle.text = "कृपाल लड़खड़ाकर ज़मीन पर गिर पड़ा... बेहोश होकर उसकी आँखें बंद होने लगीं..."
+	subtitle.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35))
+
+	# Kripal collapses flat onto the stone floor on his back
+	var fall_tw = create_tween().set_parallel(true)
+	fall_tw.tween_property(visual_model, "rotation_degrees:x", -85.0, 0.45).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	fall_tw.tween_property(kripal, "position:y", 0.12, 0.45)
+	if arm_l: fall_tw.tween_property(arm_l, "rotation_degrees:z", -35.0, 0.45)
+	if arm_r: fall_tw.tween_property(arm_r, "rotation_degrees:z", 35.0, 0.45)
+
+	# Camera falls sideways to the cold floor level beside Kripal
+	fall_tw.tween_property(camera_pivot, "position", Vector3(0.8, 0.35, -1.2), 0.45)
+	fall_tw.tween_property(camera, "position", Vector3(0, 0, 0), 0.45)
+	fall_tw.tween_property(camera, "rotation_degrees", Vector3(-4.0, 162.0, 15.0), 0.45)
+
+	# Flashlight falls to the floor pointing along Kripal's body towards his boots
+	if flashlight:
+		flashlight.visible = true
+		flashlight.position = Vector3(0.35, 0.15, -0.9)
+		flashlight.rotation_degrees = Vector3(6.0, 168.0, -10.0)
+		flashlight.light_energy = 2.4
+
+	# Eyelids close: Blink overlay fades nearly to black (losing consciousness)
+	var faint_tw = create_tween()
+	faint_tw.tween_property(blink_overlay, "color:a", 0.95, 0.9)
+	await faint_tw.finished
+	await get_tree().create_timer(0.6).timeout
+
+	# --- STAGE 2: DRAGGING SCENE (GHOST GRABBING KRIPAL'S LEGS & DRAGGING HIM) ---
+	# Eyelids flutter half-open (semi-conscious hazy vision)
+	var flutter_tw = create_tween()
+	flutter_tw.tween_property(blink_overlay, "color:a", 0.35, 1.2)
+
+	# Position Demon at Kripal's feet, hunched forward, claws gripping boots!
+	ghost_entity.position = kripal.position + Vector3(0.0, 0.1, 1.2)
+	ghost_entity.rotation_degrees = Vector3(28.0, 0.0, 0.0) # Hunched down over Kripal's legs
+	ghost_entity.visible = true
+	var ghost_arms = ghost_entity.get_node_or_null("Arms")
+	if ghost_arms:
+		ghost_arms.rotation_degrees = Vector3(45.0, 0.0, 0.0) # reaching down to grab feet!
+	if ghost_eyes: ghost_eyes.light_energy = 5.0
+	if demon_light: demon_light.light_energy = 4.0
+
+	# Play eerie dragging sound & faint struggling groan
+	if drag_audio:
+		drag_audio.play()
+	if drag_voice_audio:
+		drag_voice_audio.play()
+
+	subtitle.text = "खौफनाक साया कृपाल के पैर पकड़कर उसे अंधेरे तहखाने की तरफ घसीट रहा है..."
+	subtitle.add_theme_color_override("font_color", Color(1.0, 0.25, 0.25))
+
+	# Drag Kripal and Ghost backwards into the dark ruins over 5 seconds
+	var drag_dist = 6.0
+	var drag_tw = create_tween().set_parallel(true)
+	drag_tw.tween_property(kripal, "position:z", kripal.position.z + drag_dist, 5.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	drag_tw.tween_property(ghost_entity, "position:z", ghost_entity.position.z + drag_dist, 5.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	# Camera slowly tracks along ground following the tragic abduction
+	drag_tw.tween_property(camera_pivot, "position:z", camera_pivot.position.z + (drag_dist * 0.6), 5.0)
+
+	# Mid-drag dialogue subtitle
+	await get_tree().create_timer(1.8).timeout
+	subtitle.text = "कृपाल (कांपती हुई धीमी आवाज़): \"न... नहीं... छोड़ो मुझे... कोई बचाओ...\""
+	subtitle.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+
+	# Flashlight flickers out as he is dragged further into darkness
+	await get_tree().create_timer(1.8).timeout
+	if flashlight:
+		var fl_tw = create_tween()
+		fl_tw.tween_property(flashlight, "light_energy", 0.3, 1.2)
+
+	await drag_tw.finished
+
+	# --- STAGE 3: FADE TO BLACK & \"CHAPTER 1 SHURU\" ---
+	# Fade completely into pitch black
+	var black_tw = create_tween()
+	black_tw.tween_property(blink_overlay, "color:a", 1.0, 1.0)
+	await black_tw.finished
+
+	subtitle.text = ""
+	if drag_audio: drag_audio.stop()
+	if ambience_audio: ambience_audio.stop()
+	if heartbeat_audio: heartbeat_audio.stop()
+
+	await get_tree().create_timer(0.6).timeout
+
+	# Cinematic horror sub-bass boom
+	if boom_audio:
+		boom_audio.play()
+
+	# Show Black Screen with \"अध्याय 1 शुरू\" / CHAPTER 1
 	jumpscare_overlay.visible = false
-	signal_lost_card.visible = true
-	signal_lost_card.modulate.a = 0.0
+	chapter_card.visible = true
+	chapter_card.modulate.a = 0.0
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	
-	var card_tw = create_tween()
-	card_tw.tween_property(signal_lost_card, "modulate:a", 1.0, 1.0)
+
+	var card_fade = create_tween()
+	card_fade.tween_property(chapter_card, "modulate:a", 1.0, 1.2)
 
 func on_continue_clicked():
 	get_tree().change_scene_to_file("res://scenes/classroom.tscn")
+
+func on_replay_clicked():
+	get_tree().reload_current_scene()

@@ -13,6 +13,10 @@
 [ext_resource type="AudioStream" path="res://audio/stone_footsteps.wav" id="11_footsteps"]
 [ext_resource type="AudioStream" path="res://audio/kripal_scream.wav" id="12_scream"]
 [ext_resource type="AudioStream" path="res://audio/heartbeat.wav" id="13_heartbeat"]
+[ext_resource type="AudioStream" path="res://audio/body_drag.wav" id="14_body_drag"]
+[ext_resource type="AudioStream" path="res://audio/kripal_drag_groan.mp3" id="15_drag_voice"]
+[ext_resource type="AudioStream" path="res://audio/chapter_boom.wav" id="16_chapter_boom"]
+[ext_resource type="AudioStream" path="res://audio/player_gasp.wav" id="17_gasp"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_Bhangarh"]
 sky_top_color = Color(0.02, 0.02, 0.06, 1)
@@ -268,6 +272,22 @@ volume_db = 7.0
 [node name="HeartbeatAudio" type="AudioStreamPlayer" parent="Audio"]
 stream = ExtResource("13_heartbeat")
 volume_db = 0.0
+
+[node name="DragAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("14_body_drag")
+volume_db = 6.0
+
+[node name="DragVoiceAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("15_drag_voice")
+volume_db = 6.5
+
+[node name="BoomAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("16_chapter_boom")
+volume_db = 6.0
+
+[node name="GaspAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("17_gasp")
+volume_db = 5.0
 
 [node name="RuinsGeometry" type="Node3D" parent="."]
 
@@ -922,16 +942,16 @@ pivot_offset = Vector2(256, 256)
 texture = ExtResource("5_ghost")
 expand_mode = 1
 
-[node name="SignalLostCard" type="ColorRect" parent="CutsceneUI"]
+[node name="ChapterCard" type="ColorRect" parent="CutsceneUI"]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.01, 0.01, 0.98)
+color = Color(0.01, 0.01, 0.02, 1)
 
-[node name="Margin" type="MarginContainer" parent="CutsceneUI/SignalLostCard"]
+[node name="Margin" type="MarginContainer" parent="CutsceneUI/ChapterCard"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -941,63 +961,85 @@ theme_override_constants/margin_top = 40
 theme_override_constants/margin_right = 60
 theme_override_constants/margin_bottom = 40
 
-[node name="VBox" type="VBoxContainer" parent="CutsceneUI/SignalLostCard/Margin"]
+[node name="VBox" type="VBoxContainer" parent="CutsceneUI/ChapterCard/Margin"]
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 16
 
-[node name="AlertHeader" type="Label" parent="CutsceneUI/SignalLostCard/Margin/VBox"]
+[node name="Badge" type="Label" parent="CutsceneUI/ChapterCard/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.1, 0.1, 1)
+theme_override_colors/font_color = Color(1, 0.35, 0.35, 0.9)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 38
-text = "🔴 सिग्नल टूट गया — कृपाल का संपर्क समाप्त"
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 16
+text = "✦ भानगढ़ का शापित खंडहर ✦"
 horizontal_alignment = 1
 
-[node name="AlertSub" type="Label" parent="CutsceneUI/SignalLostCard/Margin/VBox"]
+[node name="AlertHeader" type="Label" parent="CutsceneUI/ChapterCard/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 18
-text = "लोकेशन: भानगढ़ किला — तांत्रिक का शापित तहखाना"
+theme_override_colors/font_color = Color(1, 0.15, 0.15, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 46
+text = "🔴 अध्याय 1 शुरू 🔴"
 horizontal_alignment = 1
 
-[node name="CardBox" type="PanelContainer" parent="CutsceneUI/SignalLostCard/Margin/VBox"]
+[node name="AlertSub" type="Label" parent="CutsceneUI/ChapterCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 18
+text = "CHAPTER 1 : THE EXPEDITION (भानगढ़ का रहस्य)"
+horizontal_alignment = 1
+
+[node name="CardBox" type="PanelContainer" parent="CutsceneUI/ChapterCard/Margin/VBox"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Card")
 
-[node name="CardMargin" type="MarginContainer" parent="CutsceneUI/SignalLostCard/Margin/VBox/CardBox"]
+[node name="CardMargin" type="MarginContainer" parent="CutsceneUI/ChapterCard/Margin/VBox/CardBox"]
 layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 22
 
-[node name="CardVBox" type="VBoxContainer" parent="CutsceneUI/SignalLostCard/Margin/VBox/CardBox/CardMargin"]
+[node name="CardVBox" type="VBoxContainer" parent="CutsceneUI/ChapterCard/Margin/VBox/CardBox/CardMargin"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 
-[node name="StatusInfo" type="Label" parent="CutsceneUI/SignalLostCard/Margin/VBox/CardBox/CardMargin/CardVBox"]
+[node name="StatusInfo" type="Label" parent="CutsceneUI/ChapterCard/Margin/VBox/CardBox/CardMargin/CardVBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 18
-text = "• अज्ञात अलौकिक साये द्वारा कृपाल पर जानलेवा हमला!"
+theme_override_colors/font_color = Color(1, 0.45, 0.45, 1)
+theme_override_font_sizes/font_size = 20
+text = "• कृपाल को खौफनाक साये द्वारा तहखाने में घसीट लिया गया है!"
 
-[node name="StatusDesc" type="Label" parent="CutsceneUI/SignalLostCard/Margin/VBox/CardBox/CardMargin/CardVBox"]
+[node name="StatusDesc" type="Label" parent="CutsceneUI/ChapterCard/Margin/VBox/CardBox/CardMargin/CardVBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 0.92, 0.92, 1)
+theme_override_colors/font_color = Color(0.92, 0.92, 0.94, 1)
 theme_override_font_sizes/font_size = 16
-text = "कृपाल की चीख के साथ उसका थर्मल कैमरा और बॉडीकैम पूरी तरह नष्ट हो गए हैं।
-साहिल और आशुतोष हथियारों और ट्रैप्स के साथ भानगढ़ के मुख्य दिल्ली गेट पर पहुँच रहे हैं!
-क्या वे कृपाल को उस तांत्रिक के श्राप से ज़िंदा बचा पाएंगे?!"
+text = "कृपाल की चीख के साथ उसका थर्मल कैमरा और रेडियो संपर्क पूरी तरह टूट गया है।
+दिल्ली गेट पर साहिल और आशुतोष भारी हथियारों, मोशन डिटेक्टर्स और ईएमएफ मीटर के साथ पहुंच चुके हैं!
+क्या वे अपने दोस्त को उस तांत्रिक के श्राप से ज़िंदा बचा पाएंगे?!"
 autowrap_mode = 2
 
-[node name="ContinueBtn" type="Button" parent="CutsceneUI/SignalLostCard/Margin/VBox"]
-custom_minimum_size = Vector2(380, 52)
+[node name="BtnBox" type="HBoxContainer" parent="CutsceneUI/ChapterCard/Margin/VBox"]
 layout_mode = 2
-size_flags_horizontal = 4
+alignment = 1
+theme_override_constants/separation = 20
+
+[node name="ContinueBtn" type="Button" parent="CutsceneUI/ChapterCard/Margin/VBox/BtnBox"]
+custom_minimum_size = Vector2(340, 52)
+layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 0.9, 0.3, 1)
 theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
-text = "➔ अध्याय २: भानगढ़ किले में प्रवेश करें"
+text = "➔ अध्याय 1 में प्रवेश करें (START MISSION)"
+
+[node name="ReplayBtn" type="Button" parent="CutsceneUI/ChapterCard/Margin/VBox/BtnBox"]
+custom_minimum_size = Vector2(260, 52)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_HUD")
+text = "🔄 कृपाल का दृश्य पुनः खेलें"
