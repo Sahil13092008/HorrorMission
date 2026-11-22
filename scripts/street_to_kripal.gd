@@ -149,7 +149,7 @@ var landmarks = {
 	"sahil_home": {"name": "साहिल निवास", "pos": Vector3(-11.0, 0, -22), "color": Color(1.0, 0.75, 0.2)},
 	"player_home": {"name": "मेरा घर", "pos": Vector3(11.0, 0, -42), "color": Color(0.3, 0.9, 0.4)},
 	"aashu_home": {"name": "आशुतोष निवास", "pos": Vector3(-11.0, 0, -62), "color": Color(0.85, 0.45, 1.0)},
-	"kripal": {"name": "कृपाल निवास", "pos": Vector3(8.5, 0, -85), "color": Color(1.0, 0.25, 0.25)},
+	"kripal": {"name": "कृपाल निवास", "pos": Vector3(9.0, 0, -85), "color": Color(1.0, 0.25, 0.25)},
 	"police": {"name": "पानसेमल पुलिस थाना", "pos": Vector3(11.5, 0, -235), "color": Color(0.2, 0.5, 1.0)}
 }
 
@@ -210,6 +210,9 @@ func _ready() -> void:
 	dialogues[6]["audio"] = stream_sahil_police
 	
 	update_camera_mode()
+	if player:
+		player.floor_snap_length = 0.5
+		player.floor_max_angle = deg_to_rad(45.0)
 	
 	if ambience_audio and stream_storm_ambience:
 		ambience_audio.stream = stream_storm_ambience
@@ -392,6 +395,14 @@ func trigger_lightning(is_close: bool = false) -> void:
 
 func _physics_process(delta: float) -> void:
 	pulse_time += delta
+	# Safety Floor Clamping - Permanently prevents falling through ground into void
+	if player and player.global_position.y < -0.10:
+		player.global_position.y = 0.05
+		player.velocity.y = 0.0
+	if kripal_car and kripal_car.global_position.y < -0.10:
+		kripal_car.global_position.y = 0.25
+		kripal_car.velocity.y = 0.0
+
 	_process_pedestrians(delta)
 	_update_radar_hud()
 	
@@ -430,8 +441,8 @@ func _physics_process(delta: float) -> void:
 		_handle_foot_movement(delta)
 		_update_walking_companions(delta)
 		
-		var dist_to_door: float = player.global_position.distance_to(Vector3(11.5, 0.5, -85.0))
-		var dist_to_car: float = player.global_position.distance_to(Vector3(5.2, 0.35, -85.0))
+		var dist_to_door: float = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
+		var dist_to_car: float = player.global_position.distance_to(Vector3(5.4, 0.35, -85.0))
 		
 		if (is_near_door or dist_to_door < 4.0) and not door_opened:
 			is_near_door = true
@@ -890,10 +901,10 @@ func start_door_interaction() -> void:
 	show_subtitle("🔔 [डोरबेल बजी: डिंग-डोंग]... अंदर से किसी के आने की आहट सुनाई दे रही है...", 2.5)
 	
 	var tw = create_tween()
-	tw.tween_property(player, "global_position", Vector3(0, 0.1, -93.6), 1.2)
-	tw.parallel().tween_property(sahil, "global_position", Vector3(-1.4, 0.1, -93.8), 1.2)
-	tw.parallel().tween_property(aashutosh, "global_position", Vector3(1.4, 0.1, -93.8), 1.2)
-	tw.parallel().tween_property(player, "rotation:y", deg_to_rad(180), 1.2)
+	tw.tween_property(player, "global_position", Vector3(8.0, 0.1, -85.0), 1.2)
+	tw.parallel().tween_property(sahil, "global_position", Vector3(7.6, 0.1, -86.2), 1.2)
+	tw.parallel().tween_property(aashutosh, "global_position", Vector3(7.6, 0.1, -83.8), 1.2)
+	tw.parallel().tween_property(player, "rotation:y", deg_to_rad(90), 1.2)
 	
 	await tw.finished
 	
@@ -901,13 +912,13 @@ func start_door_interaction() -> void:
 		home_door_audio.play()
 		
 	var door_tw = create_tween()
-	door_tw.tween_property(door_hinge, "rotation_degrees:y", 80.0, 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	door_tw.tween_property(door_hinge, "rotation_degrees:y", -85.0, 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	
 	if kripal_mummy:
 		kripal_mummy.visible = true
-		kripal_mummy.position.z = -0.6
+		kripal_mummy.position.x = -2.6
 		var mummy_tw = create_tween()
-		mummy_tw.tween_property(kripal_mummy, "position:z", 0.1, 1.2)
+		mummy_tw.tween_property(kripal_mummy, "position:x", -2.9, 1.2)
 		
 	await door_tw.finished
 	start_dialogue_sequence()
@@ -956,11 +967,11 @@ func end_dialogue_sequence() -> void:
 	# Aunty, Sahil, Aashutosh walk towards the car
 	var walk_tw = create_tween()
 	if kripal_mummy:
-		walk_tw.parallel().tween_property(kripal_mummy, "global_position", Vector3(4.2, 0.1, -84.2), 1.6)
+		walk_tw.parallel().tween_property(kripal_mummy, "global_position", Vector3(4.5, 0.1, -84.2), 1.6)
 	if sahil:
-		walk_tw.parallel().tween_property(sahil, "global_position", Vector3(4.4, 0.1, -85.8), 1.6)
+		walk_tw.parallel().tween_property(sahil, "global_position", Vector3(4.5, 0.1, -85.8), 1.6)
 	if aashutosh:
-		walk_tw.parallel().tween_property(aashutosh, "global_position", Vector3(6.0, 0.1, -85.8), 1.6)
+		walk_tw.parallel().tween_property(aashutosh, "global_position", Vector3(6.2, 0.1, -85.8), 1.6)
 		
 	objective_banner.text = "✦ कृपाल की कार में बैठें [E] और पानसेमल पुलिस स्टेशन ड्राइव करें"
 	show_subtitle("👩 कृपाल की माँ: 'कृपाल की गाड़ी बाहर खड़ी है... चलो सब इसमें बैठो, हम अभी पुलिस स्टेशन चलते हैं!'", 4.5)
