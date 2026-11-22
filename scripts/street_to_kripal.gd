@@ -237,7 +237,12 @@ func start_school_exit_intro() -> void:
 	cutscene_active = true
 	objective_banner.text = "✦ सेंट ऑगस्टीन स्कूल, पानसेमल से प्रस्थान • तूफान और तेज बिजलियां!"
 	
-	# Initial lightning strike illuminates St. Augustine School
+	# Cinematic camera: in front of boys looking back at St. Augustine School!
+	visual_model.visible = true
+	camera.position = Vector3(0, 1.35, -4.6)
+	camera.rotation_degrees = Vector3(-6.0, 180.0, 0.0)
+	
+	# Initial lightning strike illuminates St. Augustine School in background
 	await get_tree().create_timer(0.4).timeout
 	trigger_lightning(true)
 	
@@ -247,7 +252,7 @@ func start_school_exit_intro() -> void:
 		voice_audio.stop()
 		voice_audio.stream = stream_sahil_warning
 		voice_audio.play()
-	show_subtitle("👦 साहिल: "मौसम अचानक कितना भयानक हो गया है... आसमान में बिजलियां कड़क रही हैं!"", 3.2)
+	show_subtitle("👦 साहिल: 'मौसम अचानक कितना भयानक हो गया है... आसमान में बिजलियां कड़क रही हैं!'", 3.2)
 	
 	# Aashutosh urgency
 	await get_tree().create_timer(3.4).timeout
@@ -255,7 +260,7 @@ func start_school_exit_intro() -> void:
 		voice_audio.stop()
 		voice_audio.stream = stream_aashu_hurry
 		voice_audio.play()
-	show_subtitle("👓 आशुतोष: "हाँ भाई, जल्दी साइकिल पे बैठो! तूफान आने से पहले कृपाल के घर पहुँचना है!"", 3.5)
+	show_subtitle("👓 आशुतोष: 'हाँ भाई, जल्दी साइकिल पे बैठो! तूफान आने से पहले कृपाल के घर पहुँचना है!'", 3.5)
 	
 	# Player gives go signal
 	await get_tree().create_timer(3.7).timeout
@@ -263,9 +268,16 @@ func start_school_exit_intro() -> void:
 		voice_audio.stop()
 		voice_audio.stream = stream_player_go
 		voice_audio.play()
-	show_subtitle("👤 खिलाड़ी: "चलो भाइयो, तेजी से साइकिल चलाओ! [W, A, S, D से साइकिल चलाएं | B से घंटी बजाएं]"", 3.2)
+	show_subtitle("👤 खिलाड़ी: 'चलो भाइयो, तेजी से साइकिल चलाओ! [W, A, S, D से साइकिल चलाएं | B से घंटी बजाएं]'", 3.2)
 	
-	await get_tree().create_timer(3.2).timeout
+	await get_tree().create_timer(2.6).timeout
+	
+	# Smooth camera sweep to 3rd person riding position behind the player
+	var cam_tw = create_tween().set_parallel(true)
+	cam_tw.tween_property(camera, "position", Vector3(0, 0.75, 3.4), 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	cam_tw.tween_property(camera, "rotation_degrees", Vector3.ZERO, 1.4).set_trans(Tween.TRANS_QUAD)
+	
+	await cam_tw.finished
 	cutscene_active = false
 	objective_banner.text = "🚲 मिशन: तीनों दोस्त साइकिल से कृपाल के घर की ओर बढ़ें [W, A, S, D | SHIFT तेज | B घंटी]"
 
@@ -360,11 +372,12 @@ func trigger_lightning(is_close: bool = false) -> void:
 		tw_ui.tween_property(lightning_flash_ui, "color:a", flash_alpha * 0.8, 0.08)
 		tw_ui.tween_property(lightning_flash_ui, "color:a", 0.0, 0.45).set_ease(Tween.EASE_OUT)
 		
-	if is_close and camera:
+	if is_close and camera and not cutscene_active:
+		var base_y = camera.position.y
 		var cam_tw = create_tween()
-		cam_tw.tween_property(camera, "position:y", 0.08, 0.04)
-		cam_tw.tween_property(camera, "position:y", -0.06, 0.04)
-		cam_tw.tween_property(camera, "position:y", 0.0, 0.08)
+		cam_tw.tween_property(camera, "position:y", base_y + 0.08, 0.04)
+		cam_tw.tween_property(camera, "position:y", base_y - 0.06, 0.04)
+		cam_tw.tween_property(camera, "position:y", base_y, 0.08)
 		
 	await tw.finished
 	is_lightning_flashing = false

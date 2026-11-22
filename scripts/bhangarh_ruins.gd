@@ -120,6 +120,12 @@ func _input(event):
 		camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, deg_to_rad(-65), deg_to_rad(75))
 
 	if event is InputEventKey and event.pressed:
+		# Advance Chapter Card with Space or Enter
+		if chapter_card and chapter_card.visible:
+			if event.keycode in [KEY_SPACE, KEY_ENTER]:
+				on_continue_clicked()
+				return
+
 		# Toggle 1st / 3rd Person View with Key V
 		if event.keycode == KEY_V and is_control_active and not is_jumpscare_triggered:
 			toggle_view()
@@ -135,8 +141,11 @@ func _input(event):
 			else:
 				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
-	# Click to recapture mouse
+	# Click to advance Chapter Card or recapture mouse
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if chapter_card and chapter_card.visible:
+			on_continue_clicked()
+			return
 		if is_control_active and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not is_jumpscare_triggered:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
