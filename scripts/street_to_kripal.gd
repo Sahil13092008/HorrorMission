@@ -410,12 +410,18 @@ func _physics_process(delta: float) -> void:
 		
 	# MODE 1: CYCLING
 	if current_mode == PlayerMode.CYCLING:
+		var dist_to_kripal: int = int(abs(player.global_position.z - (-85.0)))
 		# Check if approaching Kripal's house to show dismount option
-		if player.global_position.z <= -78.0:
+		if player.global_position.z <= -75.0:
 			can_dismount = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚲 [E] दबाकर साइकिल से उतरें (PRESS [E] TO DISMOUNT BICYCLE)"
+			if objective_banner:
+				objective_banner.text = "🏠 KRIPAL'S HOUSE REACHED! PRESS [E] TO DISMOUNT & GO TO FRONT DOOR"
+		else:
+			if objective_banner:
+				objective_banner.text = "🚲 RIDE BICYCLE TO KRIPAL'S RESIDENCE [DISTANCE: %d M] — FOLLOW GOLDEN BEACON" % dist_to_kripal
 				
 		_handle_cycling_movement(delta)
 		
@@ -424,17 +430,27 @@ func _physics_process(delta: float) -> void:
 		_handle_foot_movement(delta)
 		_update_walking_companions(delta)
 		
-		if is_near_door and not door_opened:
+		var dist_to_door: float = player.global_position.distance_to(Vector3(11.5, 0.5, -85.0))
+		var dist_to_car: float = player.global_position.distance_to(Vector3(5.2, 0.35, -85.0))
+		
+		if (is_near_door or dist_to_door < 4.0) and not door_opened:
+			is_near_door = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🔔 [E] दबाकर डोरबेल बजाएं (PRESS [E] TO RING DOORBELL)"
-		elif is_near_car and door_opened:
+		elif (is_near_car or dist_to_car < 4.0) and door_opened:
+			is_near_car = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚗 [E] दबाकर कार में बैठें और चलाएं (PRESS [E] TO DRIVE CAR)"
 		else:
 			if action_prompt and not can_advance_dialogue:
-				action_prompt.visible = false
+				if not door_opened:
+					action_prompt.visible = true
+					action_prompt.text = "🚶 कृपाल के घर के दरवाजे की तरफ बढ़ें और घंटी बजाएं [E]"
+				else:
+					action_prompt.visible = true
+					action_prompt.text = "🚗 सामने खड़ी कार की तरफ बढ़ें और [E] दबाएं"
 				
 	# MODE 3: DRIVING CAR
 	elif current_mode == PlayerMode.DRIVING_CAR:
@@ -740,10 +756,87 @@ func toggle_town_map() -> void:
 
 func _on_map_canvas_draw() -> void:
 	if not map_canvas: return
-	var c_size = map_canvas.size
-	map_canvas.draw_rect(Rect2(Vector2.ZERO, c_size), Color(0.05, 0.08, 0.12, 1.0))
-	var road_center_x = c_size.x * 0.5
-	map_canvas.draw_line(Vector2(road_center_x, 40), Vector2(road_center_x, c_size.y - 40), Color(0.85, 0.75, 0.35, 0.7), 2.0)
+	var c_size: Vector2 = map_canvas.size
+	var font: Font = ThemeDB.fallback_font
+	
+	# Background
+	map_canvas.draw_rect(Rect2(Vector2.ZERO, c_size), Color(0.04, 0.06, 0.10, 0.98))
+	
+	# Map Title Header
+	map_canvas.draw_string(font, Vector2(20, 28), "🗺️ PANSEMAL TOWN MAP (पानसेमल शहर का नक्शा)", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color(1.0, 0.85, 0.3))
+	map_canvas.draw_string(font, Vector2(c_size.x - 170, 28), "[M] TO CLOSE MAP", HORIZONTAL_ALIGNMENT_RIGHT, -1, 12, Color(0.7, 0.7, 0.7))
+	
+	var road_x: float = c_size.x * 0.44
+	var map_top_y: float = 48.0
+	var map_bot_y: float = c_size.y - 28.0
+	var road_len: float = map_bot_y - map_top_y
+	
+	# Road Asphalt Body
+	map_canvas.draw_rect(Rect2(road_x - 24.0, map_top_y, 48.0, road_len), Color(0.18, 0.20, 0.23, 1.0))
+	# Road Curbs/Edges
+	map_canvas.draw_line(Vector2(road_x - 24.0, map_top_y), Vector2(road_x - 24.0, map_bot_y), Color(0.75, 0.75, 0.75, 0.8), 2.0)
+	map_canvas.draw_line(Vector2(road_x + 24.0, map_top_y), Vector2(road_x + 24.0, map_bot_y), Color(0.75, 0.75, 0.75, 0.8), 2.0)
+	
+	# Dashed Yellow Center Stripe
+	var dash_step: float = 14.0
+	var y_pos: float = map_top_y
+	while y_pos < map_bot_y:
+		map_canvas.draw_line(Vector2(road_x, y_pos), Vector2(road_x, min(y_pos + 8.0, map_bot_y)), Color(0.95, 0.85, 0.35, 0.85), 2.0)
+		y_pos += dash_step
+		
+	# Helper lambda to map 3D Z to map Y
+	var z_to_y = func(z_coord: float) -> float:
+		var factor = (25.0 - z_coord) / (25.0 - (-245.0))
+		return lerp(map_top_y + 10.0, map_bot_y - 15.0, clamp(factor, 0.0, 1.0))
+		
+	# Landmark definitions on Map
+	var map_items = [
+		{"name": "🏫 सेंट ऑगस्टीन स्कूल (SCHOOL)", "z": 20.0, "right": true, "col": Color(0.9, 0.75, 0.3), "target": false},
+		{"name": "🏠 साहिल निवास (SAHIL'S HOUSE)", "z": -22.0, "right": false, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "📚 सार्वजनिक वाचनालय (LIBRARY)", "z": -22.0, "right": true, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "🏠 मेरा घर (HERO'S HOUSE)", "z": -40.0, "right": true, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "🎬 संगम सिनेमा (SANGAM CINEMA)", "z": -48.0, "right": false, "col": Color(1.0, 0.6, 0.2), "target": false},
+		{"name": "🍬 स्वीट्स भण्डार (SWEETS)", "z": -60.0, "right": true, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "🏠 आशुतोष निवास (AASHU'S HOUSE)", "z": -72.0, "right": false, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "★ 🏠 कृपाल निवास एवं कार 🚗 [TARGET 1] ★", "z": -85.0, "right": true, "col": Color(1.0, 0.82, 0.15), "target": true},
+		{"name": "🏥 प्राथमिक स्वास्थ्य केंद्र (CLINIC)", "z": -96.0, "right": false, "col": Color(0.3, 0.9, 0.5), "target": false},
+		{"name": "🏬 सुपर बाज़ार (SUPER BAZAR)", "z": -112.0, "right": true, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "☕ पाटीदार बेकरी (BAKERY)", "z": -126.0, "right": false, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "💊 संजीवनी मेडिकल (MEDICAL)", "z": -140.0, "right": true, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "🏦 भारतीय स्टेट बैंक & ATM (SBI)", "z": -160.0, "right": false, "col": Color(0.3, 0.6, 1.0), "target": false},
+		{"name": "🔧 शर्मा ऑटो गैराज (GARAGE)", "z": -172.0, "right": true, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "📱 इलेक्ट्रॉनिक्स (ELECTRONICS)", "z": -192.0, "right": false, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "📮 मुख्य डाकघर (POST OFFICE)", "z": -196.0, "right": true, "col": Color(1.0, 0.4, 0.4), "target": false},
+		{"name": "🏛️ नगर परिषद (TOWN HALL)", "z": -225.0, "right": false, "col": Color(0.8, 0.8, 0.8), "target": false},
+		{"name": "★ 🚓 पानसेमल पुलिस थाना (POLICE) [TARGET 2] ★", "z": -235.0, "right": true, "col": Color(0.2, 0.75, 1.0), "target": true}
+	]
+	
+	for item in map_items:
+		var item_y = z_to_y.call(item["z"])
+		var box_x = road_x + 32.0 if item["right"] else road_x - 175.0
+		var box_w = 142.0
+		var box_h = 18.0
+		
+		# Draw connector line from road to building
+		map_canvas.draw_line(Vector2(road_x + (24.0 if item["right"] else -24.0), item_y), Vector2(box_x + (0 if item["right"] else box_w), item_y), Color(0.5, 0.5, 0.5, 0.4), 1.0)
+		
+		# Draw box
+		if item["target"]:
+			# Highlight target with glowing border
+			map_canvas.draw_rect(Rect2(box_x - 2, item_y - 9, box_w + 4, box_h + 2), item["col"], false, 2.0)
+			map_canvas.draw_rect(Rect2(box_x, item_y - 8, box_w, box_h), Color(item["col"].r, item["col"].g, item["col"].b, 0.25))
+			map_canvas.draw_string(font, Vector2(box_x + 3, item_y + 4), item["name"], HORIZONTAL_ALIGNMENT_LEFT, -1, 10, item["col"])
+		else:
+			map_canvas.draw_rect(Rect2(box_x, item_y - 7, box_w, box_h), Color(0.1, 0.14, 0.2, 0.75))
+			map_canvas.draw_string(font, Vector2(box_x + 3, item_y + 4), item["name"], HORIZONTAL_ALIGNMENT_LEFT, -1, 9, item["col"])
+			
+	# Draw Live Player Position on Map
+	if player:
+		var p_y = z_to_y.call(player.global_position.z)
+		var p_x = road_x + clamp(player.global_position.x * 2.5, -20.0, 20.0)
+		map_canvas.draw_circle(Vector2(p_x, p_y), 6.0, Color(0.2, 1.0, 0.3, 1.0))
+		map_canvas.draw_arc(Vector2(p_x, p_y), 8.5, 0, TAU, 16, Color(1, 1, 1, 0.9), 2.0)
+		map_canvas.draw_string(font, Vector2(p_x + 11, p_y + 4), "◄ तुम यहाँ हो (YOU)", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.2, 1.0, 0.3))
 
 func toggle_camera_mode() -> void:
 	is_first_person = not is_first_person
