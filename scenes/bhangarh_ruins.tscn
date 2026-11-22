@@ -27,12 +27,12 @@ sky_material = SubResource("ProceduralSkyMaterial_Bhangarh")
 background_mode = 2
 sky = SubResource("Sky_Bhangarh")
 ambient_light_source = 2
-ambient_light_color = Color(0.14, 0.16, 0.24, 1)
-ambient_light_energy = 0.35
+ambient_light_color = Color(0.26, 0.30, 0.44, 1)
+ambient_light_energy = 0.85
 fog_enabled = true
-fog_light_color = Color(0.06, 0.04, 0.08, 1)
-fog_density = 0.05
-fog_sky_affect = 0.6
+fog_light_color = Color(0.08, 0.08, 0.15, 1)
+fog_density = 0.02
+fog_sky_affect = 0.5
 
 [sub_resource type="StandardMaterial3D" id="Mat_StoneFloor"]
 albedo_color = Color(0.75, 0.7, 0.65, 1)
@@ -179,9 +179,9 @@ environment = SubResource("Environment_Bhangarh")
 
 [node name="Moonlight" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 5, 8, 5)
-light_color = Color(0.65, 0.72, 0.88, 1)
-light_energy = 0.55
-shadow_enabled = true
+light_color = Color(0.70, 0.80, 1.0, 1)
+light_energy = 1.1
+shadow_enabled = false
 
 [node name="Audio" type="Node" parent="."]
 
@@ -576,31 +576,30 @@ size = Vector3(0.18, 0.9, 0.18)
 material = SubResource("Mat_DarkGhost")
 
 [node name="CutsceneCamera" type="Camera3D" parent="."]
-transform = Transform3D(0.965926, 0.0669873, -0.25, 0, 0.965926, 0.258819, 0.258819, -0.25, 0.933013, 0, 0.45, 0)
+transform = Transform3D(0.857, -0.150, 0.493, 0, 0.957, 0.291, -0.515, -0.249, 0.820, 0.9, 0.55, 1.5)
 current = true
 
 [node name="Flashlight" type="SpotLight3D" parent="CutsceneCamera"]
-light_energy = 2.4
-spot_range = 14.0
-spot_angle = 45.0
+light_color = Color(0.95, 0.95, 1.0, 1)
+light_energy = 3.0
+spot_range = 18.0
+spot_angle = 44.0
+
+[node name="FloorLantern" type="SpotLight3D" parent="."]
+transform = Transform3D(0.966, 0, -0.259, 0, 1, 0, 0.259, 0, 0.966, 0.8, 0.15, 0.9)
+light_color = Color(1.0, 0.92, 0.80, 1)
+light_energy = 3.8
+spot_range = 12.0
+spot_angle = 55.0
 
 [node name="CutsceneUI" type="CanvasLayer" parent="."]
 
-[node name="BlinkTop" type="ColorRect" parent="CutsceneUI"]
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 360.0
-grow_horizontal = 2
-color = Color(0, 0, 0, 1)
-
-[node name="BlinkBottom" type="ColorRect" parent="CutsceneUI"]
-anchors_preset = 12
-anchor_top = 1.0
+[node name="BlinkOverlay" type="ColorRect" parent="CutsceneUI"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -360.0
 grow_horizontal = 2
-grow_vertical = 0
+grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
 [node name="Vignette" type="TextureRect" parent="CutsceneUI"]

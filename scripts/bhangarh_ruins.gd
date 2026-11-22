@@ -2,6 +2,7 @@ extends Node3D
 
 @onready var camera = $CutsceneCamera
 @onready var flashlight = $CutsceneCamera/Flashlight
+@onready var floor_lantern = $FloorLantern
 @onready var kripal_model = $KripalModel
 @onready var ghost_entity = $GhostEntity
 @onready var ghost_eyes = $GhostEntity/GhostHead/EyeLight
@@ -16,8 +17,7 @@ extends Node3D
 
 # Cutscene UI
 @onready var cutscene_ui = $CutsceneUI
-@onready var blink_top = $CutsceneUI/BlinkTop
-@onready var blink_bottom = $CutsceneUI/BlinkBottom
+@onready var blink_overlay = $CutsceneUI/BlinkOverlay
 @onready var subtitle = $CutsceneUI/Subtitle
 @onready var jumpscare_overlay = $CutsceneUI/JumpscareOverlay
 @onready var ghost_face = $CutsceneUI/JumpscareOverlay/GhostFace
@@ -33,7 +33,6 @@ var original_cam_pos: Vector3 = Vector3.ZERO
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	original_cam_pos = camera.position
 	
 	# Initial cutscene setup
 	jumpscare_overlay.visible = false
@@ -42,15 +41,16 @@ func _ready():
 	
 	# Kripal lying flat unconscious on cold stone floor
 	kripal_model.position = Vector3(0.0, 0.15, 0.0)
-	kripal_model.rotation_degrees = Vector3(0.0, 0.0, 85.0)
+	kripal_model.rotation_degrees = Vector3(0.0, 90.0, 85.0)
 	
-	# Camera on ground level looking up sideways
-	camera.position = Vector3(0.0, 0.35, 0.0)
-	camera.rotation_degrees = Vector3(12.0, 0.0, -22.0)
+	# Camera on ground level in front-side of Kripal looking at him
+	camera.position = Vector3(1.1, 0.55, 1.4)
+	camera.look_at(Vector3(0.0, 0.25, 0.0), Vector3.UP)
+	original_cam_pos = camera.position
 	
-	# Blink overlay covers screen
-	blink_top.position.y = 0
-	blink_bottom.position.y = 360
+	# Blink overlay covers screen initially in black
+	blink_overlay.visible = true
+	blink_overlay.modulate.a = 1.0
 	
 	if continue_btn:
 		continue_btn.pressed.connect(on_continue_clicked)
@@ -73,17 +73,19 @@ func _process(delta):
 func start_bhangarh_cutscene():
 	# 1. Groggily waking up in pitch darkness
 	subtitle.text = "..."
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(0.8).timeout
 	
-	# Eyes blinking open
+	# Realistic eyelid blinking: open slightly, close, then open fully
 	var blink_tw = create_tween()
-	blink_tw.tween_property(blink_top, "position:y", -240.0, 1.2)
-	blink_tw.parallel().tween_property(blink_bottom, "position:y", 620.0, 1.2)
+	blink_tw.tween_property(blink_overlay, "modulate:a", 0.4, 0.5)
+	blink_tw.tween_property(blink_overlay, "modulate:a", 0.8, 0.3)
+	blink_tw.tween_property(blink_overlay, "modulate:a", 0.0, 0.8)
 	await blink_tw.finished
+	blink_overlay.visible = false
 
 	await get_tree().create_timer(0.3).timeout
 
-	# 1st dialogue: Groggy awakening
+	# 1st dialogue: Groggy awakening while lying down
 	subtitle.text = "कृपाल: \"अरे... मेरा सिर बहुत दर्द कर रहा है... मैं कहाँ आ गया?!\""
 	subtitle.add_theme_color_override("font_color", Color(0.92, 0.92, 0.92))
 
@@ -94,28 +96,27 @@ func start_bhangarh_cutscene():
 
 	await get_tree().create_timer(0.4).timeout
 
-	# Kripal stands up and camera rises to eye level
+	# 2. Kripal stands up and camera rises into dramatic over-the-shoulder view
 	var rise_tw = create_tween().set_parallel(true)
-	rise_tw.tween_property(kripal_model, "position:y", 0.0, 1.8).set_trans(Tween.TRANS_QUAD)
-	rise_tw.tween_property(kripal_model, "rotation_degrees:z", 0.0, 1.8).set_trans(Tween.TRANS_QUAD)
-	rise_tw.tween_property(camera, "position", Vector3(0.0, 1.5, 0.0), 1.8).set_trans(Tween.TRANS_QUAD)
-	rise_tw.tween_property(camera, "rotation_degrees", Vector3(0.0, 0.0, 0.0), 1.8).set_trans(Tween.TRANS_QUAD)
+	rise_tw.tween_property(kripal_model, "position:y", 0.0, 2.0).set_trans(Tween.TRANS_QUAD)
+	rise_tw.tween_property(kripal_model, "rotation_degrees", Vector3(0.0, 180.0, 0.0), 2.0).set_trans(Tween.TRANS_QUAD)
+	rise_tw.tween_property(camera, "position", Vector3(0.35, 1.55, 1.4), 2.0).set_trans(Tween.TRANS_QUAD)
+	rise_tw.tween_property(camera, "rotation_degrees", Vector3(-4.0, 0.0, 0.0), 2.0).set_trans(Tween.TRANS_QUAD)
 	
 	await rise_tw.finished
 	original_cam_pos = camera.position
 
-	# 2. Looking around confused at the ancient pillars and shadows
+	# Looking around confused at the ancient pillars and shadows
 	subtitle.text = "कृपाल: \"ये... ये कैसी जगह है? चारों तरफ सिर्फ अंधेरा और पुराने पत्थर हैं...\""
 	subtitle.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 	
-	# Pan left looking at pillars
+	# Kripal turns head left and right examining the eerie ruins
 	var look_tw = create_tween()
-	look_tw.tween_property(camera, "rotation_degrees:y", 38.0, 1.3).set_trans(Tween.TRANS_SINE)
+	look_tw.tween_property(kripal_model, "rotation_degrees:y", 215.0, 1.2).set_trans(Tween.TRANS_SINE)
 	look_tw.tween_interval(0.4)
-	# Pan right looking at broken archway
-	look_tw.tween_property(camera, "rotation_degrees:y", -42.0, 1.5).set_trans(Tween.TRANS_SINE)
+	look_tw.tween_property(kripal_model, "rotation_degrees:y", 145.0, 1.4).set_trans(Tween.TRANS_SINE)
 	look_tw.tween_interval(0.3)
-	look_tw.tween_property(camera, "rotation_degrees:y", 0.0, 0.9).set_trans(Tween.TRANS_SINE)
+	look_tw.tween_property(kripal_model, "rotation_degrees:y", 180.0, 0.8).set_trans(Tween.TRANS_SINE)
 	
 	await look_tw.finished
 	await get_tree().create_timer(0.3).timeout
@@ -135,7 +136,7 @@ func start_bhangarh_cutscene():
 
 	await get_tree().create_timer(0.4).timeout
 
-	# 4. Taking cautious footsteps forward
+	# 4. Taking cautious footsteps forward down the ruined hallway
 	subtitle.text = "कृपाल: \"मुझे यहाँ से बाहर निकलने का रास्ता ढूँढना होगा...\""
 	subtitle.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 
@@ -143,8 +144,8 @@ func start_bhangarh_cutscene():
 		footstep_audio.play()
 
 	var walk_tw = create_tween().set_parallel(true)
-	walk_tw.tween_property(camera, "position:z", -2.6, 2.4)
-	walk_tw.tween_property(kripal_model, "position:z", -2.6, 2.4)
+	walk_tw.tween_property(kripal_model, "position:z", -2.8, 2.5)
+	walk_tw.tween_property(camera, "position:z", -1.4, 2.5)
 	
 	await walk_tw.finished
 	original_cam_pos = camera.position
@@ -152,14 +153,14 @@ func start_bhangarh_cutscene():
 	# 5. Sudden dead silence & Terrifying Demonic Whisper from behind!
 	if footstep_audio: footstep_audio.stop()
 	
-	# Ambience fades to dead silence
+	# Ambience fades down into dead silence
 	if ambience_audio:
 		var tw_mute = create_tween()
 		tw_mute.tween_property(ambience_audio, "volume_db", -30.0, 0.6)
 
 	await get_tree().create_timer(0.6).timeout
 
-	# Chilling whisper: "Kripaaaal..."
+	# Chilling whisper: "...कृपा...ल..."
 	subtitle.text = "खौफनाक साया (गहरी फुसफुसाहट): \"...कृपा...ल...\""
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.2, 0.2))
 
@@ -186,16 +187,17 @@ func start_bhangarh_cutscene():
 	await get_tree().create_timer(0.3).timeout
 
 	# 6. Turning around 180 degrees & JUMPSCARE!
-	# Enable ghost entity behind him
 	ghost_entity.visible = true
-	ghost_entity.position = Vector3(0.0, 1.4, 1.8)
-	if ghost_eyes: ghost_eyes.light_energy = 5.0
+	ghost_entity.position = Vector3(0.0, 1.4, 0.8)
+	if ghost_eyes: ghost_eyes.light_energy = 6.0
 
 	subtitle.text = ""
 
-	# Camera whips around 180 degrees!
-	var turn_tw = create_tween()
-	turn_tw.tween_property(camera, "rotation_degrees:y", 180.0, 1.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Camera & Kripal whip around 180 degrees to face the archway!
+	var turn_tw = create_tween().set_parallel(true)
+	turn_tw.tween_property(kripal_model, "rotation_degrees:y", 0.0, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	turn_tw.tween_property(camera, "position", Vector3(0.0, 1.45, -2.0), 0.9).set_trans(Tween.TRANS_QUAD)
+	turn_tw.tween_property(camera, "rotation_degrees", Vector3(6.0, 180.0, 0.0), 0.9).set_trans(Tween.TRANS_QUAD)
 	
 	await turn_tw.finished
 
