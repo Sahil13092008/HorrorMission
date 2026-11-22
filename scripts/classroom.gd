@@ -626,7 +626,7 @@ func on_enter_bhangarh_clicked():
 	
 	if enter_bhangarh_btn:
 		enter_bhangarh_btn.disabled = true
-		enter_bhangarh_btn.text = "🚨 कृपाल का दृश्य लोड हो रहा है..."
+		enter_bhangarh_btn.text = "🚨 LOADING KRIPAL'S POV..."
 	if beacon_btn:
 		beacon_btn.disabled = true
 

@@ -638,9 +638,9 @@ func show_subtitle(text: String, duration: float) -> void:
 func _on_start_police_pressed() -> void:
 	if start_police_btn:
 		start_police_btn.disabled = true
-		start_police_btn.text = "🚓 पानसेमल पुलिस स्टेशन की ओर प्रस्थान..."
-	# Transitions to Bhangarh Ruins or next mission stage
-	get_tree().change_scene_to_file("res://scenes/bhangarh_ruins.tscn")
+		start_police_btn.text = "🚓 RUSHING TO PANSEMAL POLICE STATION..."
+	# Transitions to next mission stage or loops to classroom/ruins
+	get_tree().change_scene_to_file("res://scenes/classroom.tscn")
 
 func _on_replay_street_pressed() -> void:
 	get_tree().reload_current_scene()

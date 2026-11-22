@@ -556,7 +556,7 @@ func execute_jumpscare():
 func on_continue_clicked():
 	if continue_btn:
 		continue_btn.disabled = true
-		continue_btn.text = "🚗 कृपाल के घर की ओर प्रस्थान..."
+		continue_btn.text = "➔ PROCEEDING TO KRIPAL'S HOUSE..."
 	get_tree().change_scene_to_file("res://scenes/street_to_kripal.tscn")
 
 func on_replay_clicked():

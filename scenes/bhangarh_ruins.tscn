@@ -981,7 +981,7 @@ theme_override_colors/font_color = Color(1, 0.35, 0.35, 0.9)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 16
-text = "✦ भानगढ़ का शापित खंडहर ✦"
+text = "✦ CHAPTER 1 : PARANORMAL ABDUCTION ✦"
 horizontal_alignment = 1
 
 [node name="AlertHeader" type="Label" parent="CutsceneUI/ChapterCard/Margin/VBox"]
@@ -990,14 +990,14 @@ theme_override_colors/font_color = Color(1, 0.15, 0.15, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 12
 theme_override_font_sizes/font_size = 46
-text = "🔴 कृपाल का रहस्यमय अपहरण 🔴"
+text = "🔴 KRIPAL HAS BEEN ABDUCTED 🔴"
 horizontal_alignment = 1
 
 [node name="AlertSub" type="Label" parent="CutsceneUI/ChapterCard/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
 theme_override_font_sizes/font_size = 18
-text = "KRIPAL ABDUCTED — HEADING TO KRIPAL'S RESIDENCE (PANSEMAL)"
+text = "DRAGGED INTO THE DARK CURSED RUINS BY AN UNKNOWN ENTITY"
 horizontal_alignment = 1
 
 [node name="CardBox" type="PanelContainer" parent="CutsceneUI/ChapterCard/Margin/VBox"]
@@ -1019,15 +1019,15 @@ theme_override_constants/separation = 12
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.45, 0.45, 1)
 theme_override_font_sizes/font_size = 20
-text = "• कृपाल को खौफनाक साये द्वारा तहखाने में घसीट लिया गया है!"
+text = "• Kripal was overwhelmed and dragged into the underground darkness!"
 
 [node name="StatusDesc" type="Label" parent="CutsceneUI/ChapterCard/Margin/VBox/CardBox/CardMargin/CardVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.92, 0.94, 1)
 theme_override_font_sizes/font_size = 16
-text = "कृपाल की चीख के साथ उसका थर्मल कैमरा और रेडियो संपर्क पूरी तरह टूट गया है।
-दिल्ली गेट पर साहिल और आशुतोष भारी हथियारों, मोशन डिटेक्टर्स और ईएमएफ मीटर के साथ पहुंच चुके हैं!
-क्या वे अपने दोस्त को उस तांत्रिक के श्राप से ज़िंदा बचा पाएंगे?!"
+text = "Kripal's radio transmitter and thermal tracker have fallen completely silent.
+A sinister shadow entity grabbed his legs and pulled him into the subterranean ruins.
+Sahil, Aashutosh and you must now immediately proceed to Kripal's residence in Pansemal to alert his mother and begin the investigation!"
 autowrap_mode = 2
 
 [node name="BtnBox" type="HBoxContainer" parent="CutsceneUI/ChapterCard/Margin/VBox"]
@@ -1042,7 +1042,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 0.9, 0.3, 1)
 theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_Btn")
-text = "➔ कृपाल के घर की ओर प्रस्थान करें (GO TO KRIPAL'S HOUSE)"
+text = "➔ PROCEED TO KRIPAL'S RESIDENCE (PANSEMAL)"
 
 [node name="ReplayBtn" type="Button" parent="CutsceneUI/ChapterCard/Margin/VBox/BtnBox"]
 custom_minimum_size = Vector2(260, 52)
@@ -1051,4 +1051,4 @@ theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_HUD")
-text = "🔄 कृपाल का दृश्य पुनः खेलें"
+text = "🔄 REPLAY SCENE"

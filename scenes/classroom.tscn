@@ -1683,7 +1683,7 @@ theme_override_colors/font_color = Color(0.95, 0.15, 0.15, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 36
-text = "हॉरर मिशन (HORROR MISSION)"
+text = "HORROR MISSION"
 horizontal_alignment = 1
 
 [node name="ChapterTitle" type="Label" parent="EventUI/ChapterCard/Margin/VBox" unique_id=15707840]
@@ -1692,7 +1692,7 @@ theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 26
-text = "★ अध्याय १: कृपाल के घर की ओर ★"
+text = "★ CHAPTER 1 : THE ABDUCTION ★"
 horizontal_alignment = 1
 
 [node name="HSep" type="HSeparator" parent="EventUI/ChapterCard/Margin/VBox" unique_id=235231656]
@@ -1717,19 +1717,19 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
 theme_override_font_sizes/font_size = 20
-text = "🔴 नया मिशन: कृपाल का घर (HEAD TO KRIPAL'S HOUSE)"
+text = "🔴 MISSION OBJECTIVE: SEARCH FOR KRIPAL"
 
 [node name="MissionContent" type="Label" parent="EventUI/ChapterCard/Margin/VBox/MissionBox/MissionMargin/MissionVBox" unique_id=1954991620]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.92, 0.92, 1)
 theme_override_font_sizes/font_size = 16
-text = "• कृपाल को क्लासरूम से किसी अलौकिक साये ने भानगढ़ के शापित खंडहरों में खींच लिया है!
-• डेस्क पर पंजे के खूनी निशान और 'फाइंड मी एट भानगढ़' का खौफनाक संदेश मिला है।
-• साहिल और आशुतोष के साथ क्लासरूम का मुख्य गेट खोलो और बाहर खड़ी गाड़ी की तरफ बढ़ो!"
+text = "• Kripal vanished into thin air the second the classroom lights flickered out!
+• Deep claw marks and a chilling note were discovered on his desk: 'FIND ME AT BHANGARH'.
+• Sahil and Aashutosh are ready with their gear. Open the classroom door and rush into Pansemal town!"
 autowrap_mode = 2
 
 [node name="ContinueBtn" type="Button" parent="EventUI/ChapterCard/Margin/VBox" unique_id=206121147]
-custom_minimum_size = Vector2(360, 52)
+custom_minimum_size = Vector2(380, 52)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -1737,7 +1737,7 @@ theme_override_colors/font_hover_color = Color(1, 0.9, 0.3, 1)
 theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_ActionBtn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ActionBtnHover")
-text = "🚗 गेट खोलो और कृपाल के घर चलो (SPACE या CLICK)"
+text = "➔ OPEN DOOR & PROCEED (CLICK OR SPACE)"
 
 [node name="BhangarhMapUI" type="ColorRect" parent="EventUI" unique_id=1688447409]
 visible = false
@@ -1777,13 +1777,13 @@ theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 23
-text = "📍 राजस्थान अन्वेषण मिशन — भानगढ़ किला (BHANGARH INVESTIGATION MAP)"
+text = "📍 BHANGARH INVESTIGATION MAP & LIVE TELEMETRY"
 
 [node name="MapSub" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader/TitleBox" unique_id=129403705]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
 theme_override_font_sizes/font_size = 14
-text = "भारतीय पुरातत्व सर्वेक्षण (A.S.I.) निषिद्ध क्षेत्र • सूर्यास्त के बाद प्रवेश पर मृत्यु का श्राप"
+text = "ARCHAEOLOGICAL SURVEY RESTRICTED ZONE • CURSED RUINS"
 
 [node name="TelemetryPills" type="HBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader" unique_id=515595384]
 layout_mode = 2
@@ -1793,19 +1793,19 @@ theme_override_constants/separation = 12
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
 theme_override_font_sizes/font_size = 14
-text = "[ईएमएफ: 5.8 mG ⚠️ ख़तरा]"
+text = "[EMF: 5.8 mG ⚠️ DANGER]"
 
 [node name="PillTemp" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader/TelemetryPills" unique_id=79442751]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 14
-text = "[तापमान: -4°C ❄️]"
+text = "[TEMP: -4°C ❄️]"
 
 [node name="PillGPS" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/TopHeader/TelemetryPills" unique_id=576268179]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 1, 0.4, 1)
 theme_override_font_sizes/font_size = 14
-text = "[जीपीएस: सक्रिय 📡]"
+text = "[GPS: ACTIVE 📡]"
 
 [node name="MainContentHBox" type="HBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox" unique_id=42760378]
 layout_mode = 2
@@ -1888,8 +1888,8 @@ theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 17
-text = "📍 कृपाल की अंतिम लोकेशन
-(तांत्रिक की गुफा / गहरा खंडहर) [CLICK]"
+text = "📍 KRIPAL'S LAST KNOWN BEACON
+(SUBTERRANEAN RUINS / OCCULT CHAMBER) [CLICK]"
 
 [node name="BeaconButton" type="Button" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/MapPanel/MapTexture/MarkerOverlay/KripalBeacon" unique_id=1099648860]
 layout_mode = 1
@@ -1926,7 +1926,7 @@ text = "●"
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
 theme_override_font_sizes/font_size = 16
-text = "लाइव फीड: कृपाल का व्यू (KRIPAL'S VIEW)"
+text = "LIVE SURVEILLANCE: KRIPAL'S VIEW"
 
 [node name="BodycamImage" type="TextureRect" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox" unique_id=1285685540]
 custom_minimum_size = Vector2(360, 210)
@@ -1943,19 +1943,19 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "• स्थिति: लापता / खूनी साये द्वारा अपहृत"
+text = "• STATUS: MISSING / ABDUCTED BY ENTITY"
 
 [node name="StatusLine2" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox/BodycamDetails" unique_id=1405966325]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
 theme_override_font_sizes/font_size = 14
-text = "• स्थान: भानगढ़ राजमहल के गहरे तहखाने"
+text = "• LOCATION: BHANGARH SUBTERRANEAN RUINS"
 
 [node name="StatusLine3" type="Label" parent="EventUI/BhangarhMapUI/Margin/VBox/MainContentHBox/BodycamPanel/BodycamVBox/BodycamDetails" unique_id=326334818]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "• ऑडियो: भयानक सांसें और चीखें सुनाई दे रही हैं!"
+text = "• AUDIO: DISTORTED BREATHING & STRUGGLE DETECTED!"
 
 [node name="BottomBar" type="HBoxContainer" parent="EventUI/BhangarhMapUI/Margin/VBox" unique_id=1605520275]
 layout_mode = 2
@@ -1966,7 +1966,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
 theme_override_font_sizes/font_size = 16
-text = "साहिल: \"नक्शा देखो! कृपाल का जीपीएस सिग्नल भानगढ़ किले के सबसे गहरे खंडहरों से आ रहा है... वो वहीं कहीं फंसा है!\""
+text = "Sahil: \"Look at the beacon! Kripal's signal is coming from deep underground Bhangarh... We must find him!\""
 autowrap_mode = 2
 
 [node name="EnterBhangarhBtn" type="Button" parent="EventUI/BhangarhMapUI/Margin/VBox/BottomBar" unique_id=1286173738]
@@ -1977,4 +1977,4 @@ theme_override_colors/font_hover_color = Color(1, 0.9, 0.3, 1)
 theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("StyleBoxFlat_ActionBtn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ActionBtnHover")
-text = "🚗 भानगढ़ के लिए निकलें ➔"
+text = "➔ WITNESS KRIPAL'S VIEW"

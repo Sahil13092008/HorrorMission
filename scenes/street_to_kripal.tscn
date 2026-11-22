@@ -1088,7 +1088,7 @@ theme_override_constants/separation = 16
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 16
-text = "✦ अध्याय २: पानसेमल पुलिस थाना ✦"
+text = "✦ CHAPTER 1 : PART II — THE REPORT ✦"
 horizontal_alignment = 1
 
 [node name="HeaderTitle" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox"]
@@ -1097,14 +1097,14 @@ theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 36
-text = "★ पानसेमल पुलिस स्टेशन की ओर प्रस्थान ★"
+text = "★ MISSION: PANSEMAL POLICE STATION ★"
 horizontal_alignment = 1
 
 [node name="HeaderSub" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
 theme_override_font_sizes/font_size = 18
-text = "THE REPORT AT PANSEMAL POLICE STATION"
+text = "EMERGENCY FIR & INVESTIGATION IN PANSEMAL TOWN"
 horizontal_alignment = 1
 
 [node name="BriefBox" type="PanelContainer" parent="StreetUI/NextChapterCard/Margin/VBox"]
@@ -1126,16 +1126,16 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.45, 0.45, 1)
 theme_override_font_sizes/font_size = 18
-text = "🔴 मिशन अपडेट: कृपाल की माँ को रोते देख टीम ने लिया फैसला"
+text = "🔴 MISSION UPDATE: MOTHER INFORMED — RUSHING TO POLICE"
 
 [node name="BriefText" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox/BriefBox/BriefMargin/BriefVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.92, 0.92, 1)
 theme_override_font_sizes/font_size = 16
-text = "कृपाल की माँ अपने लाडले बेटे के लापता होने की खबर सुनकर फूट-फूट कर रोने लगीं।
-तुमने आंटी को ढांढस बंधाया कि रोने से कुछ नहीं होगा, हमें तुरंत कदम उठाना होगा!
-साहिल, आशुतोष, तुम और कृपाल की माँ अब तुरंत पानसेमल पुलिस थाने जा रहे हैं ताकि पुलिस फोर्स के साथ कृपाल की खोजबीन शुरू की जा सके!
-क्या पुलिस इस खौफनाक शैतानी साए का सामना कर पाएगी?!"
+text = "After hearing that Kripal was dragged away by a sinister paranormal entity, his mother broke down in tears.
+You comforted her and made an urgent decision: crying will not solve this crisis, we must act immediately!
+Sahil, Aashutosh, Kripal's mother, and you are now rushing straight to Pansemal Police Station to file an emergency FIR and mobilize the search team!
+Will the authorities believe the tale of an invisible demonic shadow?!"
 autowrap_mode = 2
 
 [node name="BtnBox" type="HBoxContainer" parent="StreetUI/NextChapterCard/Margin/VBox"]
@@ -1144,16 +1144,16 @@ alignment = 1
 theme_override_constants/separation = 20
 
 [node name="StartPoliceBtn" type="Button" parent="StreetUI/NextChapterCard/Margin/VBox/BtnBox"]
-custom_minimum_size = Vector2(340, 52)
+custom_minimum_size = Vector2(380, 52)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBox_ActionBtn")
-text = "➔ पानसेमल पुलिस स्टेशन चलें (START)"
+text = "➔ RUSH TO PANSEMAL POLICE STATION"
 
 [node name="ReplayStreetBtn" type="Button" parent="StreetUI/NextChapterCard/Margin/VBox/BtnBox"]
 custom_minimum_size = Vector2(250, 52)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_font_sizes/font_size = 16
-text = "🔄 दृश्य पुनः खेलें"
+text = "🔄 REPLAY SCENE"
