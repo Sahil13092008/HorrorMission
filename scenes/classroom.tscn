@@ -72,6 +72,21 @@ albedo_color = Color(0.18, 0.18, 0.2, 1)
 metallic = 0.85
 roughness = 0.3
 
+[sub_resource type="StandardMaterial3D" id="Mat_FanBody"]
+albedo_color = Color(0.24, 0.15, 0.1, 1)
+metallic = 0.35
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_FanBlade"]
+albedo_color = Color(0.26, 0.16, 0.11, 1)
+metallic = 0.25
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_FanGold"]
+albedo_color = Color(0.88, 0.72, 0.28, 1)
+metallic = 0.85
+roughness = 0.22
+
 [sub_resource type="StandardMaterial3D" id="Mat_Kripal"]
 albedo_color = Color(0.18, 0.2, 0.22, 1)
 roughness = 0.7
@@ -1449,69 +1464,239 @@ text = "KRIPAL
 font_size = 18
 outline_size = 4
 
-[node name="CeilingFans" type="Node3D" parent="." unique_id=34944014]
+[node name="CeilingFans" type="Node3D" parent="."]
 
-[node name="Fan1" type="Node3D" parent="CeilingFans" unique_id=1529689595]
+[node name="Fan1" type="Node3D" parent="CeilingFans"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, -2.5)
 
-[node name="Rod" type="CSGBox3D" parent="CeilingFans/Fan1" unique_id=82706498]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
-size = Vector3(0.06, 0.6, 0.06)
-material = SubResource("Mat_MetalLegs")
+[node name="CeilingCanopy" type="CSGCylinder3D" parent="CeilingFans/Fan1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+radius = 0.08
+height = 0.08
+sides = 16
+material = SubResource("Mat_FanBody")
 
-[node name="Center" type="CSGBox3D" parent="CeilingFans/Fan1" unique_id=2127205544]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
-size = Vector3(0.3, 0.12, 0.3)
-material = SubResource("Mat_MetalLegs")
+[node name="Rod" type="CSGCylinder3D" parent="CeilingFans/Fan1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.26, 0)
+radius = 0.02
+height = 0.52
+sides = 12
+material = SubResource("Mat_FanBody")
 
-[node name="Blades" type="Node3D" parent="CeilingFans/Fan1" unique_id=1411843631]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+[node name="MotorTopCanopy" type="CSGCylinder3D" parent="CeilingFans/Fan1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+radius = 0.09
+height = 0.06
+sides = 16
+material = SubResource("Mat_FanBody")
 
-[node name="Blade1" type="CSGBox3D" parent="CeilingFans/Fan1/Blades" unique_id=1838757432]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, 0)
-size = Vector3(1.1, 0.02, 0.2)
-material = SubResource("Mat_MetalLegs")
+[node name="MotorCenter" type="CSGCylinder3D" parent="CeilingFans/Fan1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58, 0)
+radius = 0.22
+height = 0.12
+sides = 24
+material = SubResource("Mat_FanBody")
 
-[node name="Blade2" type="CSGBox3D" parent="CeilingFans/Fan1/Blades" unique_id=688728712]
-transform = Transform3D(-0.5, 0, 0.866, 0, 1, 0, -0.866, 0, -0.5, -0.3, 0, 0.52)
-size = Vector3(1.1, 0.02, 0.2)
-material = SubResource("Mat_MetalLegs")
+[node name="MotorGoldRing" type="CSGCylinder3D" parent="CeilingFans/Fan1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58, 0)
+radius = 0.228
+height = 0.024
+sides = 24
+material = SubResource("Mat_FanGold")
 
-[node name="Blade3" type="CSGBox3D" parent="CeilingFans/Fan1/Blades" unique_id=131656065]
-transform = Transform3D(-0.5, 0, -0.866, 0, 1, 0, 0.866, 0, -0.5, -0.3, 0, -0.52)
-size = Vector3(1.1, 0.02, 0.2)
-material = SubResource("Mat_MetalLegs")
+[node name="MotorBottomCap" type="CSGCylinder3D" parent="CeilingFans/Fan1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.65, 0)
+radius = 0.13
+height = 0.04
+sides = 16
+material = SubResource("Mat_FanGold")
 
-[node name="Fan2" type="Node3D" parent="CeilingFans" unique_id=1095742553]
+[node name="Blades" type="Node3D" parent="CeilingFans/Fan1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58, 0)
+
+[node name="BladeHolder1" type="Node3D" parent="CeilingFans/Fan1/Blades"]
+
+[node name="Shank" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0, 0)
+size = Vector3(0.14, 0.016, 0.05)
+material = SubResource("Mat_FanGold")
+
+[node name="Blade" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0, 0)
+size = Vector3(0.9, 0.012, 0.18)
+material = SubResource("Mat_FanBlade")
+
+[node name="Ridge" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0.007, 0)
+size = Vector3(0.86, 0.006, 0.02)
+material = SubResource("Mat_FanGold")
+
+[node name="Tip" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 1.19, 0, 0)
+size = Vector3(0.08, 0.012, 0.13)
+material = SubResource("Mat_FanBlade")
+
+[node name="BladeHolder2" type="Node3D" parent="CeilingFans/Fan1/Blades"]
+transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, 0, 0, 0)
+
+[node name="Shank" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0, 0)
+size = Vector3(0.14, 0.016, 0.05)
+material = SubResource("Mat_FanGold")
+
+[node name="Blade" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0, 0)
+size = Vector3(0.9, 0.012, 0.18)
+material = SubResource("Mat_FanBlade")
+
+[node name="Ridge" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0.007, 0)
+size = Vector3(0.86, 0.006, 0.02)
+material = SubResource("Mat_FanGold")
+
+[node name="Tip" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 1.19, 0, 0)
+size = Vector3(0.08, 0.012, 0.13)
+material = SubResource("Mat_FanBlade")
+
+[node name="BladeHolder3" type="Node3D" parent="CeilingFans/Fan1/Blades"]
+transform = Transform3D(-0.5, 0, 0.866025, 0, 1, 0, -0.866025, 0, -0.5, 0, 0, 0)
+
+[node name="Shank" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0, 0)
+size = Vector3(0.14, 0.016, 0.05)
+material = SubResource("Mat_FanGold")
+
+[node name="Blade" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0, 0)
+size = Vector3(0.9, 0.012, 0.18)
+material = SubResource("Mat_FanBlade")
+
+[node name="Ridge" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0.007, 0)
+size = Vector3(0.86, 0.006, 0.02)
+material = SubResource("Mat_FanGold")
+
+[node name="Tip" type="CSGBox3D" parent="CeilingFans/Fan1/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 1.19, 0, 0)
+size = Vector3(0.08, 0.012, 0.13)
+material = SubResource("Mat_FanBlade")
+
+[node name="Fan2" type="Node3D" parent="CeilingFans"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 2.5)
 
-[node name="Rod" type="CSGBox3D" parent="CeilingFans/Fan2" unique_id=716037751]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
-size = Vector3(0.06, 0.6, 0.06)
-material = SubResource("Mat_MetalLegs")
+[node name="CeilingCanopy" type="CSGCylinder3D" parent="CeilingFans/Fan2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+radius = 0.08
+height = 0.08
+sides = 16
+material = SubResource("Mat_FanBody")
 
-[node name="Center" type="CSGBox3D" parent="CeilingFans/Fan2" unique_id=1658388379]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
-size = Vector3(0.3, 0.12, 0.3)
-material = SubResource("Mat_MetalLegs")
+[node name="Rod" type="CSGCylinder3D" parent="CeilingFans/Fan2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.26, 0)
+radius = 0.02
+height = 0.52
+sides = 12
+material = SubResource("Mat_FanBody")
 
-[node name="Blades" type="Node3D" parent="CeilingFans/Fan2" unique_id=909005976]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+[node name="MotorTopCanopy" type="CSGCylinder3D" parent="CeilingFans/Fan2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+radius = 0.09
+height = 0.06
+sides = 16
+material = SubResource("Mat_FanBody")
 
-[node name="Blade1" type="CSGBox3D" parent="CeilingFans/Fan2/Blades" unique_id=798913691]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, 0)
-size = Vector3(1.1, 0.02, 0.2)
-material = SubResource("Mat_MetalLegs")
+[node name="MotorCenter" type="CSGCylinder3D" parent="CeilingFans/Fan2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58, 0)
+radius = 0.22
+height = 0.12
+sides = 24
+material = SubResource("Mat_FanBody")
 
-[node name="Blade2" type="CSGBox3D" parent="CeilingFans/Fan2/Blades" unique_id=1032804436]
-transform = Transform3D(-0.5, 0, 0.866, 0, 1, 0, -0.866, 0, -0.5, -0.3, 0, 0.52)
-size = Vector3(1.1, 0.02, 0.2)
-material = SubResource("Mat_MetalLegs")
+[node name="MotorGoldRing" type="CSGCylinder3D" parent="CeilingFans/Fan2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58, 0)
+radius = 0.228
+height = 0.024
+sides = 24
+material = SubResource("Mat_FanGold")
 
-[node name="Blade3" type="CSGBox3D" parent="CeilingFans/Fan2/Blades" unique_id=1420352335]
-transform = Transform3D(-0.5, 0, -0.866, 0, 1, 0, 0.866, 0, -0.5, -0.3, 0, -0.52)
-size = Vector3(1.1, 0.02, 0.2)
-material = SubResource("Mat_MetalLegs")
+[node name="MotorBottomCap" type="CSGCylinder3D" parent="CeilingFans/Fan2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.65, 0)
+radius = 0.13
+height = 0.04
+sides = 16
+material = SubResource("Mat_FanGold")
+
+[node name="Blades" type="Node3D" parent="CeilingFans/Fan2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58, 0)
+
+[node name="BladeHolder1" type="Node3D" parent="CeilingFans/Fan2/Blades"]
+
+[node name="Shank" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0, 0)
+size = Vector3(0.14, 0.016, 0.05)
+material = SubResource("Mat_FanGold")
+
+[node name="Blade" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0, 0)
+size = Vector3(0.9, 0.012, 0.18)
+material = SubResource("Mat_FanBlade")
+
+[node name="Ridge" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0.007, 0)
+size = Vector3(0.86, 0.006, 0.02)
+material = SubResource("Mat_FanGold")
+
+[node name="Tip" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 1.19, 0, 0)
+size = Vector3(0.08, 0.012, 0.13)
+material = SubResource("Mat_FanBlade")
+
+[node name="BladeHolder2" type="Node3D" parent="CeilingFans/Fan2/Blades"]
+transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, 0, 0, 0)
+
+[node name="Shank" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0, 0)
+size = Vector3(0.14, 0.016, 0.05)
+material = SubResource("Mat_FanGold")
+
+[node name="Blade" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0, 0)
+size = Vector3(0.9, 0.012, 0.18)
+material = SubResource("Mat_FanBlade")
+
+[node name="Ridge" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0.007, 0)
+size = Vector3(0.86, 0.006, 0.02)
+material = SubResource("Mat_FanGold")
+
+[node name="Tip" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 1.19, 0, 0)
+size = Vector3(0.08, 0.012, 0.13)
+material = SubResource("Mat_FanBlade")
+
+[node name="BladeHolder3" type="Node3D" parent="CeilingFans/Fan2/Blades"]
+transform = Transform3D(-0.5, 0, 0.866025, 0, 1, 0, -0.866025, 0, -0.5, 0, 0, 0)
+
+[node name="Shank" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0, 0)
+size = Vector3(0.14, 0.016, 0.05)
+material = SubResource("Mat_FanGold")
+
+[node name="Blade" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0, 0)
+size = Vector3(0.9, 0.012, 0.18)
+material = SubResource("Mat_FanBlade")
+
+[node name="Ridge" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0.007, 0)
+size = Vector3(0.86, 0.006, 0.02)
+material = SubResource("Mat_FanGold")
+
+[node name="Tip" type="CSGBox3D" parent="CeilingFans/Fan2/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 1.19, 0, 0)
+size = Vector3(0.08, 0.012, 0.13)
+material = SubResource("Mat_FanBlade")
 
 [node name="Lights" type="Node3D" parent="." unique_id=927524556]
 
