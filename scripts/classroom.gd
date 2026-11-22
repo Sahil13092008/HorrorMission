@@ -622,18 +622,18 @@ func pulse_radar_beacon():
 
 func on_enter_bhangarh_clicked():
 	if map_dialogue_feed:
-		map_dialogue_feed.text = "🚗 कृपाल के घर की ओर प्रस्थान... (HEADING TO KRIPAL'S HOUSE)"
+		map_dialogue_feed.text = "👁️ कृपाल के साथ क्या हुआ था? (KRIPAL'S VIEW LOADING...)"
 	
 	if enter_bhangarh_btn:
 		enter_bhangarh_btn.disabled = true
-		enter_bhangarh_btn.text = "🚨 कृपाल के घर की ओर प्रस्थान..."
+		enter_bhangarh_btn.text = "🚨 कृपाल का दृश्य लोड हो रहा है..."
 	if beacon_btn:
 		beacon_btn.disabled = true
 
-	# Dramatic transition fade out into street journey to Kripal's house
+	# Dramatic transition fade out into Kripal's POV scene
 	var tw = create_tween()
 	tw.tween_property(bhangarh_map_ui, "modulate", Color(0.0, 0.0, 0.0, 1.0), 0.8)
 	if sfx_ambience:
 		tw.parallel().tween_property(sfx_ambience, "volume_db", -25.0, 0.8)
 	await tw.finished
-	get_tree().change_scene_to_file("res://scenes/street_to_kripal.tscn")
+	get_tree().change_scene_to_file("res://scenes/bhangarh_ruins.tscn")

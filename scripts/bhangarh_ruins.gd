@@ -554,7 +554,10 @@ func execute_jumpscare():
 	card_fade.tween_property(chapter_card, "modulate:a", 1.0, 1.2)
 
 func on_continue_clicked():
-	get_tree().change_scene_to_file("res://scenes/classroom.tscn")
+	if continue_btn:
+		continue_btn.disabled = true
+		continue_btn.text = "🚗 कृपाल के घर की ओर प्रस्थान..."
+	get_tree().change_scene_to_file("res://scenes/street_to_kripal.tscn")
 
 func on_replay_clicked():
 	get_tree().reload_current_scene()
