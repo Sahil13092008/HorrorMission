@@ -524,10 +524,8 @@ func trigger_door_open():
 	if door_prompt:
 		door_prompt.visible = false
 
-	# Play creaking door audio
-	if door_audio and sfx_door:
-		door_audio.stream = sfx_door
-		door_audio.play()
+	# Door creak audio removed per user request
+
 
 	subtitle.text = "🚪 क्लासरूम का भारी लकड़ी का गेट खुल रहा है..."
 	subtitle.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
