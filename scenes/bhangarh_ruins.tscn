@@ -191,6 +191,46 @@ expand_margin_top = 4.0
 expand_margin_right = 8.0
 expand_margin_bottom = 4.0
 
+[sub_resource type="StandardMaterial3D" id="Mat_Demon_Shroud"]
+albedo_color = Color(0.04, 0.03, 0.05, 0.98)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="Mat_Demon_Decay"]
+albedo_color = Color(0.12, 0.10, 0.11, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_Demon_PaleSkin"]
+albedo_color = Color(0.65, 0.62, 0.58, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_Demon_Skull"]
+albedo_color = Color(0.72, 0.68, 0.62, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_Demon_Fangs"]
+albedo_color = Color(0.85, 0.80, 0.68, 1)
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_Demon_Crimson"]
+albedo_color = Color(1, 0.05, 0.05, 1)
+emission_enabled = true
+emission = Color(1, 0.08, 0.08, 1)
+emission_energy_multiplier = 8.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_Demon_Horns"]
+albedo_color = Color(0.08, 0.05, 0.06, 1)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_Demon_Claws"]
+albedo_color = Color(0.12, 0.08, 0.08, 1)
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_Demon_Core"]
+albedo_color = Color(0.9, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.1, 0.1, 1)
+emission_energy_multiplier = 6.0
+
 [node name="BhangarhRuins" type="Node3D"]
 script = ExtResource("1_ruins")
 
@@ -575,44 +615,182 @@ size = Vector3(0.17, 0.03, 0.25)
 material = SubResource("Mat_Boots_Black")
 
 [node name="GhostEntity" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 6.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 5.0)
 visible = false
 
-[node name="GhostBody" type="CSGCylinder3D" parent="GhostEntity"]
-radius = 0.45
-height = 2.4
-material = SubResource("Mat_DarkGhost")
+[node name="DemonLight" type="OmniLight3D" parent="GhostEntity"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+light_color = Color(1, 0.08, 0.08, 1)
+light_energy = 5.0
+omni_range = 7.0
 
-[node name="GhostHead" type="CSGSphere3D" parent="GhostEntity"]
+[node name="RobeMain" type="CSGCylinder3D" parent="GhostEntity"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
-radius = 0.32
-material = SubResource("Mat_DarkGhost")
+radius = 0.52
+height = 2.4
+cone = true
+material = SubResource("Mat_Demon_Shroud")
 
-[node name="EyeLeft" type="CSGSphere3D" parent="GhostEntity/GhostHead"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.05, -0.28)
-radius = 0.06
-material = SubResource("Mat_RedEyes")
+[node name="RobeTornSkirt1" type="CSGBox3D" parent="GhostEntity"]
+transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, -0.25, 0.4, 0.2)
+size = Vector3(0.25, 0.9, 0.25)
+material = SubResource("Mat_Demon_Shroud")
 
-[node name="EyeRight" type="CSGSphere3D" parent="GhostEntity/GhostHead"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.05, -0.28)
-radius = 0.06
-material = SubResource("Mat_RedEyes")
+[node name="RobeTornSkirt2" type="CSGBox3D" parent="GhostEntity"]
+transform = Transform3D(0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0, 0, 1, 0.25, 0.4, 0.2)
+size = Vector3(0.25, 0.9, 0.25)
+material = SubResource("Mat_Demon_Shroud")
 
-[node name="EyeLight" type="OmniLight3D" parent="GhostEntity/GhostHead"]
+[node name="ChestCavity" type="CSGBox3D" parent="GhostEntity"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.25)
+size = Vector3(0.42, 0.55, 0.25)
+material = SubResource("Mat_Demon_Decay")
+
+[node name="DemonCore" type="CSGSphere3D" parent="GhostEntity"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.22)
+radius = 0.12
+material = SubResource("Mat_Demon_Core")
+
+[node name="RibL1" type="CSGBox3D" parent="GhostEntity"]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, -0.18, 1.75, -0.32)
+size = Vector3(0.18, 0.04, 0.10)
+material = SubResource("Mat_Demon_Skull")
+
+[node name="RibR1" type="CSGBox3D" parent="GhostEntity"]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 0.18, 1.75, -0.32)
+size = Vector3(0.18, 0.04, 0.10)
+material = SubResource("Mat_Demon_Skull")
+
+[node name="RibL2" type="CSGBox3D" parent="GhostEntity"]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, -0.17, 1.60, -0.32)
+size = Vector3(0.17, 0.04, 0.10)
+material = SubResource("Mat_Demon_Skull")
+
+[node name="RibR2" type="CSGBox3D" parent="GhostEntity"]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 0.17, 1.60, -0.32)
+size = Vector3(0.17, 0.04, 0.10)
+material = SubResource("Mat_Demon_Skull")
+
+[node name="DemonHead" type="Node3D" parent="GhostEntity"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+
+[node name="SkullCranium" type="CSGSphere3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -0.05)
+radius = 0.26
+material = SubResource("Mat_Demon_Skull")
+
+[node name="JawUnhinged" type="CSGBox3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, -0.24, -0.20)
+size = Vector3(0.22, 0.22, 0.24)
+material = SubResource("Mat_Demon_Skull")
+
+[node name="MouthAbyss" type="CSGBox3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14, -0.22)
+size = Vector3(0.16, 0.16, 0.14)
+material = SubResource("Mat_Demon_Shroud")
+
+[node name="FangUpperL" type="CSGBox3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, -0.08, -0.27)
+size = Vector3(0.025, 0.08, 0.025)
+material = SubResource("Mat_Demon_Fangs")
+
+[node name="FangUpperR" type="CSGBox3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, -0.08, -0.27)
+size = Vector3(0.025, 0.08, 0.025)
+material = SubResource("Mat_Demon_Fangs")
+
+[node name="FangLowerL" type="CSGBox3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, -0.20, -0.27)
+size = Vector3(0.025, 0.07, 0.025)
+material = SubResource("Mat_Demon_Fangs")
+
+[node name="FangLowerR" type="CSGBox3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.04, -0.20, -0.27)
+size = Vector3(0.025, 0.07, 0.025)
+material = SubResource("Mat_Demon_Fangs")
+
+[node name="EyeLeft" type="CSGSphere3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09, 0.05, -0.27)
+radius = 0.05
+material = SubResource("Mat_Demon_Crimson")
+
+[node name="EyeRight" type="CSGSphere3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 0.05, -0.27)
+radius = 0.05
+material = SubResource("Mat_Demon_Crimson")
+
+[node name="EyeLight" type="OmniLight3D" parent="GhostEntity/DemonHead"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.4)
-light_color = Color(1, 0.15, 0.15, 1)
-light_energy = 3.5
-omni_range = 4.0
+light_color = Color(1, 0.05, 0.05, 1)
+light_energy = 6.0
+omni_range = 5.0
 
-[node name="GhostArmL" type="CSGBox3D" parent="GhostEntity"]
-transform = Transform3D(0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 0, 0, 1, -0.65, 0.6, -0.45)
-size = Vector3(0.18, 0.9, 0.18)
-material = SubResource("Mat_DarkGhost")
+[node name="HornL_Base" type="CSGCylinder3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(0.866025, 0.433013, -0.25, -0.5, 0.75, -0.433013, 0, 0.5, 0.866025, -0.18, 0.28, -0.05)
+radius = 0.05
+height = 0.35
+cone = true
+material = SubResource("Mat_Demon_Horns")
 
-[node name="GhostArmR" type="CSGBox3D" parent="GhostEntity"]
-transform = Transform3D(0.939693, -0.34202, 0, 0.34202, 0.939693, 0, 0, 0, 1, 0.65, 0.6, -0.45)
-size = Vector3(0.18, 0.9, 0.18)
-material = SubResource("Mat_DarkGhost")
+[node name="HornR_Base" type="CSGCylinder3D" parent="GhostEntity/DemonHead"]
+transform = Transform3D(0.866025, -0.433013, 0.25, 0.5, 0.75, -0.433013, 0, 0.5, 0.866025, 0.18, 0.28, -0.05)
+radius = 0.05
+height = 0.35
+cone = true
+material = SubResource("Mat_Demon_Horns")
+
+[node name="Arms" type="Node3D" parent="GhostEntity"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+
+[node name="ArmL_Upper" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(0.866025, 0.5, 0, -0.5, 0.866025, 0, 0, 0, 1, -0.55, 0.0, -0.15)
+size = Vector3(0.14, 0.75, 0.14)
+material = SubResource("Mat_Demon_Shroud")
+
+[node name="ArmL_Forearm" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(0.965926, 0, 0.258819, 0.258819, 0, -0.965926, 0, 1, 0, -0.75, -0.35, -0.55)
+size = Vector3(0.12, 0.65, 0.12)
+material = SubResource("Mat_Demon_PaleSkin")
+
+[node name="ClawL1" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.80, -0.38, -0.95)
+size = Vector3(0.025, 0.03, 0.22)
+material = SubResource("Mat_Demon_Claws")
+
+[node name="ClawL2" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.74, -0.38, -0.98)
+size = Vector3(0.025, 0.03, 0.25)
+material = SubResource("Mat_Demon_Claws")
+
+[node name="ClawL3" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.68, -0.38, -0.95)
+size = Vector3(0.025, 0.03, 0.22)
+material = SubResource("Mat_Demon_Claws")
+
+[node name="ArmR_Upper" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(0.866025, -0.5, 0, 0.5, 0.866025, 0, 0, 0, 1, 0.55, 0.0, -0.15)
+size = Vector3(0.14, 0.75, 0.14)
+material = SubResource("Mat_Demon_Shroud")
+
+[node name="ArmR_Forearm" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(0.965926, 0, -0.258819, -0.258819, 0, -0.965926, 0, 1, 0, 0.75, -0.35, -0.55)
+size = Vector3(0.12, 0.65, 0.12)
+material = SubResource("Mat_Demon_PaleSkin")
+
+[node name="ClawR1" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.68, -0.38, -0.95)
+size = Vector3(0.025, 0.03, 0.22)
+material = SubResource("Mat_Demon_Claws")
+
+[node name="ClawR2" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.74, -0.38, -0.98)
+size = Vector3(0.025, 0.03, 0.25)
+material = SubResource("Mat_Demon_Claws")
+
+[node name="ClawR3" type="CSGBox3D" parent="GhostEntity/Arms"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.80, -0.38, -0.95)
+size = Vector3(0.025, 0.03, 0.22)
+material = SubResource("Mat_Demon_Claws")
 
 [node name="FloorLantern" type="SpotLight3D" parent="."]
 transform = Transform3D(0.966, 0, -0.259, 0, 1, 0, 0.259, 0, 0.966, 0.8, 0.15, 0.9)

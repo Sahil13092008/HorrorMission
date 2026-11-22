@@ -17,7 +17,8 @@ extends Node3D
 # --- ENVIRONMENT & GHOST ---
 @onready var floor_lantern = $FloorLantern
 @onready var ghost_entity = $GhostEntity
-@onready var ghost_eyes = $GhostEntity/GhostHead/EyeLight
+@onready var ghost_eyes = $GhostEntity/DemonHead/EyeLight
+@onready var demon_light = $GhostEntity/DemonLight
 
 # --- AUDIO PLAYERS ---
 @onready var ambience_audio = $Audio/AmbienceAudio
@@ -63,9 +64,9 @@ var is_control_active = false
 var is_jumpscare_triggered = false
 var has_shouted_call = false
 var has_triggered_whisper = false
-var has_turned_toward_ghost = false
 
 var walk_anim_time: float = 0.0
+var ghost_anim_time: float = 0.0
 var footstep_timer: float = 0.0
 var camera_shake_trauma: float = 0.0
 var default_cam_local_pos: Vector3 = TPV_OFFSET
@@ -202,6 +203,16 @@ func start_awakening_cutscene():
 	# Prompt player to choose/toggle view or start moving
 	set_view_mode(ViewMode.THIRD_PERSON)
 
+func _process(delta):
+	# Supernatural hovering and demonic breathing animation for Ghost
+	if ghost_entity and ghost_entity.visible:
+		ghost_anim_time += delta
+		ghost_entity.position.y = 0.2 + sin(ghost_anim_time * 2.8) * 0.12
+		if ghost_eyes:
+			ghost_eyes.light_energy = 5.5 + sin(ghost_anim_time * 6.0) * 2.0
+		if demon_light:
+			demon_light.light_energy = 4.5 + sin(ghost_anim_time * 4.0) * 1.5
+
 func _physics_process(delta):
 	# Camera trauma shake processing
 	if camera_shake_trauma > 0:
@@ -275,7 +286,7 @@ func _physics_process(delta):
 
 	kripal.move_and_slide()
 
-	# Check exploration triggers based on position and movement
+	# Check exploration triggers
 	check_story_triggers()
 
 func check_story_triggers():
@@ -287,17 +298,10 @@ func check_story_triggers():
 		has_shouted_call = true
 		trigger_shout_dialogue()
 
-	# Trigger 2: Venture deep into the ruins -> Terrifying Demonic Whisper!
+	# Trigger 2: Venture deep into the ruins -> Automatically Turn & Jumpscare!
 	if has_shouted_call and not has_triggered_whisper and kripal.position.z < -3.2:
 		has_triggered_whisper = true
-		trigger_demon_whisper()
-
-	# Trigger 3: If whisper triggered, detect if player looks behind or wait 3.5s
-	if has_triggered_whisper and not is_jumpscare_triggered:
-		# Check if player rotation Y or camera is looking back (towards positive Z)
-		var forward = -kripal.global_transform.basis.z
-		if forward.z > 0.4: # player turned around facing back!
-			trigger_jumpscare()
+		start_demon_encounter_and_turn()
 
 func trigger_shout_dialogue():
 	subtitle.text = "कृपाल: \"साहिल! आशुतोष! कहाँ हो भाई तुम लोग?! कोई है यहाँ?!\""
@@ -320,22 +324,34 @@ func trigger_shout_dialogue():
 	if not has_triggered_whisper:
 		subtitle.text = ""
 
-func trigger_demon_whisper():
-	# Wind ambience fades into dead silence
+func start_demon_encounter_and_turn():
+	# 1. Lock player control for cinematic horror suspense
+	is_control_active = false
+	
+	# Stop player feet
+	kripal.velocity = Vector3.ZERO
+	if leg_l and leg_r:
+		leg_l.rotation.x = 0
+		leg_r.rotation.x = 0
+	if arm_l and arm_r:
+		arm_l.rotation.x = 0
+		arm_r.rotation.x = 0
+
+	# Wind ambience fades out into dead silence
 	if ambience_audio:
 		var tw_mute = create_tween()
-		tw_mute.tween_property(ambience_audio, "volume_db", -32.0, 0.8)
+		tw_mute.tween_property(ambience_audio, "volume_db", -36.0, 0.6)
 
-	await get_tree().create_timer(0.6).timeout
+	await get_tree().create_timer(0.5).timeout
 
-	# Demonic whisper: "...कृपा...ल..."
+	# 2. Demonic whisper echoes right from behind: "...कृपा...ल..."
 	subtitle.text = "खौफनाक साया (गहरी फुसफुसाहट): \"...कृपा...ल...\""
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.2, 0.2))
 
-	# Frantic heartbeat accelerates
+	# Frantic adrenaline heartbeat starts pounding!
 	if heartbeat_audio:
-		heartbeat_audio.volume_db = 4.0
-		heartbeat_audio.pitch_scale = 1.35
+		heartbeat_audio.volume_db = 4.5
+		heartbeat_audio.pitch_scale = 1.38
 
 	if whisper_audio:
 		whisper_audio.play()
@@ -343,7 +359,7 @@ func trigger_demon_whisper():
 
 	await get_tree().create_timer(0.3).timeout
 
-	# Kripal freezes in trembling terror
+	# 3. Kripal speaks in trembling fear: "क... कौन है वहाँ?!"
 	subtitle.text = "कृपाल (कांपती आवाज़ में): \"क... कौन है वहाँ?! कौन बोल रहा है?!\""
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.8, 0.4))
 
@@ -351,40 +367,42 @@ func trigger_demon_whisper():
 		voice_audio.stream = voice_freeze
 		voice_audio.play()
 
-	# Red blinking warning on objective banner!
-	objective_banner.text = "⚠️ खौफनाक साया पीछे है! पीछे मुड़कर देखें! (LOOK BEHIND YOU!)"
-	objective_banner.add_theme_color_override("font_color", Color(1.0, 0.15, 0.15))
-
-	# Spawn Ghost Entity in the dark archway behind Kripal
+	# 4. Spawn the terrifying demonic entity behind Kripal in the dark archway
+	ghost_entity.position = Vector3(kripal.position.x, 0.2, kripal.position.z + 4.2)
+	ghost_entity.rotation_degrees = Vector3(0.0, 180.0, 0.0) # facing Kripal!
 	ghost_entity.visible = true
-	ghost_entity.position = Vector3(0.0, 1.4, kripal.position.z + 4.2)
-	if ghost_eyes: ghost_eyes.light_energy = 6.0
+	if ghost_eyes: ghost_eyes.light_energy = 6.5
+	if demon_light: demon_light.light_energy = 5.0
 
-	# If player doesn't turn within 3.5 seconds, force jumpscare
-	await get_tree().create_timer(3.5).timeout
-	if not is_jumpscare_triggered:
-		trigger_jumpscare()
+	# 5. KRIPAL AUTOMATICALLY TURNS AROUND (180 DEGREES) TO FACE BEHIND!
+	var turn_tw = create_tween().set_parallel(true)
+	var target_rot_y = kripal.rotation_degrees.y + 180.0
+	turn_tw.tween_property(kripal, "rotation_degrees:y", target_rot_y, 1.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	turn_tw.tween_property(camera_pivot, "rotation_degrees:x", 0.0, 1.8).set_trans(Tween.TRANS_QUAD)
+	
+	# Wait for Kripal to finish turning around
+	await turn_tw.finished
 
-func trigger_jumpscare():
+	# The moment Kripal completes turning, his flashlight hits the terrifying demon face!
+	await get_tree().create_timer(0.35).timeout
+
+	# 6. TRIGGER THE JUMPSCARE!
+	execute_jumpscare()
+
+func execute_jumpscare():
 	if is_jumpscare_triggered: return
 	is_jumpscare_triggered = true
-	is_control_active = false
 	
 	subtitle.text = ""
 	objective_banner.visible = false
 	hud_container.visible = false
 
-	# Whip camera and Kripal around to face ghost
-	var look_back_tw = create_tween().set_parallel(true)
-	look_back_tw.tween_property(kripal, "rotation_degrees:y", 0.0, 0.4).set_trans(Tween.TRANS_QUAD)
-	look_back_tw.tween_property(camera_pivot, "rotation_degrees", Vector3.ZERO, 0.4)
-	
-	# THE JUMPSCARE!
+	# THE MOMENT HE LOOKS: JUMPSCARE!
 	camera_shake_trauma = 1.0
 
-	# Ghost lunges straight at camera
+	# Ghost lunges straight at camera at terrifying speed
 	var lunge_tw = create_tween()
-	lunge_tw.tween_property(ghost_entity, "position", kripal.position + Vector3(0.0, 1.2, 0.3), 0.22)
+	lunge_tw.tween_property(ghost_entity, "position", kripal.position + Vector3(0.0, 1.2, 0.25), 0.22)
 
 	# 2D Screen Jumpscare face flashes and screams
 	jumpscare_overlay.visible = true
@@ -396,13 +414,13 @@ func trigger_jumpscare():
 	if scream_audio:
 		scream_audio.play()
 
-	# Camera violently crashes to the ground
+	# Camera violently crashes down to the stone floor
 	var drop_tw = create_tween().set_parallel(true)
 	drop_tw.tween_property(camera, "position:y", -1.2, 0.35)
 	drop_tw.tween_property(camera, "rotation_degrees:z", 55.0, 0.35)
 	
-	# Flashlight flickers out
-	await get_tree().create_timer(0.2).timeout
+	# Flashlight violently flickers out into pitch darkness
+	await get_tree().create_timer(0.18).timeout
 	if flashlight: flashlight.visible = false
 	await get_tree().create_timer(0.1).timeout
 	if flashlight: flashlight.visible = true
