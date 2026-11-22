@@ -26,6 +26,7 @@ extends Node3D
 @onready var lightning_light: DirectionalLight3D = $LightningLight
 @onready var door_hinge: Node3D = $KripalHouse/DoorHinge
 @onready var door_trigger: Area3D = $KripalHouse/DoorTrigger
+@onready var police_door_trigger: Area3D = $EnvironmentProps/PansemalTownHouses/PansemalPoliceStation/PoliceDoorTrigger
 @onready var kripal_mummy: Node3D = $KripalHouse/KripalMummy
 @onready var sahil: CharacterBody3D = $Companions/SahilCompanion
 @onready var aashutosh: CharacterBody3D = $Companions/AashutoshCompanion
@@ -103,6 +104,7 @@ var cycle_tilt: float = 0.0
 # --- State Variables ---
 var is_cycling: bool = true
 var is_near_door: bool = false
+var is_near_police_door: bool = false
 var cutscene_active: bool = false
 var door_opened: bool = false
 var dialogue_in_progress: bool = false
@@ -214,6 +216,9 @@ func _ready() -> void:
 	if door_trigger:
 		door_trigger.body_entered.connect(_on_door_trigger_entered)
 		door_trigger.body_exited.connect(_on_door_trigger_exited)
+	if police_door_trigger:
+		police_door_trigger.body_entered.connect(_on_police_trigger_entered)
+		police_door_trigger.body_exited.connect(_on_police_trigger_exited)
 		
 	if prompt_label: prompt_label.visible = false
 	if dialogue_box: dialogue_box.visible = false
@@ -324,6 +329,8 @@ func _input(event: InputEvent) -> void:
 			
 		if is_near_door and not cutscene_active:
 			start_door_interaction()
+		elif is_near_police_door and not cutscene_active:
+			_on_start_police_pressed()
 		elif dialogue_in_progress and can_advance_dialogue:
 			advance_dialogue()
 		elif not cutscene_active and not is_town_map_open:
@@ -678,6 +685,15 @@ func _on_door_trigger_exited(body: Node3D) -> void:
 		is_near_door = false
 		if prompt_label and not cutscene_active: prompt_label.visible = false
 
+func _on_police_trigger_entered(body: Node3D) -> void:
+	if body == player:
+		is_near_police_door = true
+		show_subtitle("🚓 [E] दबाकर पानसेमल पुलिस स्टेशन में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)", 5.0)
+
+func _on_police_trigger_exited(body: Node3D) -> void:
+	if body == player:
+		is_near_police_door = false
+
 func start_door_interaction() -> void:
 	if cutscene_active: return
 	cutscene_active = true
@@ -791,7 +807,11 @@ func _on_start_police_pressed() -> void:
 	if start_police_btn:
 		start_police_btn.disabled = true
 		start_police_btn.text = "🚓 RUSHING TO PANSEMAL POLICE STATION..."
-	# -- Load police station interior scene --
+	# Loops or transitions to next mission scene
+	var tw = create_tween()
+	if next_chapter_card:
+		tw.tween_property(next_chapter_card, "modulate:a", 0.0, 0.4)
+	await get_tree().create_timer(0.4).timeout
 	get_tree().change_scene_to_file("res://scenes/police_station.tscn")
 
 func _on_replay_street_pressed() -> void:

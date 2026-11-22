@@ -733,6 +733,13 @@ light_color = Color(0.1, 0.4, 1, 1)
 light_energy = 3.5
 omni_range = 8.0
 
+
+[node name="PoliceDoorTrigger" type="Area3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.2, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation/PoliceDoorTrigger"]
+shape = SubResource("Box_DoorTrigger")
+
 [node name="Pedestrians" type="Node3D" parent="EnvironmentProps"]
 
 [node name="Pedestrian1" type="Node3D" parent="EnvironmentProps/Pedestrians"]
