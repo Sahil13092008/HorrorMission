@@ -1,0 +1,981 @@
+[gd_scene format=3 uid="uid://c8m2k1p9x5v7y"]
+
+[ext_resource type="Script" path="res://scripts/street_to_kripal.gd" id="1_street"]
+[ext_resource type="AudioStream" path="res://audio/street_ambience.wav" id="2_ambience"]
+[ext_resource type="AudioStream" path="res://audio/doorbell.wav" id="3_doorbell"]
+[ext_resource type="AudioStream" path="res://audio/home_door_open.wav" id="4_door_open"]
+[ext_resource type="AudioStream" path="res://audio/mummy_line_1.mp3" id="5_mummy1"]
+[ext_resource type="AudioStream" path="res://audio/mummy_line_2.mp3" id="6_mummy2"]
+[ext_resource type="AudioStream" path="res://audio/stone_footsteps.wav" id="7_footstep"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat_Street"]
+sky_top_color = Color(0.04, 0.05, 0.12, 1)
+sky_horizon_color = Color(0.18, 0.15, 0.25, 1)
+ground_bottom_color = Color(0.02, 0.02, 0.04, 1)
+ground_horizon_color = Color(0.12, 0.10, 0.18, 1)
+
+[sub_resource type="Sky" id="Sky_Street"]
+sky_material = SubResource("SkyMat_Street")
+
+[sub_resource type="Environment" id="Environment_Street"]
+background_mode = 2
+sky = SubResource("Sky_Street")
+ambient_light_source = 2
+ambient_light_color = Color(0.20, 0.22, 0.32, 1)
+ambient_light_energy = 0.55
+fog_enabled = true
+fog_light_color = Color(0.10, 0.12, 0.18, 1)
+fog_density = 0.012
+
+[sub_resource type="CapsuleShape3D" id="Capsule_Player"]
+radius = 0.35
+height = 1.75
+
+[sub_resource type="BoxShape3D" id="Box_DoorTrigger"]
+size = Vector3(3.0, 2.5, 3.0)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Asphalt"]
+albedo_color = Color(0.14, 0.15, 0.17, 1)
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="Mat_RoadStripe"]
+albedo_color = Color(0.92, 0.88, 0.45, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sidewalk"]
+albedo_color = Color(0.38, 0.40, 0.43, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_Curb"]
+albedo_color = Color(0.28, 0.29, 0.31, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_TreeTrunk"]
+albedo_color = Color(0.26, 0.16, 0.10, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="Mat_TreeLeaves"]
+albedo_color = Color(0.12, 0.30, 0.15, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_LampPole"]
+albedo_color = Color(0.18, 0.20, 0.22, 1)
+metallic = 0.75
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_LampLight"]
+albedo_color = Color(1, 0.95, 0.75, 1)
+emission_enabled = true
+emission = Color(1, 0.95, 0.75, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_HouseWall1"]
+albedo_color = Color(0.75, 0.70, 0.62, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_HouseWall2"]
+albedo_color = Color(0.68, 0.45, 0.35, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_KripalHouse"]
+albedo_color = Color(0.65, 0.72, 0.80, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="Mat_WindowWarm"]
+albedo_color = Color(1, 0.88, 0.55, 1)
+emission_enabled = true
+emission = Color(1, 0.85, 0.45, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_GateIron"]
+albedo_color = Color(0.10, 0.11, 0.12, 1)
+metallic = 0.8
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_DoorWood"]
+albedo_color = Color(0.36, 0.18, 0.10, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_SareeRed"]
+albedo_color = Color(0.72, 0.12, 0.16, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_SareeGold"]
+albedo_color = Color(0.92, 0.76, 0.22, 1)
+metallic = 0.5
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_MummySkin"]
+albedo_color = Color(0.82, 0.65, 0.52, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_MummyHair"]
+albedo_color = Color(0.20, 0.20, 0.22, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_BindiRed"]
+albedo_color = Color(0.85, 0.05, 0.05, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_BellGlow"]
+albedo_color = Color(0.25, 0.95, 0.45, 1)
+emission_enabled = true
+emission = Color(0.25, 0.95, 0.45, 1)
+emission_energy_multiplier = 2.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_Companion_Sahil"]
+albedo_color = Color(0.48, 0.28, 0.16, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_Companion_Aashu"]
+albedo_color = Color(0.85, 0.42, 0.15, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_Jeans"]
+albedo_color = Color(0.18, 0.24, 0.35, 1)
+roughness = 0.85
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_Radar"]
+bg_color = Color(0.04, 0.06, 0.10, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.75, 1, 0.85)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_Dialogue"]
+bg_color = Color(0.05, 0.06, 0.09, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.75, 0.25, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_ActionBtn"]
+bg_color = Color(0.8, 0.2, 0.2, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.5, 0.5, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="StreetToKripal" type="Node3D"]
+script = ExtResource("1_street")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_Street")
+
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 10, 20, 10)
+light_color = Color(0.70, 0.75, 0.92, 1)
+light_energy = 0.45
+shadow_enabled = true
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="AmbienceAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("2_ambience")
+volume_db = -4.0
+autoplay = true
+
+[node name="DoorbellAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("3_doorbell")
+volume_db = 5.0
+
+[node name="HomeDoorAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("4_door_open")
+volume_db = 4.0
+
+[node name="VoiceAudio" type="AudioStreamPlayer" parent="Audio"]
+volume_db = 6.0
+
+[node name="FootstepAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("7_footstep")
+volume_db = -2.0
+
+[node name="EnvironmentProps" type="Node3D" parent="."]
+
+[node name="RoadMain" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, -40)
+use_collision = true
+size = Vector3(8.0, 0.1, 90.0)
+material = SubResource("Mat_Asphalt")
+
+[node name="RoadCenterStripe" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -40)
+size = Vector3(0.22, 0.01, 88.0)
+material = SubResource("Mat_RoadStripe")
+
+[node name="SidewalkLeft" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 0.1, -40)
+use_collision = true
+size = Vector3(2.4, 0.2, 90.0)
+material = SubResource("Mat_Sidewalk")
+
+[node name="CurbLeft" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 0.12, -40)
+size = Vector3(0.15, 0.24, 90.0)
+material = SubResource("Mat_Curb")
+
+[node name="SidewalkRight" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.1, -40)
+use_collision = true
+size = Vector3(2.4, 0.2, 90.0)
+material = SubResource("Mat_Sidewalk")
+
+[node name="CurbRight" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.12, -40)
+size = Vector3(0.15, 0.24, 90.0)
+material = SubResource("Mat_Curb")
+
+[node name="StreetLamps" type="Node3D" parent="EnvironmentProps"]
+
+[node name="Lamp1" type="Node3D" parent="EnvironmentProps/StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0, -10)
+[node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+radius = 0.08
+height = 4.8
+material = SubResource("Mat_LampPole")
+[node name="Arm" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 4.65, 0)
+size = Vector3(1.2, 0.08, 0.08)
+material = SubResource("Mat_LampPole")
+[node name="Head" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 4.55, 0)
+size = Vector3(0.35, 0.12, 0.25)
+material = SubResource("Mat_LampLight")
+[node name="Light" type="SpotLight3D" parent="EnvironmentProps/StreetLamps/Lamp1"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1.1, 4.5, 0)
+light_color = Color(1, 0.90, 0.65, 1)
+light_energy = 3.8
+spot_range = 14.0
+spot_angle = 50.0
+
+[node name="Lamp2" type="Node3D" parent="EnvironmentProps/StreetLamps"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.8, 0, -25)
+[node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+radius = 0.08
+height = 4.8
+material = SubResource("Mat_LampPole")
+[node name="Arm" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 4.65, 0)
+size = Vector3(1.2, 0.08, 0.08)
+material = SubResource("Mat_LampPole")
+[node name="Head" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 4.55, 0)
+size = Vector3(0.35, 0.12, 0.25)
+material = SubResource("Mat_LampLight")
+[node name="Light" type="SpotLight3D" parent="EnvironmentProps/StreetLamps/Lamp2"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1.1, 4.5, 0)
+light_color = Color(1, 0.90, 0.65, 1)
+light_energy = 3.8
+spot_range = 14.0
+spot_angle = 50.0
+
+[node name="Lamp3" type="Node3D" parent="EnvironmentProps/StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0, -45)
+[node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+radius = 0.08
+height = 4.8
+material = SubResource("Mat_LampPole")
+[node name="Arm" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 4.65, 0)
+size = Vector3(1.2, 0.08, 0.08)
+material = SubResource("Mat_LampPole")
+[node name="Head" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 4.55, 0)
+size = Vector3(0.35, 0.12, 0.25)
+material = SubResource("Mat_LampLight")
+[node name="Light" type="SpotLight3D" parent="EnvironmentProps/StreetLamps/Lamp3"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1.1, 4.5, 0)
+light_color = Color(1, 0.90, 0.65, 1)
+light_energy = 3.8
+spot_range = 14.0
+spot_angle = 50.0
+
+[node name="Lamp4" type="Node3D" parent="EnvironmentProps/StreetLamps"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.8, 0, -62)
+[node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+radius = 0.08
+height = 4.8
+material = SubResource("Mat_LampPole")
+[node name="Arm" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 4.65, 0)
+size = Vector3(1.2, 0.08, 0.08)
+material = SubResource("Mat_LampPole")
+[node name="Head" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 4.55, 0)
+size = Vector3(0.35, 0.12, 0.25)
+material = SubResource("Mat_LampLight")
+[node name="Light" type="SpotLight3D" parent="EnvironmentProps/StreetLamps/Lamp4"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1.1, 4.5, 0)
+light_color = Color(1, 0.90, 0.65, 1)
+light_energy = 3.8
+spot_range = 14.0
+spot_angle = 50.0
+
+[node name="Trees" type="Node3D" parent="EnvironmentProps"]
+
+[node name="Tree1" type="Node3D" parent="EnvironmentProps/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 0, -18)
+[node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.22
+height = 3.6
+material = SubResource("Mat_TreeTrunk")
+[node name="LeavesBottom" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
+radius = 1.6
+radial_segments = 10
+rings = 6
+material = SubResource("Mat_TreeLeaves")
+[node name="LeavesTop" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
+radius = 1.2
+radial_segments = 8
+rings = 5
+material = SubResource("Mat_TreeLeaves")
+
+[node name="Tree2" type="Node3D" parent="EnvironmentProps/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0, -32)
+[node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.22
+height = 3.6
+material = SubResource("Mat_TreeTrunk")
+[node name="LeavesBottom" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
+radius = 1.6
+radial_segments = 10
+rings = 6
+material = SubResource("Mat_TreeLeaves")
+[node name="LeavesTop" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
+radius = 1.2
+radial_segments = 8
+rings = 5
+material = SubResource("Mat_TreeLeaves")
+
+[node name="Tree3" type="Node3D" parent="EnvironmentProps/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 0, -54)
+[node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.22
+height = 3.6
+material = SubResource("Mat_TreeTrunk")
+[node name="LeavesBottom" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
+radius = 1.6
+radial_segments = 10
+rings = 6
+material = SubResource("Mat_TreeLeaves")
+[node name="LeavesTop" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
+radius = 1.2
+radial_segments = 8
+rings = 5
+material = SubResource("Mat_TreeLeaves")
+
+[node name="RoadsideHouses" type="Node3D" parent="EnvironmentProps"]
+
+[node name="HouseLeft1" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 3.0, -18)
+use_collision = true
+size = Vector3(8.0, 6.0, 18.0)
+material = SubResource("Mat_HouseWall1")
+[node name="Win1" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses/HouseLeft1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.4, -3)
+size = Vector3(0.15, 1.2, 1.8)
+material = SubResource("Mat_WindowWarm")
+
+[node name="HouseRight1" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 3.0, -32)
+use_collision = true
+size = Vector3(8.0, 6.0, 20.0)
+material = SubResource("Mat_HouseWall2")
+[node name="Win2" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses/HouseRight1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 0.5, 2)
+size = Vector3(0.15, 1.2, 1.8)
+material = SubResource("Mat_WindowWarm")
+
+[node name="HouseLeft2" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 3.0, -50)
+use_collision = true
+size = Vector3(8.0, 6.0, 20.0)
+material = SubResource("Mat_HouseWall1")
+
+[node name="Pedestrians" type="Node3D" parent="EnvironmentProps"]
+
+[node name="Pedestrian1" type="Node3D" parent="EnvironmentProps/Pedestrians"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 0.2, -22)
+[node name="Body" type="CSGBox3D" parent="EnvironmentProps/Pedestrians/Pedestrian1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+size = Vector3(0.4, 0.8, 0.25)
+material = SubResource("Mat_HouseWall1")
+[node name="Head" type="CSGSphere3D" parent="EnvironmentProps/Pedestrians/Pedestrian1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+radius = 0.16
+material = SubResource("Mat_MummySkin")
+[node name="Pants" type="CSGBox3D" parent="EnvironmentProps/Pedestrians/Pedestrian1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+size = Vector3(0.35, 0.7, 0.22)
+material = SubResource("Mat_Jeans")
+
+[node name="Pedestrian2" type="Node3D" parent="EnvironmentProps/Pedestrians"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.6, 0.2, -40)
+[node name="Body" type="CSGBox3D" parent="EnvironmentProps/Pedestrians/Pedestrian2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+size = Vector3(0.4, 0.8, 0.25)
+material = SubResource("Mat_Companion_Aashu")
+[node name="Head" type="CSGSphere3D" parent="EnvironmentProps/Pedestrians/Pedestrian2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+radius = 0.16
+material = SubResource("Mat_MummySkin")
+[node name="Pants" type="CSGBox3D" parent="EnvironmentProps/Pedestrians/Pedestrian2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+size = Vector3(0.35, 0.7, 0.22)
+material = SubResource("Mat_Jeans")
+
+[node name="KripalHouse" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -78)
+
+[node name="GatePillarL" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 1.25, 6.0)
+use_collision = true
+size = Vector3(0.5, 2.5, 0.5)
+material = SubResource("Mat_HouseWall2")
+
+[node name="GatePillarR" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 1.25, 6.0)
+use_collision = true
+size = Vector3(0.5, 2.5, 0.5)
+material = SubResource("Mat_HouseWall2")
+
+[node name="BoundaryWallL" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 1.0, 6.0)
+use_collision = true
+size = Vector3(7.8, 2.0, 0.3)
+material = SubResource("Mat_HouseWall1")
+
+[node name="BoundaryWallR" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 1.0, 6.0)
+use_collision = true
+size = Vector3(7.8, 2.0, 0.3)
+material = SubResource("Mat_HouseWall1")
+
+[node name="NamePlate" type="Label3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.1, 6.3)
+text = "🏠 कृपाल निवास
+KRIPAL'S RESIDENCE"
+font_size = 22
+outline_size = 6
+
+[node name="FrontYard" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 2.8)
+use_collision = true
+size = Vector3(10.0, 0.1, 6.0)
+material = SubResource("Mat_Sidewalk")
+
+[node name="HouseStructure" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -4.0)
+use_collision = true
+size = Vector3(12.0, 7.0, 8.0)
+material = SubResource("Mat_KripalHouse")
+
+[node name="Window1" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 1.8, 0.05)
+size = Vector3(1.6, 1.4, 0.1)
+material = SubResource("Mat_WindowWarm")
+
+[node name="Window2" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 1.8, 0.05)
+size = Vector3(1.6, 1.4, 0.1)
+material = SubResource("Mat_WindowWarm")
+
+[node name="PorchRoof" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0.8)
+size = Vector3(3.2, 0.2, 1.8)
+material = SubResource("Mat_HouseWall2")
+
+[node name="PorchLight" type="OmniLight3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0.8)
+light_color = Color(1, 0.92, 0.72, 1)
+light_energy = 3.5
+omni_range = 8.0
+
+[node name="DoorFrame" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0.02)
+size = Vector3(1.5, 2.5, 0.15)
+material = SubResource("Mat_Curb")
+
+[node name="DoorHinge" type="Node3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.65, 0.0, 0.05)
+
+[node name="MainDoor" type="CSGBox3D" parent="KripalHouse/DoorHinge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65, 1.2, 0)
+size = Vector3(1.3, 2.4, 0.08)
+material = SubResource("Mat_DoorWood")
+
+[node name="DoorHandle" type="CSGBox3D" parent="KripalHouse/DoorHinge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, 1.15, 0.06)
+size = Vector3(0.06, 0.16, 0.08)
+material = SubResource("Mat_SareeGold")
+
+[node name="DoorbellButton" type="CSGBox3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.88, 1.35, 0.1)
+size = Vector3(0.12, 0.18, 0.06)
+material = SubResource("Mat_BellGlow")
+
+[node name="BellLabel" type="Label3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.88, 1.55, 0.15)
+text = "🔔 BELL"
+font_size = 14
+outline_size = 3
+
+[node name="DoorTrigger" type="Area3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 1.4)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KripalHouse/DoorTrigger"]
+shape = SubResource("Box_DoorTrigger")
+
+[node name="KripalMummy" type="Node3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -0.5)
+visible = false
+
+[node name="SareeSkirt" type="CSGCylinder3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48, 0)
+radius = 0.32
+height = 0.95
+cone = true
+material = SubResource("Mat_SareeRed")
+
+[node name="SareeTorso" type="CSGBox3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.12, 0)
+size = Vector3(0.42, 0.45, 0.26)
+material = SubResource("Mat_SareeRed")
+
+[node name="PalluDrape" type="CSGBox3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(0.966, -0.259, 0, 0.259, 0.966, 0, 0, 0, 1, -0.05, 1.18, 0.08)
+size = Vector3(0.38, 0.46, 0.14)
+material = SubResource("Mat_SareeGold")
+
+[node name="Head" type="CSGSphere3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.52, 0)
+radius = 0.18
+material = SubResource("Mat_MummySkin")
+
+[node name="HairBun" type="CSGSphere3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, -0.12)
+radius = 0.14
+material = SubResource("Mat_MummyHair")
+
+[node name="Bindi" type="CSGSphere3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.56, 0.17)
+radius = 0.02
+material = SubResource("Mat_BindiRed")
+
+[node name="ArmL" type="CSGBox3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28, 1.05, 0)
+size = Vector3(0.12, 0.52, 0.12)
+material = SubResource("Mat_SareeRed")
+
+[node name="ArmR" type="CSGBox3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1.05, 0)
+size = Vector3(0.12, 0.52, 0.12)
+material = SubResource("Mat_SareeRed")
+
+[node name="Bangles" type="CSGCylinder3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 0.85, 0)
+radius = 0.08
+height = 0.08
+material = SubResource("Mat_SareeGold")
+
+[node name="MummyNameTag" type="Label3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+text = "👩 KRIPAL'S MOTHER (कृपाल की माँ)"
+font_size = 18
+outline_size = 4
+
+[node name="MummySpotlight" type="SpotLight3D" parent="KripalHouse"]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 3.2, 1.8)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 5.0
+spot_range = 6.0
+spot_angle = 45.0
+
+[node name="Companions" type="Node3D" parent="."]
+
+[node name="SahilCompanion" type="CharacterBody3D" parent="Companions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.1, 0.5)
+
+[node name="Body" type="CSGBox3D" parent="Companions/SahilCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+size = Vector3(0.45, 0.65, 0.28)
+material = SubResource("Mat_Companion_Sahil")
+
+[node name="Head" type="CSGBox3D" parent="Companions/SahilCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_MummySkin")
+
+[node name="Pants" type="CSGBox3D" parent="Companions/SahilCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+size = Vector3(0.38, 0.75, 0.24)
+material = SubResource("Mat_HouseWall1")
+
+[node name="NameTag" type="Label3D" parent="Companions/SahilCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+text = "SAHIL
+[Companion]"
+font_size = 15
+outline_size = 3
+
+[node name="AashutoshCompanion" type="CharacterBody3D" parent="Companions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.1, 0.5)
+
+[node name="Body" type="CSGBox3D" parent="Companions/AashutoshCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+size = Vector3(0.45, 0.65, 0.28)
+material = SubResource("Mat_Companion_Aashu")
+
+[node name="Head" type="CSGBox3D" parent="Companions/AashutoshCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_MummySkin")
+
+[node name="Pants" type="CSGBox3D" parent="Companions/AashutoshCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+size = Vector3(0.38, 0.75, 0.24)
+material = SubResource("Mat_Jeans")
+
+[node name="NameTag" type="Label3D" parent="Companions/AashutoshCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+text = "AASHUTOSH
+[Companion]"
+font_size = 15
+outline_size = 3
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 1.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_Player")
+
+[node name="CameraPivot" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player/CameraPivot"]
+current = true
+
+[node name="Flashlight" type="SpotLight3D" parent="Player/CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, -0.15, 0.1)
+light_color = Color(0.96, 0.96, 1, 1)
+light_energy = 3.2
+spot_range = 22.0
+spot_angle = 42.0
+
+[node name="VisualModel" type="Node3D" parent="Player"]
+
+[node name="Torso" type="CSGBox3D" parent="Player/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+size = Vector3(0.45, 0.65, 0.28)
+material = SubResource("Mat_Jeans")
+
+[node name="Head" type="CSGBox3D" parent="Player/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_MummySkin")
+
+[node name="Legs" type="CSGBox3D" parent="Player/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+size = Vector3(0.38, 0.75, 0.24)
+material = SubResource("Mat_Curb")
+
+[node name="StreetUI" type="CanvasLayer" parent="."]
+
+[node name="HUDContainer" type="MarginContainer" parent="StreetUI"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 90.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 25
+
+[node name="HBox" type="HBoxContainer" parent="StreetUI/HUDContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ViewToggleBtn" type="Button" parent="StreetUI/HUDContainer/HBox"]
+custom_minimum_size = Vector2(230, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "👁️ [V] कैमरा: 1st Person"
+
+[node name="ControlsTip" type="Label" parent="StreetUI/HUDContainer/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.88, 0.95, 0.85)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 13
+text = "[W, A, S, D] चलना | [SHIFT] दौड़ना | [V] कैमरा व्यू | [F] टॉर्च | [E] बातचीत / डोरबेल"
+
+[node name="ObjectiveBanner" type="Label" parent="StreetUI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -380.0
+offset_top = 62.0
+offset_right = 380.0
+offset_bottom = 92.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 15
+text = "✦ मिशन: सड़क पर आगे बढ़ें और कृपाल के घर पहुँचकर डोरबेल बजाएं"
+horizontal_alignment = 1
+
+[node name="MiniMapPanel" type="PanelContainer" parent="StreetUI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 15.0
+offset_right = -20.0
+offset_bottom = 225.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBox_Radar")
+
+[node name="Margin" type="MarginContainer" parent="StreetUI/MiniMapPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="StreetUI/MiniMapPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RadarTitle" type="Label" parent="StreetUI/MiniMapPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "🌐 जीपीएस रडार मैप (GPS RADAR)"
+horizontal_alignment = 1
+
+[node name="RadarDisplay" type="Control" parent="StreetUI/MiniMapPanel/Margin/VBox"]
+custom_minimum_size = Vector2(176, 140)
+layout_mode = 2
+
+[node name="DistanceLabel" type="Label" parent="StreetUI/MiniMapPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 13
+text = "📍 कृपाल का घर: 78m"
+horizontal_alignment = 1
+
+[node name="PromptLabel" type="Label" parent="StreetUI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = 35.0
+offset_right = 260.0
+offset_bottom = 75.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+text = "[E दबाएं] 🔔 डोरबेल बजाएं"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="StreetUI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = -140.0
+offset_right = 500.0
+offset_bottom = -95.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="DialogueBox" type="PanelContainer" parent="StreetUI"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -460.0
+offset_top = -180.0
+offset_right = 460.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBox_Dialogue")
+
+[node name="Margin" type="MarginContainer" parent="StreetUI/DialogueBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 15
+
+[node name="VBox" type="VBoxContainer" parent="StreetUI/DialogueBox/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SpeakerLabel" type="Label" parent="StreetUI/DialogueBox/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "SPEAKER NAME"
+
+[node name="DialogueText" type="Label" parent="StreetUI/DialogueBox/Margin/VBox"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_font_sizes/font_size = 16
+text = "Dialogue content will display here..."
+autowrap_mode = 2
+
+[node name="AdvanceTip" type="Label" parent="StreetUI/DialogueBox/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.65, 0.7, 1)
+theme_override_font_sizes/font_size = 13
+text = "[CLICK या E / SPACE दबाएं ▶]"
+horizontal_alignment = 2
+
+[node name="NextChapterCard" type="ColorRect" parent="StreetUI"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.03, 0.98)
+
+[node name="Margin" type="MarginContainer" parent="StreetUI/NextChapterCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 40
+
+[node name="VBox" type="VBoxContainer" parent="StreetUI/NextChapterCard/Margin"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="HeaderBadge" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.35, 0.9)
+theme_override_font_sizes/font_size = 16
+text = "✦ मिशन पूरा — कृपाल की माँ से मिला सुराग ✦"
+horizontal_alignment = 1
+
+[node name="HeaderTitle" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 38
+text = "★ अध्याय २: भानगढ़ किले की ओर प्रस्थान ★"
+horizontal_alignment = 1
+
+[node name="HeaderSub" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 18
+text = "THE RESCUE EXPEDITION (भानगढ़ का रहस्य)"
+horizontal_alignment = 1
+
+[node name="BriefBox" type="PanelContainer" parent="StreetUI/NextChapterCard/Margin/VBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_Dialogue")
+
+[node name="BriefMargin" type="MarginContainer" parent="StreetUI/NextChapterCard/Margin/VBox/BriefBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 18
+
+[node name="BriefVBox" type="VBoxContainer" parent="StreetUI/NextChapterCard/Margin/VBox/BriefBox/BriefMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BriefHeading" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox/BriefBox/BriefMargin/BriefVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.45, 0.45, 1)
+theme_override_font_sizes/font_size = 18
+text = "🔴 मिशन अपडेट: कृपाल की माँ ने दिया ताबीज और नक्शा"
+
+[node name="BriefText" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox/BriefBox/BriefMargin/BriefVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.92, 1)
+theme_override_font_sizes/font_size = 16
+text = "कृपाल की माँ ने रोते हुए पुराने तांत्रिक के श्राप का सच बताया और तांत्रिक से बचाव के लिए रक्षा-कवच और भानगढ़ का गुप्त नक्शा टीम को सौंप दिया।
+साहिल, आशुतोष और तुम अब पूरी तैयारी और हथियारों के साथ सीधे भानगढ़ किले की ओर कूच कर रहे हो!
+क्या तुम अपने भाई कृपाल को उस खौफनाक शैतान के चंगुल से ज़िंदा निकाल पाओगे?!"
+autowrap_mode = 2
+
+[node name="BtnBox" type="HBoxContainer" parent="StreetUI/NextChapterCard/Margin/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 20
+
+[node name="StartBhangarhBtn" type="Button" parent="StreetUI/NextChapterCard/Margin/VBox/BtnBox"]
+custom_minimum_size = Vector2(340, 52)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBox_ActionBtn")
+text = "➔ भानगढ़ किले में प्रवेश करें (START MISSION)"
+
+[node name="ReplayStreetBtn" type="Button" parent="StreetUI/NextChapterCard/Margin/VBox/BtnBox"]
+custom_minimum_size = Vector2(250, 52)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 16
+text = "🔄 गली का दृश्य पुनः खेलें"

@@ -628,10 +628,10 @@ func on_enter_bhangarh_clicked():
 	if beacon_btn:
 		beacon_btn.disabled = true
 
-	# Dramatic transition fade out into Bhangarh ruins scene
+	# Dramatic transition fade out into street journey to Kripal's house
 	var tw = create_tween()
 	tw.tween_property(bhangarh_map_ui, "modulate", Color(0.0, 0.0, 0.0, 1.0), 0.8)
 	if sfx_ambience:
 		tw.parallel().tween_property(sfx_ambience, "volume_db", -25.0, 0.8)
 	await tw.finished
-	get_tree().change_scene_to_file("res://scenes/bhangarh_ruins.tscn")
+	get_tree().change_scene_to_file("res://scenes/street_to_kripal.tscn")
