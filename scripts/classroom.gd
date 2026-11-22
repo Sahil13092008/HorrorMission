@@ -636,5 +636,5 @@ func on_enter_bhangarh_clicked():
 	if sfx_ambience:
 		tw.parallel().tween_property(sfx_ambience, "volume_db", -25.0, 0.8)
 	await tw.finished
-	# -- Antigravity: After Bhangarh map confirm, load bicycle cutscene first --
-	get_tree().change_scene_to_file("res://scenes/cycle_ride.tscn")
+	# -- Antigravity: After Bhangarh map confirm, transition to Kripal's POV (Bhangarh Ruins Prologue) --
+	get_tree().change_scene_to_file("res://scenes/bhangarh_ruins.tscn")
