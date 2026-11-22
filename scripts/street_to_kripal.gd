@@ -639,8 +639,8 @@ func _on_start_police_pressed() -> void:
 	if start_police_btn:
 		start_police_btn.disabled = true
 		start_police_btn.text = "🚓 RUSHING TO PANSEMAL POLICE STATION..."
-	# Transitions to next mission stage or loops to classroom/ruins
-	get_tree().change_scene_to_file("res://scenes/classroom.tscn")
+	# -- Antigravity: Load police station interior scene --
+	get_tree().change_scene_to_file("res://scenes/police_station.tscn")
 
 func _on_replay_street_pressed() -> void:
 	get_tree().reload_current_scene()

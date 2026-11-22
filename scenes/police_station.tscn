@@ -1,0 +1,291 @@
+[gd_scene load_steps=22 format=3 uid="uid://police_station_main"]
+
+[ext_resource type="Script" path="res://scripts/police_station.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/buildings/police_station.jpg" id="2_bgtex"]
+[ext_resource type="AudioStream" path="res://audio/police_station_ambience.wav" id="3_amb"]
+[ext_resource type="AudioStream" path="res://audio/fir_stamp.wav" id="4_stamp"]
+[ext_resource type="AudioStream" path="res://audio/complaint_writing.wav" id="5_write"]
+[ext_resource type="AudioStream" path="res://audio/station_door.wav" id="6_door"]
+[ext_resource type="Texture2D" path="res://textures/avatar_player.png" id="7_avplayer"]
+[ext_resource type="Texture2D" path="res://textures/avatar_sahil.png" id="8_avsahil"]
+[ext_resource type="Texture2D" path="res://textures/avatar_aashutosh.png" id="9_avaashu"]
+[ext_resource type="Texture2D" path="res://textures/avatar_mission.png" id="10_avmission"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyPS"]
+sky_top_color = Color(0.04, 0.05, 0.12, 1)
+sky_horizon_color = Color(0.18, 0.15, 0.25, 1)
+ground_bottom_color = Color(0.02, 0.02, 0.04, 1)
+ground_horizon_color = Color(0.12, 0.10, 0.18, 1)
+
+[sub_resource type="Sky" id="Sky_PS"]
+sky_material = SubResource("SkyPS")
+
+[sub_resource type="Environment" id="Env_PS"]
+background_mode = 2
+sky = SubResource("Sky_PS")
+ambient_light_source = 2
+ambient_light_color = Color(0.20, 0.22, 0.32, 1)
+ambient_light_energy = 0.55
+fog_enabled = true
+fog_light_color = Color(0.10, 0.12, 0.18, 1)
+fog_density = 0.008
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+size = Vector3(20, 0.2, 20)
+
+[sub_resource type="BoxMesh" id="WallMesh"]
+size = Vector3(20, 6, 0.3)
+
+[sub_resource type="BoxMesh" id="DeskMesh"]
+size = Vector3(2, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="ChairMesh"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxMesh" id="PaperMesh"]
+size = Vector3(0.3, 0.02, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="FloorMat"]
+albedo_color = Color(0.6, 0.55, 0.5, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="WallMat"]
+albedo_color = Color(0.88, 0.86, 0.80, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="DeskMat"]
+albedo_color = Color(0.4, 0.28, 0.18, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="PaperMat"]
+albedo_color = Color(0.95, 0.93, 0.85, 1)
+roughness = 0.6
+
+[sub_resource type="BoxShape3D" id="FloorCol"]
+size = Vector3(20, 0.2, 20)
+
+[sub_resource type="BoxShape3D" id="WallCol"]
+size = Vector3(20, 6, 0.3)
+
+[sub_resource type="CapsuleShape3D" id="NPCShape"]
+radius = 0.3
+height = 1.7
+
+; ─────────────────────────────────────────────────────────────
+; ROOT
+; ─────────────────────────────────────────────────────────────
+[node name="PoliceStation" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_PS")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.5, 0, 0, 0.866, -0.5, 0.5, 0.433, 0.75, 0, 8, 0)
+light_color = Color(0.95, 0.9, 0.8, 1)
+light_energy = 0.6
+shadow_enabled = true
+
+; ─── Interior Ceiling Light ────────────────────────────────
+[node name="OmniLight_Ceiling" type="OmniLight3D" parent="."]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 4, 0)
+light_color = Color(1.0, 0.95, 0.80, 1)
+light_energy = 1.8
+omni_range = 12.0
+
+; ─── FLOOR ────────────────────────────────────────────────
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 0, 0)
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("FloorMesh")
+surface_material_override/0 = SubResource("FloorMat")
+
+[node name="FloorShape" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("FloorCol")
+
+; ─── BACK WALL ────────────────────────────────────────────
+[node name="BackWall" type="StaticBody3D" parent="."]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 3, -8)
+
+[node name="WallMesh" type="MeshInstance3D" parent="BackWall"]
+mesh = SubResource("WallMesh")
+surface_material_override/0 = SubResource("WallMat")
+
+[node name="WallShape" type="CollisionShape3D" parent="BackWall"]
+shape = SubResource("WallCol")
+
+; ─── SIDE WALL LEFT ────────────────────────────────────────
+[node name="LeftWall" type="StaticBody3D" parent="."]
+transform = Transform3D(0,0,1, 0,1,0, -1,0,0, -8, 3, 0)
+
+[node name="WallMesh2" type="MeshInstance3D" parent="LeftWall"]
+mesh = SubResource("WallMesh")
+surface_material_override/0 = SubResource("WallMat")
+
+[node name="WallShape2" type="CollisionShape3D" parent="LeftWall"]
+shape = SubResource("WallCol")
+
+; ─── SIDE WALL RIGHT ───────────────────────────────────────
+[node name="RightWall" type="StaticBody3D" parent="."]
+transform = Transform3D(0,0,1, 0,1,0, -1,0,0, 8, 3, 0)
+
+[node name="WallMesh3" type="MeshInstance3D" parent="RightWall"]
+mesh = SubResource("WallMesh")
+surface_material_override/0 = SubResource("WallMat")
+
+[node name="WallShape3" type="CollisionShape3D" parent="RightWall"]
+shape = SubResource("WallCol")
+
+; ─── OFFICER DESK ─────────────────────────────────────────
+[node name="OfficerDesk" type="StaticBody3D" parent="."]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 0.9, -4)
+
+[node name="DeskMesh" type="MeshInstance3D" parent="OfficerDesk"]
+mesh = SubResource("DeskMesh")
+surface_material_override/0 = SubResource("DeskMat")
+
+; ─── FIR PAPER PROP ───────────────────────────────────────
+[node name="Props" type="Node3D" parent="."]
+
+[node name="FIRPaper" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0.3, 0.97, -4)
+mesh = SubResource("PaperMesh")
+surface_material_override/0 = SubResource("PaperMat")
+
+[node name="StampProp" type="MeshInstance3D" parent="Props"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, -0.5, 0.97, -3.9)
+mesh = SubResource("ChairMesh")
+surface_material_override/0 = SubResource("DeskMat")
+
+; ─── CHARACTERS ───────────────────────────────────────────
+[node name="Characters" type="Node3D" parent="."]
+
+; Police Officer NPC
+[node name="PoliceOfficer" type="CharacterBody3D" parent="Characters"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 0.1, -5.5)
+
+[node name="OfficerBody" type="MeshInstance3D" parent="Characters/PoliceOfficer"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 0.9, 0)
+mesh = SubResource("ChairMesh")
+
+[node name="OfficerCol" type="CollisionShape3D" parent="Characters/PoliceOfficer"]
+shape = SubResource("NPCShape")
+
+; Player stand-in
+[node name="Player" type="CharacterBody3D" parent="Characters"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 0.1, -1.5)
+
+[node name="PlayerBody" type="MeshInstance3D" parent="Characters/Player"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 0.9, 0)
+mesh = SubResource("ChairMesh")
+
+[node name="PlayerCol" type="CollisionShape3D" parent="Characters/Player"]
+shape = SubResource("NPCShape")
+
+; Sahil stand-in
+[node name="Sahil" type="CharacterBody3D" parent="Characters"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, -1, 0.1, -1.5)
+
+[node name="SahilBody" type="MeshInstance3D" parent="Characters/Sahil"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 0.9, 0)
+mesh = SubResource("ChairMesh")
+
+[node name="SahilCol" type="CollisionShape3D" parent="Characters/Sahil"]
+shape = SubResource("NPCShape")
+
+; Aashutosh stand-in
+[node name="Aashutosh" type="CharacterBody3D" parent="Characters"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 1, 0.1, -1.5)
+
+[node name="AashutoshBody" type="MeshInstance3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 0.9, 0)
+mesh = SubResource("ChairMesh")
+
+[node name="AashutoshCol" type="CollisionShape3D" parent="Characters/Aashutosh"]
+shape = SubResource("NPCShape")
+
+; Kripal's Mummy
+[node name="KripalMummy" type="CharacterBody3D" parent="Characters"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0.5, 0.1, -0.8)
+
+[node name="MummyBody" type="MeshInstance3D" parent="Characters/KripalMummy"]
+transform = Transform3D(1,0,0, 0,1,0, 0,0,1, 0, 0.9, 0)
+mesh = SubResource("ChairMesh")
+
+[node name="MummyCol" type="CollisionShape3D" parent="Characters/KripalMummy"]
+shape = SubResource("NPCShape")
+
+; ─── AUDIO ────────────────────────────────────────────────
+[node name="Audio" type="Node3D" parent="."]
+
+[node name="AmbienceAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("3_amb")
+autoplay = true
+volume_db = -8.0
+
+[node name="VoiceAudio" type="AudioStreamPlayer" parent="Audio"]
+volume_db = 0.0
+
+[node name="SFXAudio" type="AudioStreamPlayer" parent="Audio"]
+volume_db = 2.0
+
+; ─── UI / CANVAS LAYER ────────────────────────────────────
+[node name="UI" type="Node3D" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="UI"]
+
+; Fade Overlay
+[node name="FadeOverlay" type="ColorRect" parent="UI/CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 1)
+mouse_filter = 2
+
+; Mission Banner
+[node name="MissionBanner" type="Label" parent="UI/CanvasLayer"]
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 0.0
+anchor_bottom = 0.0
+offset_left = -400
+offset_right = 400
+offset_top = 24
+offset_bottom = 72
+text = "CHAPTER 1 — PART III : PANSEMAL POLICE STATION"
+horizontal_alignment = 1
+vertical_alignment = 1
+visible = false
+
+; Dialogue Box (bottom bar)
+[node name="DialogueBox" type="PanelContainer" parent="UI/CanvasLayer"]
+anchor_left = 0.0
+anchor_right = 1.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -180
+offset_bottom = 0
+visible = false
+
+[node name="HBox" type="HBoxContainer" parent="UI/CanvasLayer/DialogueBox"]
+size_flags_horizontal = 3
+
+[node name="Portrait" type="TextureRect" parent="UI/CanvasLayer/DialogueBox/HBox"]
+custom_minimum_size = Vector2(100, 140)
+texture = ExtResource("7_avplayer")
+stretch_mode = 6
+
+[node name="VBox" type="VBoxContainer" parent="UI/CanvasLayer/DialogueBox/HBox"]
+size_flags_horizontal = 3
+
+[node name="Speaker" type="Label" parent="UI/CanvasLayer/DialogueBox/HBox/VBox"]
+text = "SPEAKER"
+
+[node name="Text" type="Label" parent="UI/CanvasLayer/DialogueBox/HBox/VBox"]
+text = "..."
+autowrap_mode = 3
+size_flags_vertical = 3
+
+[node name="Tip" type="Label" parent="UI/CanvasLayer/DialogueBox/HBox/VBox"]
+text = "[ E / SPACE / CLICK — NEXT ]"
+horizontal_alignment = 2

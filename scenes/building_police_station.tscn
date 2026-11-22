@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://building_police_station"]
+
+[ext_resource type="Texture" uid="uid://police_tex" path="res://assets/buildings/police_station.jpg"]
+
+[node name="PoliceStation" type="Node3D"]
+    [node name="AreaTrigger" type="Area3D" parent="PoliceStation"]
+    script = ExtResource( 2 )
+    [node name="CollisionShape" type="CollisionShape3D" parent="AreaTrigger"]
+    shape = BoxShape3D:new()
+    shape.size = Vector3(4,4,0.2)
+
+
+[node name="Sprite" type="Sprite3D" parent="."]
+texture = ExtResource( "uid://police_tex" )
+
+[node name="StaticBody" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape" type="CollisionShape3D" parent="StaticBody"]
+shape = BoxShape3D:new()
+shape.size = Vector3(4, 4, 0.2)  # approximate size, adjust in editor if needed

@@ -1,0 +1,774 @@
+[gd_scene format=3 uid="uid://b7v6x9k2m1q4w"]
+
+[ext_resource type="Script" path="res://scripts/cycle_ride.gd" id="1_cycle"]
+[ext_resource type="AudioStream" path="res://audio/street_ambience.wav" id="2_ambience"]
+[ext_resource type="AudioStream" path="res://audio/bicycle_ride.wav" id="3_bike_audio"]
+[ext_resource type="AudioStream" path="res://audio/thunder_strike.wav" id="4_thunder"]
+[ext_resource type="Texture2D" path="res://textures/avatar_player.png" id="5_avatar_p"]
+[ext_resource type="Texture2D" path="res://textures/avatar_sahil.png" id="6_avatar_s"]
+[ext_resource type="Texture2D" path="res://textures/avatar_aashutosh.png" id="7_avatar_a"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat_BloodStorm"]
+sky_top_color = Color(0.42, 0.04, 0.04, 1)
+sky_horizon_color = Color(0.78, 0.12, 0.10, 1)
+ground_bottom_color = Color(0.12, 0.02, 0.02, 1)
+ground_horizon_color = Color(0.38, 0.06, 0.06, 1)
+
+[sub_resource type="Sky" id="Sky_BloodStorm"]
+sky_material = SubResource("SkyMat_BloodStorm")
+
+[sub_resource type="Environment" id="Environment_BloodStorm"]
+background_mode = 2
+sky = SubResource("Sky_BloodStorm")
+ambient_light_source = 2
+ambient_light_color = Color(0.38, 0.12, 0.12, 1)
+ambient_light_energy = 0.65
+fog_enabled = true
+fog_light_color = Color(0.35, 0.08, 0.08, 1)
+fog_density = 0.016
+
+[sub_resource type="StandardMaterial3D" id="Mat_Asphalt"]
+albedo_color = Color(0.12, 0.13, 0.15, 1)
+roughness = 0.92
+
+[sub_resource type="StandardMaterial3D" id="Mat_RoadStripe"]
+albedo_color = Color(0.90, 0.85, 0.40, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sidewalk"]
+albedo_color = Color(0.32, 0.33, 0.35, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_Curb"]
+albedo_color = Color(0.24, 0.25, 0.26, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_LampPole"]
+albedo_color = Color(0.15, 0.16, 0.18, 1)
+metallic = 0.8
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_LampLight"]
+albedo_color = Color(1, 0.92, 0.65, 1)
+emission_enabled = true
+emission = Color(1, 0.92, 0.65, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_TreeTrunk"]
+albedo_color = Color(0.22, 0.14, 0.08, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="Mat_TreeLeaves"]
+albedo_color = Color(0.10, 0.22, 0.12, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_BikeFramePlayer"]
+albedo_color = Color(0.15, 0.45, 0.35, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_BikeFrameSahil"]
+albedo_color = Color(0.15, 0.35, 0.70, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_BikeFrameAashu"]
+albedo_color = Color(0.75, 0.45, 0.15, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_BikeMetal"]
+albedo_color = Color(0.65, 0.68, 0.72, 1)
+metallic = 0.9
+roughness = 0.25
+
+[sub_resource type="StandardMaterial3D" id="Mat_BikeTire"]
+albedo_color = Color(0.08, 0.08, 0.09, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_BikeHeadlight"]
+albedo_color = Color(1, 1, 0.85, 1)
+emission_enabled = true
+emission = Color(1, 1, 0.85, 1)
+emission_energy_multiplier = 5.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_RiderPlayer"]
+albedo_color = Color(0.20, 0.55, 0.45, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_RiderSahil"]
+albedo_color = Color(0.20, 0.35, 0.75, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_RiderBackpack"]
+albedo_color = Color(0.95, 0.78, 0.15, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_RiderAashu"]
+albedo_color = Color(0.85, 0.48, 0.18, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Skin"]
+albedo_color = Color(0.85, 0.68, 0.52, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_HouseWall"]
+albedo_color = Color(0.55, 0.50, 0.45, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_KripalHouse"]
+albedo_color = Color(0.55, 0.62, 0.70, 1)
+
+[sub_resource type="StandardMaterial3D" id="Mat_WindowGlow"]
+albedo_color = Color(1, 0.85, 0.45, 1)
+emission_enabled = true
+emission = Color(1, 0.85, 0.45, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StyleBoxFlat" id="Style_Banner"]
+bg_color = Color(0.08, 0.02, 0.02, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.25, 0.25, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="Style_Dialogue"]
+bg_color = Color(0.06, 0.06, 0.09, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.35, 0.35, 0.85)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="Style_SkipBtn"]
+bg_color = Color(0.12, 0.12, 0.18, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.7, 0.3, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="CycleRideScene" type="Node3D"]
+script = ExtResource("1_cycle")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_BloodStorm")
+
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 10, 20, 10)
+light_color = Color(0.75, 0.25, 0.25, 1)
+light_energy = 0.55
+shadow_enabled = true
+
+[node name="LightningLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 30, 0)
+light_color = Color(0.95, 0.95, 1, 1)
+light_energy = 0.0
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="AmbienceAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("2_ambience")
+volume_db = -3.0
+autoplay = true
+
+[node name="BicycleAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("3_bike_audio")
+volume_db = 2.0
+autoplay = true
+
+[node name="ThunderAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("4_thunder")
+volume_db = 7.0
+
+[node name="CameraMain" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1.8, 25)
+current = true
+fov = 68.0
+
+[node name="EnvironmentProps" type="Node3D" parent="."]
+
+[node name="RoadMain" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, -30)
+size = Vector3(8.0, 0.1, 130.0)
+material = SubResource("Mat_Asphalt")
+
+[node name="RoadCenterStripe" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -30)
+size = Vector3(0.22, 0.01, 128.0)
+material = SubResource("Mat_RoadStripe")
+
+[node name="SidewalkLeft" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 0.1, -30)
+size = Vector3(2.4, 0.2, 130.0)
+material = SubResource("Mat_Sidewalk")
+
+[node name="CurbLeft" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 0.12, -30)
+size = Vector3(0.15, 0.24, 130.0)
+material = SubResource("Mat_Curb")
+
+[node name="SidewalkRight" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.1, -30)
+size = Vector3(2.4, 0.2, 130.0)
+material = SubResource("Mat_Sidewalk")
+
+[node name="CurbRight" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.12, -30)
+size = Vector3(0.15, 0.24, 130.0)
+material = SubResource("Mat_Curb")
+
+[node name="StreetLamps" type="Node3D" parent="EnvironmentProps"]
+
+[node name="Lamp1" type="Node3D" parent="EnvironmentProps/StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0, 15)
+[node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+radius = 0.08
+height = 4.8
+material = SubResource("Mat_LampPole")
+[node name="Head" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 4.6, 0)
+size = Vector3(0.35, 0.12, 0.25)
+material = SubResource("Mat_LampLight")
+[node name="Light" type="SpotLight3D" parent="EnvironmentProps/StreetLamps/Lamp1"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.8, 4.5, 0)
+light_color = Color(1, 0.90, 0.65, 1)
+light_energy = 3.5
+spot_range = 14.0
+
+[node name="Lamp2" type="Node3D" parent="EnvironmentProps/StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0, -10)
+[node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+radius = 0.08
+height = 4.8
+material = SubResource("Mat_LampPole")
+[node name="Head" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 4.6, 0)
+size = Vector3(0.35, 0.12, 0.25)
+material = SubResource("Mat_LampLight")
+[node name="Light" type="SpotLight3D" parent="EnvironmentProps/StreetLamps/Lamp2"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.8, 4.5, 0)
+light_color = Color(1, 0.90, 0.65, 1)
+light_energy = 3.5
+spot_range = 14.0
+
+[node name="Lamp3" type="Node3D" parent="EnvironmentProps/StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0, -35)
+[node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+radius = 0.08
+height = 4.8
+material = SubResource("Mat_LampPole")
+[node name="Head" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 4.6, 0)
+size = Vector3(0.35, 0.12, 0.25)
+material = SubResource("Mat_LampLight")
+[node name="Light" type="SpotLight3D" parent="EnvironmentProps/StreetLamps/Lamp3"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.8, 4.5, 0)
+light_color = Color(1, 0.90, 0.65, 1)
+light_energy = 3.5
+spot_range = 14.0
+
+[node name="Lamp4" type="Node3D" parent="EnvironmentProps/StreetLamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0, -60)
+[node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+radius = 0.08
+height = 4.8
+material = SubResource("Mat_LampPole")
+[node name="Head" type="CSGBox3D" parent="EnvironmentProps/StreetLamps/Lamp4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 4.6, 0)
+size = Vector3(0.35, 0.12, 0.25)
+material = SubResource("Mat_LampLight")
+[node name="Light" type="SpotLight3D" parent="EnvironmentProps/StreetLamps/Lamp4"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.8, 4.5, 0)
+light_color = Color(1, 0.90, 0.65, 1)
+light_energy = 3.5
+spot_range = 14.0
+
+[node name="Trees" type="Node3D" parent="EnvironmentProps"]
+
+[node name="Tree1" type="Node3D" parent="EnvironmentProps/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 10)
+[node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.25
+height = 3.6
+material = SubResource("Mat_TreeTrunk")
+[node name="Leaves" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+radius = 1.9
+material = SubResource("Mat_TreeLeaves")
+
+[node name="Tree2" type="Node3D" parent="EnvironmentProps/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, -5)
+[node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.25
+height = 3.6
+material = SubResource("Mat_TreeTrunk")
+[node name="Leaves" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+radius = 1.9
+material = SubResource("Mat_TreeLeaves")
+
+[node name="Tree3" type="Node3D" parent="EnvironmentProps/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -25)
+[node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.25
+height = 3.6
+material = SubResource("Mat_TreeTrunk")
+[node name="Leaves" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+radius = 1.9
+material = SubResource("Mat_TreeLeaves")
+
+[node name="Tree4" type="Node3D" parent="EnvironmentProps/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, -48)
+[node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.25
+height = 3.6
+material = SubResource("Mat_TreeTrunk")
+[node name="Leaves" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
+radius = 1.9
+material = SubResource("Mat_TreeLeaves")
+
+[node name="KripalHouseFront" type="Node3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -78)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/KripalHouseFront"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 0)
+size = Vector3(14.0, 8.0, 10.0)
+material = SubResource("Mat_KripalHouse")
+[node name="Window1" type="CSGBox3D" parent="EnvironmentProps/KripalHouseFront"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 2.5, 5.05)
+size = Vector3(1.8, 1.4, 0.1)
+material = SubResource("Mat_WindowGlow")
+[node name="Window2" type="CSGBox3D" parent="EnvironmentProps/KripalHouseFront"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 2.5, 5.05)
+size = Vector3(1.8, 1.4, 0.1)
+material = SubResource("Mat_WindowGlow")
+[node name="PorchLight" type="OmniLight3D" parent="EnvironmentProps/KripalHouseFront"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 5.5)
+light_color = Color(1, 0.85, 0.45, 1)
+light_energy = 3.0
+omni_range = 10.0
+
+[node name="BicycleSquad" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 25)
+
+[node name="PlayerBike" type="Node3D" parent="BicycleSquad"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="FrameTop" type="CSGBox3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.65, 0)
+size = Vector3(0.06, 0.06, 0.75)
+material = SubResource("Mat_BikeFramePlayer")
+[node name="FrameDown" type="CSGBox3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 0.50, 0.1)
+size = Vector3(0.06, 0.06, 0.85)
+material = SubResource("Mat_BikeFramePlayer")
+[node name="Seat" type="CSGBox3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.78, 0.35)
+size = Vector3(0.22, 0.06, 0.3)
+material = SubResource("Mat_BikeTire")
+[node name="Handlebars" type="CSGCylinder3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0.95, -0.42)
+radius = 0.03
+height = 0.65
+material = SubResource("Mat_BikeMetal")
+[node name="WheelFront" type="Node3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, -0.48)
+[node name="Tire" type="CSGCylinder3D" parent="BicycleSquad/PlayerBike/WheelFront"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.35
+height = 0.08
+material = SubResource("Mat_BikeTire")
+[node name="Rim" type="CSGCylinder3D" parent="BicycleSquad/PlayerBike/WheelFront"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.28
+height = 0.06
+material = SubResource("Mat_BikeMetal")
+[node name="WheelRear" type="Node3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.48)
+[node name="Tire" type="CSGCylinder3D" parent="BicycleSquad/PlayerBike/WheelRear"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.35
+height = 0.08
+material = SubResource("Mat_BikeTire")
+[node name="Rim" type="CSGCylinder3D" parent="BicycleSquad/PlayerBike/WheelRear"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.28
+height = 0.06
+material = SubResource("Mat_BikeMetal")
+[node name="PedalCrank" type="Node3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.05)
+[node name="CrankArm" type="CSGBox3D" parent="BicycleSquad/PlayerBike/PedalCrank"]
+size = Vector3(0.28, 0.04, 0.04)
+material = SubResource("Mat_BikeMetal")
+[node name="Headlight" type="SpotLight3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.45)
+light_color = Color(1, 0.95, 0.75, 1)
+light_energy = 5.0
+spot_range = 22.0
+spot_angle = 32.0
+[node name="HeadlightMesh" type="CSGSphere3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.45)
+radius = 0.08
+material = SubResource("Mat_BikeHeadlight")
+[node name="RiderPlayer" type="Node3D" parent="BicycleSquad/PlayerBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0.28)
+[node name="Torso" type="CSGBox3D" parent="BicycleSquad/PlayerBike/RiderPlayer"]
+transform = Transform3D(1, 0, 0, 0, 0.920505, -0.390731, 0, 0.390731, 0.920505, 0, 0.35, -0.15)
+size = Vector3(0.38, 0.55, 0.22)
+material = SubResource("Mat_RiderPlayer")
+[node name="Head" type="CSGSphere3D" parent="BicycleSquad/PlayerBike/RiderPlayer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -0.32)
+radius = 0.16
+material = SubResource("Mat_Skin")
+[node name="ArmL" type="CSGCylinder3D" parent="BicycleSquad/PlayerBike/RiderPlayer"]
+transform = Transform3D(0.965926, 0.12941, -0.224144, -0.258819, 0.482963, -0.836516, 0, 0.866025, 0.5, -0.22, 0.45, -0.32)
+radius = 0.05
+height = 0.48
+material = SubResource("Mat_RiderPlayer")
+[node name="ArmR" type="CSGCylinder3D" parent="BicycleSquad/PlayerBike/RiderPlayer"]
+transform = Transform3D(0.965926, -0.12941, 0.224144, 0.258819, 0.482963, -0.836516, 0, 0.866025, 0.5, 0.22, 0.45, -0.32)
+radius = 0.05
+height = 0.48
+material = SubResource("Mat_RiderPlayer")
+[node name="LegL" type="Node3D" parent="BicycleSquad/PlayerBike/RiderPlayer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.05, 0)
+[node name="Thigh" type="CSGCylinder3D" parent="BicycleSquad/PlayerBike/RiderPlayer/LegL"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, 0, -0.22, -0.1)
+radius = 0.07
+height = 0.45
+material = SubResource("Mat_RiderPlayer")
+[node name="LegR" type="Node3D" parent="BicycleSquad/PlayerBike/RiderPlayer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.05, 0)
+[node name="Thigh" type="CSGCylinder3D" parent="BicycleSquad/PlayerBike/RiderPlayer/LegR"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, -0.22, 0.1)
+radius = 0.07
+height = 0.45
+material = SubResource("Mat_RiderPlayer")
+
+[node name="SahilBike" type="Node3D" parent="BicycleSquad"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 0, 0.9)
+[node name="FrameTop" type="CSGBox3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.65, 0)
+size = Vector3(0.06, 0.06, 0.75)
+material = SubResource("Mat_BikeFrameSahil")
+[node name="FrameDown" type="CSGBox3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 0.50, 0.1)
+size = Vector3(0.06, 0.06, 0.85)
+material = SubResource("Mat_BikeFrameSahil")
+[node name="Seat" type="CSGBox3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.78, 0.35)
+size = Vector3(0.22, 0.06, 0.3)
+material = SubResource("Mat_BikeTire")
+[node name="Handlebars" type="CSGCylinder3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0.95, -0.42)
+radius = 0.03
+height = 0.65
+material = SubResource("Mat_BikeMetal")
+[node name="WheelFront" type="Node3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, -0.48)
+[node name="Tire" type="CSGCylinder3D" parent="BicycleSquad/SahilBike/WheelFront"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.35
+height = 0.08
+material = SubResource("Mat_BikeTire")
+[node name="Rim" type="CSGCylinder3D" parent="BicycleSquad/SahilBike/WheelFront"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.28
+height = 0.06
+material = SubResource("Mat_BikeMetal")
+[node name="WheelRear" type="Node3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.48)
+[node name="Tire" type="CSGCylinder3D" parent="BicycleSquad/SahilBike/WheelRear"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.35
+height = 0.08
+material = SubResource("Mat_BikeTire")
+[node name="Rim" type="CSGCylinder3D" parent="BicycleSquad/SahilBike/WheelRear"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.28
+height = 0.06
+material = SubResource("Mat_BikeMetal")
+[node name="PedalCrank" type="Node3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.05)
+[node name="CrankArm" type="CSGBox3D" parent="BicycleSquad/SahilBike/PedalCrank"]
+size = Vector3(0.28, 0.04, 0.04)
+material = SubResource("Mat_BikeMetal")
+[node name="Headlight" type="SpotLight3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.45)
+light_color = Color(1, 0.95, 0.75, 1)
+light_energy = 5.0
+spot_range = 22.0
+spot_angle = 32.0
+[node name="HeadlightMesh" type="CSGSphere3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.45)
+radius = 0.08
+material = SubResource("Mat_BikeHeadlight")
+[node name="RiderSahil" type="Node3D" parent="BicycleSquad/SahilBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0.28)
+[node name="Torso" type="CSGBox3D" parent="BicycleSquad/SahilBike/RiderSahil"]
+transform = Transform3D(1, 0, 0, 0, 0.920505, -0.390731, 0, 0.390731, 0.920505, 0, 0.35, -0.15)
+size = Vector3(0.38, 0.55, 0.22)
+material = SubResource("Mat_RiderSahil")
+[node name="Backpack" type="CSGBox3D" parent="BicycleSquad/SahilBike/RiderSahil"]
+transform = Transform3D(1, 0, 0, 0, 0.920505, -0.390731, 0, 0.390731, 0.920505, 0, 0.36, -0.02)
+size = Vector3(0.32, 0.40, 0.16)
+material = SubResource("Mat_RiderBackpack")
+[node name="Head" type="CSGSphere3D" parent="BicycleSquad/SahilBike/RiderSahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -0.32)
+radius = 0.16
+material = SubResource("Mat_Skin")
+[node name="ArmL" type="CSGCylinder3D" parent="BicycleSquad/SahilBike/RiderSahil"]
+transform = Transform3D(0.965926, 0.12941, -0.224144, -0.258819, 0.482963, -0.836516, 0, 0.866025, 0.5, -0.22, 0.45, -0.32)
+radius = 0.05
+height = 0.48
+material = SubResource("Mat_RiderSahil")
+[node name="ArmR" type="CSGCylinder3D" parent="BicycleSquad/SahilBike/RiderSahil"]
+transform = Transform3D(0.965926, -0.12941, 0.224144, 0.258819, 0.482963, -0.836516, 0, 0.866025, 0.5, 0.22, 0.45, -0.32)
+radius = 0.05
+height = 0.48
+material = SubResource("Mat_RiderSahil")
+[node name="LegL" type="Node3D" parent="BicycleSquad/SahilBike/RiderSahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.05, 0)
+[node name="Thigh" type="CSGCylinder3D" parent="BicycleSquad/SahilBike/RiderSahil/LegL"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, 0, -0.22, -0.1)
+radius = 0.07
+height = 0.45
+material = SubResource("Mat_RiderSahil")
+[node name="LegR" type="Node3D" parent="BicycleSquad/SahilBike/RiderSahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.05, 0)
+[node name="Thigh" type="CSGCylinder3D" parent="BicycleSquad/SahilBike/RiderSahil/LegR"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, -0.22, 0.1)
+radius = 0.07
+height = 0.45
+material = SubResource("Mat_RiderSahil")
+
+[node name="AashuBike" type="Node3D" parent="BicycleSquad"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0, 0.6)
+[node name="FrameTop" type="CSGBox3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.65, 0)
+size = Vector3(0.06, 0.06, 0.75)
+material = SubResource("Mat_BikeFrameAashu")
+[node name="FrameDown" type="CSGBox3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 0.50, 0.1)
+size = Vector3(0.06, 0.06, 0.85)
+material = SubResource("Mat_BikeFrameAashu")
+[node name="Seat" type="CSGBox3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.78, 0.35)
+size = Vector3(0.22, 0.06, 0.3)
+material = SubResource("Mat_BikeTire")
+[node name="Handlebars" type="CSGCylinder3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0.95, -0.42)
+radius = 0.03
+height = 0.65
+material = SubResource("Mat_BikeMetal")
+[node name="WheelFront" type="Node3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, -0.48)
+[node name="Tire" type="CSGCylinder3D" parent="BicycleSquad/AashuBike/WheelFront"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.35
+height = 0.08
+material = SubResource("Mat_BikeTire")
+[node name="Rim" type="CSGCylinder3D" parent="BicycleSquad/AashuBike/WheelFront"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.28
+height = 0.06
+material = SubResource("Mat_BikeMetal")
+[node name="WheelRear" type="Node3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.48)
+[node name="Tire" type="CSGCylinder3D" parent="BicycleSquad/AashuBike/WheelRear"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.35
+height = 0.08
+material = SubResource("Mat_BikeTire")
+[node name="Rim" type="CSGCylinder3D" parent="BicycleSquad/AashuBike/WheelRear"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 0.28
+height = 0.06
+material = SubResource("Mat_BikeMetal")
+[node name="PedalCrank" type="Node3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.05)
+[node name="CrankArm" type="CSGBox3D" parent="BicycleSquad/AashuBike/PedalCrank"]
+size = Vector3(0.28, 0.04, 0.04)
+material = SubResource("Mat_BikeMetal")
+[node name="Headlight" type="SpotLight3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.45)
+light_color = Color(1, 0.95, 0.75, 1)
+light_energy = 5.0
+spot_range = 22.0
+spot_angle = 32.0
+[node name="HeadlightMesh" type="CSGSphere3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.45)
+radius = 0.08
+material = SubResource("Mat_BikeHeadlight")
+[node name="RiderAashu" type="Node3D" parent="BicycleSquad/AashuBike"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0.28)
+[node name="Torso" type="CSGBox3D" parent="BicycleSquad/AashuBike/RiderAashu"]
+transform = Transform3D(1, 0, 0, 0, 0.920505, -0.390731, 0, 0.390731, 0.920505, 0, 0.35, -0.15)
+size = Vector3(0.38, 0.55, 0.22)
+material = SubResource("Mat_RiderAashu")
+[node name="Head" type="CSGSphere3D" parent="BicycleSquad/AashuBike/RiderAashu"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -0.32)
+radius = 0.16
+material = SubResource("Mat_Skin")
+[node name="ArmL" type="CSGCylinder3D" parent="BicycleSquad/AashuBike/RiderAashu"]
+transform = Transform3D(0.965926, 0.12941, -0.224144, -0.258819, 0.482963, -0.836516, 0, 0.866025, 0.5, -0.22, 0.45, -0.32)
+radius = 0.05
+height = 0.48
+material = SubResource("Mat_RiderAashu")
+[node name="ArmR" type="CSGCylinder3D" parent="BicycleSquad/AashuBike/RiderAashu"]
+transform = Transform3D(0.965926, -0.12941, 0.224144, 0.258819, 0.482963, -0.836516, 0, 0.866025, 0.5, 0.22, 0.45, -0.32)
+radius = 0.05
+height = 0.48
+material = SubResource("Mat_RiderAashu")
+[node name="LegL" type="Node3D" parent="BicycleSquad/AashuBike/RiderAashu"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.05, 0)
+[node name="Thigh" type="CSGCylinder3D" parent="BicycleSquad/AashuBike/RiderAashu/LegL"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, 0, -0.22, -0.1)
+radius = 0.07
+height = 0.45
+material = SubResource("Mat_RiderAashu")
+[node name="LegR" type="Node3D" parent="BicycleSquad/AashuBike/RiderAashu"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.05, 0)
+[node name="Thigh" type="CSGCylinder3D" parent="BicycleSquad/AashuBike/RiderAashu/LegR"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, -0.22, 0.1)
+radius = 0.07
+height = 0.45
+material = SubResource("Mat_RiderAashu")
+
+[node name="CutsceneUI" type="CanvasLayer" parent="."]
+
+[node name="LightningOverlay" type="ColorRect" parent="CutsceneUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+
+[node name="MissionBanner" type="PanelContainer" parent="CutsceneUI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -380.0
+offset_top = 22.0
+offset_right = 380.0
+offset_bottom = 86.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("Style_Banner")
+
+[node name="Margin" type="MarginContainer" parent="CutsceneUI/MissionBanner"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="CutsceneUI/MissionBanner/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Title" type="Label" parent="CutsceneUI/MissionBanner/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 15
+text = "✦ CHAPTER 1 : THE EMERGENCY RIDE — BLOOD SKY OVER PANSEMAL ✦"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="CutsceneUI/MissionBanner/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.85, 0.75, 1)
+theme_override_font_sizes/font_size = 12
+text = "MISSION OBJECTIVE: RACE TO KRIPAL'S HOUSE BEFORE THE STORM HITS"
+horizontal_alignment = 1
+
+[node name="DialogueBox" type="PanelContainer" parent="CutsceneUI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -460.0
+offset_top = -140.0
+offset_right = 460.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("Style_Dialogue")
+
+[node name="Margin" type="MarginContainer" parent="CutsceneUI/DialogueBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 12
+
+[node name="HBox" type="HBoxContainer" parent="CutsceneUI/DialogueBox/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="AvatarFrame" type="PanelContainer" parent="CutsceneUI/DialogueBox/Margin/HBox"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+
+[node name="Avatar" type="TextureRect" parent="CutsceneUI/DialogueBox/Margin/HBox/AvatarFrame"]
+layout_mode = 2
+texture = ExtResource("5_avatar_p")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="CutsceneUI/DialogueBox/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="SpeakerName" type="Label" parent="CutsceneUI/DialogueBox/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "👤 खिलाड़ी (YOU / PLAYER)"
+
+[node name="DialogueText" type="Label" parent="CutsceneUI/DialogueBox/Margin/HBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "साहिल, आशुतोष... और तेज़ पैडल मारो! कृपाल बहुत बड़ी मुसीबत में है!"
+autowrap_mode = 2
+
+[node name="SkipBtn" type="Button" parent="CutsceneUI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -215.0
+offset_top = 22.0
+offset_right = -25.0
+offset_bottom = 58.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(1, 0.85, 0.45, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("Style_SkipBtn")
+text = "[SPACE] SKIP CUTSCENE ➔"
+
+[node name="FadeOverlay" type="ColorRect" parent="CutsceneUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
