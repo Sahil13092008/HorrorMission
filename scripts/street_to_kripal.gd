@@ -320,6 +320,13 @@ func handle_interaction() -> void:
 		
 	if cutscene_active: return
 	
+	var dist_door_quick = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
+	if (is_near_door or dist_door_quick < 6.5) and not door_opened:
+		if current_mode == PlayerMode.CYCLING:
+			dismount_bicycle()
+		start_door_interaction()
+		return
+
 	if current_mode == PlayerMode.CYCLING:
 		if can_dismount:
 			dismount_bicycle()
@@ -458,7 +465,7 @@ func _physics_process(delta: float) -> void:
 		var dist_to_door: float = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
 		var dist_to_car: float = player.global_position.distance_to(Vector3(5.6, 0.35, -76.0))
 		
-		if (is_near_door or dist_to_door < 4.0) and not door_opened:
+		if (is_near_door or dist_to_door < 6.5) and not door_opened:
 			is_near_door = true
 			if action_prompt:
 				action_prompt.visible = true
@@ -552,9 +559,11 @@ func _handle_foot_movement(delta: float) -> void:
 	else:
 		player.velocity.y = 0.0
 		
+	var is_sprint: bool = Input.is_key_pressed(KEY_SHIFT)
+	var foot_speed: float = 6.0 if is_sprint else WALK_SPEED
 	if direction != Vector3.ZERO:
-		player.velocity.x = direction.x * WALK_SPEED
-		player.velocity.z = direction.z * WALK_SPEED
+		player.velocity.x = direction.x * foot_speed
+		player.velocity.z = direction.z * foot_speed
 		if footstep_audio and not footstep_audio.playing:
 			footstep_audio.pitch_scale = randf_range(0.9, 1.1)
 			footstep_audio.play()
@@ -684,13 +693,17 @@ func exit_car() -> void:
 		action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
 
 func _update_walking_companions(delta: float) -> void:
-	# Companions follow player on foot
+	# Companions follow BEHIND the player on foot so they never block the front path
 	if sahil and sahil.visible:
-		var target_s = player.global_position + Vector3(1.2, 0, 0.8)
-		sahil.global_position = sahil.global_position.lerp(target_s, 3.5 * delta)
+		var follow_s = player.transform.basis * Vector3(-1.2, 0, 1.2)
+		var target_s = player.global_position + follow_s
+		sahil.global_position = sahil.global_position.lerp(target_s, 4.0 * delta)
+		sahil.rotation.y = lerp_angle(sahil.rotation.y, player.rotation.y, 6.0 * delta)
 	if aashutosh and aashutosh.visible:
-		var target_a = player.global_position + Vector3(-1.2, 0, 0.8)
-		aashutosh.global_position = aashutosh.global_position.lerp(target_a, 3.5 * delta)
+		var follow_a = player.transform.basis * Vector3(1.2, 0, 1.2)
+		var target_a = player.global_position + follow_a
+		aashutosh.global_position = aashutosh.global_position.lerp(target_a, 4.0 * delta)
+		aashutosh.rotation.y = lerp_angle(aashutosh.rotation.y, player.rotation.y, 6.0 * delta)
 	if kripal_mummy and kripal_mummy.visible and current_mode == PlayerMode.FOOT_POLICE:
 		var target_m = player.global_position + Vector3(-0.6, 0, 1.2)
 		kripal_mummy.global_position = kripal_mummy.global_position.lerp(target_m, 3.5 * delta)
