@@ -16,6 +16,7 @@ extends Node3D
 
 # --- ENVIRONMENT & GHOST ---
 @onready var floor_lantern = $FloorLantern
+@onready var dropped_flashlight = $DroppedFlashlight
 @onready var ghost_entity = $GhostEntity
 @onready var ghost_eyes = $GhostEntity/DemonHead/EyeLight
 @onready var demon_light = $GhostEntity/DemonLight
@@ -421,12 +422,13 @@ func execute_jumpscare():
 	if scream_audio:
 		scream_audio.play()
 
-	# Flashlight violently flickers
+	# Flashlight violently flickers and turns off
 	await get_tree().create_timer(0.20).timeout
 	if flashlight: flashlight.visible = false
 	await get_tree().create_timer(0.08).timeout
 	if flashlight: flashlight.visible = true
 	await get_tree().create_timer(0.12).timeout
+	if flashlight: flashlight.visible = false
 
 	# --- STAGE 1: KRIPAL COLLAPSES & BEHOSH (FAINTING) ---
 	# Fade out 2D jumpscare overlay
@@ -444,20 +446,8 @@ func execute_jumpscare():
 	var fall_tw = create_tween().set_parallel(true)
 	fall_tw.tween_property(visual_model, "rotation_degrees:x", -85.0, 0.45).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	fall_tw.tween_property(kripal, "position:y", 0.12, 0.45)
-	if arm_l: fall_tw.tween_property(arm_l, "rotation_degrees:z", -35.0, 0.45)
-	if arm_r: fall_tw.tween_property(arm_r, "rotation_degrees:z", 35.0, 0.45)
-
-	# Camera falls sideways to the cold floor level beside Kripal
-	fall_tw.tween_property(camera_pivot, "position", Vector3(0.8, 0.35, -1.2), 0.45)
-	fall_tw.tween_property(camera, "position", Vector3(0, 0, 0), 0.45)
-	fall_tw.tween_property(camera, "rotation_degrees", Vector3(-4.0, 162.0, 15.0), 0.45)
-
-	# Flashlight falls to the floor pointing along Kripal's body towards his boots
-	if flashlight:
-		flashlight.visible = true
-		flashlight.position = Vector3(0.35, 0.15, -0.9)
-		flashlight.rotation_degrees = Vector3(6.0, 168.0, -10.0)
-		flashlight.light_energy = 2.4
+	if arm_l: fall_tw.tween_property(arm_l, "rotation_degrees", Vector3(-115.0, -20.0, -15.0), 0.45)
+	if arm_r: fall_tw.tween_property(arm_r, "rotation_degrees", Vector3(-120.0, 20.0, 15.0), 0.45)
 
 	# Eyelids close: Blink overlay fades nearly to black (losing consciousness)
 	var faint_tw = create_tween()
@@ -468,17 +458,31 @@ func execute_jumpscare():
 	# --- STAGE 2: DRAGGING SCENE (GHOST GRABBING KRIPAL'S LEGS & DRAGGING HIM) ---
 	# Eyelids flutter half-open (semi-conscious hazy vision)
 	var flutter_tw = create_tween()
-	flutter_tw.tween_property(blink_overlay, "color:a", 0.35, 1.2)
+	flutter_tw.tween_property(blink_overlay, "color:a", 0.30, 1.2)
 
-	# Position Demon at Kripal's feet, hunched forward, claws gripping boots!
-	ghost_entity.position = kripal.position + Vector3(0.0, 0.1, 1.2)
-	ghost_entity.rotation_degrees = Vector3(28.0, 0.0, 0.0) # Hunched down over Kripal's legs
+	# 1. Position the dropped flashlight on the floor behind Kripal, aiming forward
+	if dropped_flashlight:
+		dropped_flashlight.global_position = Vector3(kripal.global_position.x - 0.75, 0.22, kripal.global_position.z - 1.4)
+		dropped_flashlight.look_at(kripal.global_position + Vector3(0.0, 0.35, 0.8), Vector3.UP)
+		dropped_flashlight.visible = true
+		dropped_flashlight.light_energy = 3.6
+
+	# 2. Position Demon at Kripal's feet, hunched forward with arms reaching down to grab boots!
 	ghost_entity.visible = true
+	ghost_entity.global_position = Vector3(kripal.global_position.x, 0.18, kripal.global_position.z + 1.45)
+	ghost_entity.rotation_degrees = Vector3(25.0, 0.0, 0.0) # Hunched forward directly over Kripal's boots
+	
 	var ghost_arms = ghost_entity.get_node_or_null("Arms")
 	if ghost_arms:
-		ghost_arms.rotation_degrees = Vector3(45.0, 0.0, 0.0) # reaching down to grab feet!
-	if ghost_eyes: ghost_eyes.light_energy = 5.0
-	if demon_light: demon_light.light_energy = 4.0
+		ghost_arms.rotation_degrees = Vector3(48.0, 0.0, 0.0) # Hands and claws reaching straight down to Kripal's ankles!
+	if ghost_eyes: ghost_eyes.light_energy = 6.0
+	if demon_light: demon_light.light_energy = 5.0
+
+	# 3. Setup Cinematic Side-Profile Tracking Camera
+	# Using top_level = true so it moves in pure world space regardless of player rotation
+	camera.top_level = true
+	camera.global_position = Vector3(kripal.global_position.x + 2.7, 0.82, kripal.global_position.z + 0.35)
+	camera.look_at(Vector3(kripal.global_position.x, 0.42, kripal.global_position.z + 0.65), Vector3.UP)
 
 	# Play eerie dragging sound & faint struggling groan
 	if drag_audio:
@@ -486,27 +490,40 @@ func execute_jumpscare():
 	if drag_voice_audio:
 		drag_voice_audio.play()
 
-	subtitle.text = "खौफनाक साया कृपाल के पैर पकड़कर उसे अंधेरे तहखाने की तरफ घसीट रहा है..."
+	subtitle.text = "खौफनाक साया दोनों हाथों से कृपाल के पैर पकड़कर उसे अंधेरे में घसीट रहा है..."
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.25, 0.25))
 
-	# Drag Kripal and Ghost backwards into the dark ruins over 5 seconds
-	var drag_dist = 6.0
+	var drag_dist = 6.5
+	var drag_duration = 5.2
+
+	# 4. Drag Animation: Kripal, Ghost, and Camera all move backwards together!
 	var drag_tw = create_tween().set_parallel(true)
-	drag_tw.tween_property(kripal, "position:z", kripal.position.z + drag_dist, 5.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-	drag_tw.tween_property(ghost_entity, "position:z", ghost_entity.position.z + drag_dist, 5.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-	# Camera slowly tracks along ground following the tragic abduction
-	drag_tw.tween_property(camera_pivot, "position:z", camera_pivot.position.z + (drag_dist * 0.6), 5.0)
+	drag_tw.tween_property(kripal, "global_position:z", kripal.global_position.z + drag_dist, drag_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	drag_tw.tween_property(ghost_entity, "global_position:z", ghost_entity.global_position.z + drag_dist, drag_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	drag_tw.tween_property(camera, "global_position:z", camera.global_position.z + drag_dist, drag_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+
+	# 5. Demon physical pulling motion (tugging rhythmically) + Kripal clawing at stone floor
+	var tug_tw = create_tween().set_loops(4)
+	if ghost_arms:
+		tug_tw.tween_property(ghost_arms, "rotation_degrees:x", 55.0, 0.65).set_trans(Tween.TRANS_SINE)
+		tug_tw.tween_property(ghost_arms, "rotation_degrees:x", 42.0, 0.65).set_trans(Tween.TRANS_SINE)
+	if arm_l and arm_r:
+		var claw_tw = create_tween().set_loops(4)
+		claw_tw.tween_property(arm_l, "rotation_degrees:x", -100.0, 0.65)
+		claw_tw.parallel().tween_property(arm_r, "rotation_degrees:x", -135.0, 0.65)
+		claw_tw.tween_property(arm_l, "rotation_degrees:x", -125.0, 0.65)
+		claw_tw.parallel().tween_property(arm_r, "rotation_degrees:x", -110.0, 0.65)
 
 	# Mid-drag dialogue subtitle
 	await get_tree().create_timer(1.8).timeout
 	subtitle.text = "कृपाल (कांपती हुई धीमी आवाज़): \"न... नहीं... छोड़ो मुझे... कोई बचाओ...\""
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
 
-	# Flashlight flickers out as he is dragged further into darkness
+	# Dropped flashlight flickers out as distance increases
 	await get_tree().create_timer(1.8).timeout
-	if flashlight:
+	if dropped_flashlight:
 		var fl_tw = create_tween()
-		fl_tw.tween_property(flashlight, "light_energy", 0.3, 1.2)
+		fl_tw.tween_property(dropped_flashlight, "light_energy", 0.5, 1.2)
 
 	await drag_tw.finished
 
