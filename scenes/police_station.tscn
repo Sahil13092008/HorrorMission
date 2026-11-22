@@ -1,0 +1,1057 @@
+[gd_scene format=3 uid="uid://ps_station_pansemal_01"]
+
+[ext_resource type="Script" path="res://scripts/police_station.gd" id="1_script"]
+[ext_resource type="AudioStream" path="res://audio/police_fan_buzz.wav" id="2_fan_buzz"]
+[ext_resource type="AudioStream" path="res://audio/police_radio_chatter.wav" id="3_radio_chatter"]
+[ext_resource type="AudioStream" path="res://audio/paper_write_scribble.wav" id="4_paper_write"]
+[ext_resource type="AudioStream" path="res://audio/police_stamp_thud.wav" id="5_stamp_thud"]
+[ext_resource type="AudioStream" path="res://audio/station_door_close.wav" id="6_door_close"]
+[ext_resource type="AudioStream" path="res://audio/thunder_distant.wav" id="7_thunder"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
+sky_top_color = Color(0.04, 0.06, 0.12, 1)
+sky_horizon_color = Color(0.08, 0.1, 0.16, 1)
+ground_bottom_color = Color(0.02, 0.03, 0.05, 1)
+
+[sub_resource type="Sky" id="Sky_night"]
+sky_material = SubResource("ProceduralSkyMaterial_night")
+
+[sub_resource type="Environment" id="Environment_ps"]
+background_mode = 2
+sky = SubResource("Sky_night")
+ambient_light_source = 2
+ambient_light_color = Color(0.18, 0.22, 0.28, 1)
+ambient_light_energy = 0.8
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_Floor"]
+albedo_color = Color(0.32, 0.34, 0.36, 1)
+roughness = 0.45
+metallic = 0.15
+
+[sub_resource type="StandardMaterial3D" id="Mat_WallUpper"]
+albedo_color = Color(0.88, 0.86, 0.78, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_WallLower"]
+albedo_color = Color(0.15, 0.26, 0.2, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="Mat_WallTrim"]
+albedo_color = Color(0.95, 0.95, 0.95, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_DeskWood"]
+albedo_color = Color(0.24, 0.14, 0.09, 1)
+roughness = 0.4
+metallic = 0.1
+
+[sub_resource type="StandardMaterial3D" id="Mat_GlassTop"]
+transparency = 1
+albedo_color = Color(0.7, 0.85, 0.9, 0.4)
+roughness = 0.1
+metallic = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_IronBars"]
+albedo_color = Color(0.18, 0.18, 0.2, 1)
+metallic = 0.9
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceKhaki"]
+albedo_color = Color(0.68, 0.58, 0.42, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceDarkBrown"]
+albedo_color = Color(0.22, 0.14, 0.08, 1)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceGold"]
+albedo_color = Color(0.9, 0.76, 0.26, 1)
+metallic = 0.85
+roughness = 0.25
+
+[sub_resource type="StandardMaterial3D" id="Mat_Skin"]
+albedo_color = Color(0.85, 0.64, 0.5, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_Hair"]
+albedo_color = Color(0.08, 0.07, 0.06, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Mat_SahilRed"]
+albedo_color = Color(0.85, 0.18, 0.15, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Mat_AashuBlue"]
+albedo_color = Color(0.18, 0.35, 0.85, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Mat_MummySaree"]
+albedo_color = Color(0.75, 0.22, 0.42, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_Jeans"]
+albedo_color = Color(0.18, 0.25, 0.4, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="Mat_PaperWhite"]
+albedo_color = Color(0.92, 0.9, 0.84, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_RegisterRed"]
+albedo_color = Color(0.55, 0.12, 0.12, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_BeaconRedGlow"]
+albedo_color = Color(1, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.1, 0.1, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_BeaconBlueGlow"]
+albedo_color = Color(0.1, 0.4, 1, 1)
+emission_enabled = true
+emission = Color(0.1, 0.4, 1, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_CeilingFanBody"]
+albedo_color = Color(0.24, 0.15, 0.1, 1)
+metallic = 0.35
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_CeilingFanBlade"]
+albedo_color = Color(0.26, 0.16, 0.11, 1)
+metallic = 0.25
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_CeilingFanGold"]
+albedo_color = Color(0.88, 0.72, 0.28, 1)
+metallic = 0.85
+roughness = 0.22
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_GlassPanel"]
+bg_color = Color(0.06, 0.08, 0.12, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.5, 0.9, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_FIRSheet"]
+bg_color = Color(0.96, 0.94, 0.88, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.2, 0.1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 16
+
+[node name="PoliceStation" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ps")
+
+[node name="Lights" type="Node3D" parent="."]
+
+[node name="TubeLight1" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, -1.5)
+light_color = Color(0.95, 0.98, 1, 1)
+light_energy = 2.2
+omni_range = 10.0
+
+[node name="TubeLight2" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 3.0)
+light_color = Color(0.95, 0.98, 1, 1)
+light_energy = 2.0
+omni_range = 10.0
+
+[node name="DeskLampLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.85, 1.2, -0.9)
+light_color = Color(1, 0.88, 0.65, 1)
+light_energy = 1.6
+omni_range = 3.5
+
+[node name="WindowRedBeacon" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 2.5, 4.5)
+light_color = Color(1, 0.1, 0.1, 1)
+light_energy = 2.8
+omni_range = 8.0
+
+[node name="WindowBlueBeacon" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 2.5, 5.5)
+light_color = Color(0.1, 0.4, 1, 1)
+light_energy = 2.8
+omni_range = 8.0
+
+[node name="RoomGeometry" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+use_collision = true
+size = Vector3(12, 0.2, 14)
+material = SubResource("Mat_Floor")
+
+[node name="Ceiling" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
+use_collision = true
+size = Vector3(12, 0.2, 14)
+material = SubResource("Mat_WallUpper")
+
+[node name="WallBackUpper" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -6.9)
+use_collision = true
+size = Vector3(12, 2.2, 0.2)
+material = SubResource("Mat_WallUpper")
+
+[node name="WallBackLower" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -6.9)
+use_collision = true
+size = Vector3(12, 1.5, 0.2)
+material = SubResource("Mat_WallLower")
+
+[node name="WallBackTrim" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.52, -6.88)
+size = Vector3(12, 0.06, 0.24)
+material = SubResource("Mat_WallTrim")
+
+[node name="WallFrontUpper" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 6.9)
+use_collision = true
+size = Vector3(12, 2.2, 0.2)
+material = SubResource("Mat_WallUpper")
+
+[node name="WallFrontLower" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 6.9)
+use_collision = true
+size = Vector3(12, 1.5, 0.2)
+material = SubResource("Mat_WallLower")
+
+[node name="WallLeft" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.9, 1.85, 0)
+use_collision = true
+size = Vector3(0.2, 3.7, 14)
+material = SubResource("Mat_WallUpper")
+
+[node name="WallRight" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9, 1.85, 0)
+use_collision = true
+size = Vector3(0.2, 3.7, 14)
+material = SubResource("Mat_WallUpper")
+
+[node name="EntranceDoorFrame" type="CSGBox3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 6.85)
+size = Vector3(1.8, 2.6, 0.3)
+material = SubResource("Mat_DeskWood")
+
+[node name="CeilingFan" type="Node3D" parent="RoomGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7, 0)
+
+[node name="CeilingCanopy" type="CSGCylinder3D" parent="RoomGeometry/CeilingFan"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+radius = 0.08
+height = 0.08
+sides = 16
+material = SubResource("Mat_CeilingFanBody")
+
+[node name="Rod" type="CSGCylinder3D" parent="RoomGeometry/CeilingFan"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.26, 0)
+radius = 0.02
+height = 0.52
+sides = 12
+material = SubResource("Mat_CeilingFanBody")
+
+[node name="MotorTopCanopy" type="CSGCylinder3D" parent="RoomGeometry/CeilingFan"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+radius = 0.09
+height = 0.06
+sides = 16
+material = SubResource("Mat_CeilingFanBody")
+
+[node name="MotorCenter" type="CSGCylinder3D" parent="RoomGeometry/CeilingFan"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58, 0)
+radius = 0.22
+height = 0.12
+sides = 24
+material = SubResource("Mat_CeilingFanBody")
+
+[node name="MotorGoldRing" type="CSGCylinder3D" parent="RoomGeometry/CeilingFan"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58, 0)
+radius = 0.228
+height = 0.024
+sides = 24
+material = SubResource("Mat_CeilingFanGold")
+
+[node name="MotorBottomCap" type="CSGCylinder3D" parent="RoomGeometry/CeilingFan"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.65, 0)
+radius = 0.13
+height = 0.04
+sides = 16
+material = SubResource("Mat_CeilingFanGold")
+
+[node name="Blades" type="Node3D" parent="RoomGeometry/CeilingFan"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.58, 0)
+
+[node name="BladeHolder1" type="Node3D" parent="RoomGeometry/CeilingFan/Blades"]
+
+[node name="Shank" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0, 0)
+size = Vector3(0.14, 0.016, 0.05)
+material = SubResource("Mat_CeilingFanGold")
+
+[node name="Blade" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0, 0)
+size = Vector3(0.9, 0.012, 0.18)
+material = SubResource("Mat_CeilingFanBlade")
+
+[node name="Ridge" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0.007, 0)
+size = Vector3(0.86, 0.006, 0.02)
+material = SubResource("Mat_CeilingFanGold")
+
+[node name="Tip" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder1"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 1.19, 0, 0)
+size = Vector3(0.08, 0.012, 0.13)
+material = SubResource("Mat_CeilingFanBlade")
+
+[node name="BladeHolder2" type="Node3D" parent="RoomGeometry/CeilingFan/Blades"]
+transform = Transform3D(-0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, -0.5, 0, 0, 0)
+
+[node name="Shank" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0, 0)
+size = Vector3(0.14, 0.016, 0.05)
+material = SubResource("Mat_CeilingFanGold")
+
+[node name="Blade" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0, 0)
+size = Vector3(0.9, 0.012, 0.18)
+material = SubResource("Mat_CeilingFanBlade")
+
+[node name="Ridge" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0.007, 0)
+size = Vector3(0.86, 0.006, 0.02)
+material = SubResource("Mat_CeilingFanGold")
+
+[node name="Tip" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder2"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 1.19, 0, 0)
+size = Vector3(0.08, 0.012, 0.13)
+material = SubResource("Mat_CeilingFanBlade")
+
+[node name="BladeHolder3" type="Node3D" parent="RoomGeometry/CeilingFan/Blades"]
+transform = Transform3D(-0.5, 0, 0.866025, 0, 1, 0, -0.866025, 0, -0.5, 0, 0, 0)
+
+[node name="Shank" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0, 0)
+size = Vector3(0.14, 0.016, 0.05)
+material = SubResource("Mat_CeilingFanGold")
+
+[node name="Blade" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0, 0)
+size = Vector3(0.9, 0.012, 0.18)
+material = SubResource("Mat_CeilingFanBlade")
+
+[node name="Ridge" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 0.72, 0.007, 0)
+size = Vector3(0.86, 0.006, 0.02)
+material = SubResource("Mat_CeilingFanGold")
+
+[node name="Tip" type="CSGBox3D" parent="RoomGeometry/CeilingFan/Blades/BladeHolder3"]
+transform = Transform3D(1, 0, 0, 0, 0.992, -0.126, 0, 0.126, 0.992, 1.19, 0, 0)
+size = Vector3(0.08, 0.012, 0.13)
+material = SubResource("Mat_CeilingFanBlade")
+
+[node name="OfficeProps" type="Node3D" parent="."]
+
+[node name="InspectorDesk" type="CSGBox3D" parent="OfficeProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, -1)
+use_collision = true
+size = Vector3(2.6, 0.76, 1.2)
+material = SubResource("Mat_DeskWood")
+
+[node name="GlassTop" type="CSGBox3D" parent="OfficeProps/InspectorDesk"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39, 0)
+size = Vector3(2.5, 0.015, 1.1)
+material = SubResource("Mat_GlassTop")
+
+[node name="FIRRegister" type="CSGBox3D" parent="OfficeProps/InspectorDesk"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, -0.25, 0.41, 0.1)
+size = Vector3(0.42, 0.04, 0.32)
+material = SubResource("Mat_RegisterRed")
+
+[node name="RegisterPages" type="CSGBox3D" parent="OfficeProps/InspectorDesk/FIRRegister"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
+size = Vector3(0.39, 0.035, 0.29)
+material = SubResource("Mat_PaperWhite")
+
+[node name="StampPad" type="CSGBox3D" parent="OfficeProps/InspectorDesk"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.41, -0.15)
+size = Vector3(0.12, 0.02, 0.09)
+material = SubResource("Mat_AashuBlue")
+
+[node name="RubberStamp" type="CSGCylinder3D" parent="OfficeProps/InspectorDesk"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 0.44, -0.15)
+radius = 0.03
+height = 0.08
+material = SubResource("Mat_DeskWood")
+
+[node name="PoliceVHFTransceiver" type="CSGBox3D" parent="OfficeProps/InspectorDesk"]
+transform = Transform3D(0.966, 0, -0.259, 0, 1, 0, 0.259, 0, 0.966, -0.85, 0.46, -0.2)
+size = Vector3(0.24, 0.16, 0.18)
+material = SubResource("Mat_IronBars")
+
+[node name="RadioAntenna" type="CSGCylinder3D" parent="OfficeProps/InspectorDesk/PoliceVHFTransceiver"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.25, 0.05)
+radius = 0.008
+height = 0.38
+material = SubResource("Mat_IronBars")
+
+[node name="PolicePeakedCap" type="CSGCylinder3D" parent="OfficeProps/InspectorDesk"]
+transform = Transform3D(0.94, 0, 0.34, 0, 1, 0, -0.34, 0, 0.94, 0.85, 0.43, 0.1)
+radius = 0.14
+height = 0.07
+material = SubResource("Mat_PoliceKhaki")
+
+[node name="CapPeak" type="CSGBox3D" parent="OfficeProps/InspectorDesk/PolicePeakedCap"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0.12)
+size = Vector3(0.18, 0.015, 0.08)
+material = SubResource("Mat_PoliceDarkBrown")
+
+[node name="InspectorChair" type="Node3D" parent="OfficeProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.8)
+
+[node name="Seat" type="CSGBox3D" parent="OfficeProps/InspectorChair"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+size = Vector3(0.6, 0.1, 0.55)
+material = SubResource("Mat_PoliceDarkBrown")
+
+[node name="Backrest" type="CSGBox3D" parent="OfficeProps/InspectorChair"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, -0.24)
+size = Vector3(0.55, 0.75, 0.1)
+material = SubResource("Mat_PoliceDarkBrown")
+
+[node name="WallBoard" type="CSGBox3D" parent="OfficeProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -6.75)
+size = Vector3(3.5, 1.4, 0.05)
+material = SubResource("Mat_WallLower")
+
+[node name="BoardTitle" type="Label3D" parent="OfficeProps/WallBoard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0.03)
+text = "★ मध्य प्रदेश पुलिस — थाना पानसेमल ★
+PANSEMAL DISTRICT POLICE STATION"
+font_size = 20
+outline_size = 6
+
+[node name="NoticeBoard" type="CSGBox3D" parent="OfficeProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 2.2, -6.75)
+size = Vector3(2.4, 1.3, 0.05)
+material = SubResource("Mat_DeskWood")
+
+[node name="NoticeText" type="Label3D" parent="OfficeProps/NoticeBoard"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.03)
+text = "CRIME BULLETIN & EMERGENCY NOTICES
+- CASE #402/BHANGARH : HIGH PRIORITY
+- BARWANI DISTRICT NIGHT PATROL
+- INTER-STATE COORDINATION : RAJASTHAN"
+font_size = 14
+outline_size = 4
+
+[node name="LockupCell" type="Node3D" parent="OfficeProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0, -2.5)
+
+[node name="Bar1" type="CSGCylinder3D" parent="OfficeProps/LockupCell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+radius = 0.025
+height = 3.0
+material = SubResource("Mat_IronBars")
+
+[node name="Bar2" type="CSGCylinder3D" parent="OfficeProps/LockupCell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 1.5, 0)
+radius = 0.025
+height = 3.0
+material = SubResource("Mat_IronBars")
+
+[node name="Bar3" type="CSGCylinder3D" parent="OfficeProps/LockupCell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 1.5, 0)
+radius = 0.025
+height = 3.0
+material = SubResource("Mat_IronBars")
+
+[node name="Bar4" type="CSGCylinder3D" parent="OfficeProps/LockupCell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 1.5, 0)
+radius = 0.025
+height = 3.0
+material = SubResource("Mat_IronBars")
+
+[node name="Characters" type="Node3D" parent="."]
+
+[node name="Thanedaar" type="Node3D" parent="Characters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.65)
+
+[node name="Torso" type="CSGBox3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+size = Vector3(0.5, 0.65, 0.3)
+material = SubResource("Mat_PoliceKhaki")
+
+[node name="Belt" type="CSGBox3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, 0)
+size = Vector3(0.52, 0.1, 0.32)
+material = SubResource("Mat_PoliceDarkBrown")
+
+[node name="Buckle" type="CSGBox3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, 0.17)
+size = Vector3(0.1, 0.08, 0.03)
+material = SubResource("Mat_PoliceGold")
+
+[node name="ShoulderStarL" type="CSGBox3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.22, 1.26, 0)
+size = Vector3(0.06, 0.03, 0.08)
+material = SubResource("Mat_PoliceGold")
+
+[node name="ShoulderStarR" type="CSGBox3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 1.26, 0)
+size = Vector3(0.06, 0.03, 0.08)
+material = SubResource("Mat_PoliceGold")
+
+[node name="Head" type="CSGSphere3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
+radius = 0.17
+material = SubResource("Mat_Skin")
+
+[node name="Hair" type="CSGSphere3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, -0.04)
+radius = 0.165
+material = SubResource("Mat_Hair")
+
+[node name="Moustache" type="CSGBox3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.42, 0.15)
+size = Vector3(0.16, 0.04, 0.05)
+material = SubResource("Mat_Hair")
+
+[node name="Arms" type="CSGBox3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0.28)
+size = Vector3(0.72, 0.16, 0.35)
+material = SubResource("Mat_PoliceKhaki")
+
+[node name="NameTag" type="Label3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+text = "👮 थानेदार आर. के. शर्मा
+(INSPECTOR R.K. SHARMA)"
+font_size = 18
+outline_size = 5
+
+[node name="Sahil" type="Node3D" parent="Characters"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, -1.2, 0, 1.4)
+
+[node name="Torso" type="CSGBox3D" parent="Characters/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+size = Vector3(0.42, 0.65, 0.26)
+material = SubResource("Mat_SahilRed")
+
+[node name="Pants" type="CSGBox3D" parent="Characters/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+size = Vector3(0.38, 0.75, 0.24)
+material = SubResource("Mat_Jeans")
+
+[node name="Head" type="CSGSphere3D" parent="Characters/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+radius = 0.15
+material = SubResource("Mat_Skin")
+
+[node name="Hair" type="CSGSphere3D" parent="Characters/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, -0.03)
+radius = 0.145
+material = SubResource("Mat_Hair")
+
+[node name="NameTag" type="Label3D" parent="Characters/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.88, 0)
+text = "🧢 साहिल (SAHIL)"
+font_size = 16
+outline_size = 4
+
+[node name="Aashutosh" type="Node3D" parent="Characters"]
+transform = Transform3D(0.966, 0, -0.259, 0, 1, 0, 0.259, 0, 0.966, 1.2, 0, 1.4)
+
+[node name="Torso" type="CSGBox3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+size = Vector3(0.42, 0.65, 0.26)
+material = SubResource("Mat_AashuBlue")
+
+[node name="Pants" type="CSGBox3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+size = Vector3(0.38, 0.75, 0.24)
+material = SubResource("Mat_Jeans")
+
+[node name="Head" type="CSGSphere3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+radius = 0.15
+material = SubResource("Mat_Skin")
+
+[node name="Spectacles" type="CSGBox3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0.14)
+size = Vector3(0.22, 0.05, 0.03)
+material = SubResource("Mat_IronBars")
+
+[node name="NameTag" type="Label3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.88, 0)
+text = "👓 आशुतोष (AASHUTOSH)"
+font_size = 16
+outline_size = 4
+
+[node name="KripalMummy" type="Node3D" parent="Characters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 1.7)
+
+[node name="SareeSkirt" type="CSGCylinder3D" parent="Characters/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48, 0)
+radius = 0.28
+height = 0.95
+sides = 16
+material = SubResource("Mat_MummySaree")
+
+[node name="SareeTorso" type="CSGBox3D" parent="Characters/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.08, 0)
+size = Vector3(0.38, 0.48, 0.24)
+material = SubResource("Mat_MummySaree")
+
+[node name="Head" type="CSGSphere3D" parent="Characters/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
+radius = 0.14
+material = SubResource("Mat_Skin")
+
+[node name="HairBun" type="CSGSphere3D" parent="Characters/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, -0.1)
+radius = 0.11
+material = SubResource("Mat_Hair")
+
+[node name="Bindi" type="CSGSphere3D" parent="Characters/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0.13)
+radius = 0.02
+material = SubResource("Mat_SahilRed")
+
+[node name="NameTag" type="Label3D" parent="Characters/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.78, 0)
+text = "👩 कृपाल की माँ (KRIPAL'S MOTHER)"
+font_size = 16
+outline_size = 4
+
+[node name="Player" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 2)
+
+[node name="VisualModel" type="Node3D" parent="Player"]
+
+[node name="Torso" type="CSGBox3D" parent="Player/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+size = Vector3(0.42, 0.65, 0.26)
+material = SubResource("Mat_DeskWood")
+
+[node name="Pants" type="CSGBox3D" parent="Player/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+size = Vector3(0.38, 0.75, 0.24)
+material = SubResource("Mat_Jeans")
+
+[node name="Head" type="CSGSphere3D" parent="Player/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+radius = 0.15
+material = SubResource("Mat_Skin")
+
+[node name="CameraPivot" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player/CameraPivot"]
+current = true
+fov = 72.0
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="VoiceAudio" type="AudioStreamPlayer" parent="Audio"]
+
+[node name="FanBuzzAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("2_fan_buzz")
+volume_db = -8.0
+
+[node name="RadioChatterAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("3_radio_chatter")
+volume_db = -10.0
+
+[node name="PaperScribbleAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("4_paper_write")
+volume_db = -3.0
+
+[node name="StampThudAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("5_stamp_thud")
+volume_db = 2.0
+
+[node name="DoorCloseAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("6_door_close")
+volume_db = 0.0
+
+[node name="ThunderAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("7_thunder")
+volume_db = -6.0
+
+[node name="PoliceUI" type="CanvasLayer" parent="."]
+
+[node name="HUD" type="Control" parent="PoliceUI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HeaderBox" type="PanelContainer" parent="PoliceUI/HUD"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -380.0
+offset_top = 18.0
+offset_right = 380.0
+offset_bottom = 74.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBox_GlassPanel")
+
+[node name="Margin" type="MarginContainer" parent="PoliceUI/HUD/HeaderBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="PoliceUI/HUD/HeaderBox/Margin"]
+layout_mode = 2
+
+[node name="StationTitle" type="Label" parent="PoliceUI/HUD/HeaderBox/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 17
+text = "★ PANSEMAL DISTRICT POLICE STATION — EMERGENCY REPORT ★"
+horizontal_alignment = 1
+
+[node name="ObjectiveLabel" type="Label" parent="PoliceUI/HUD/HeaderBox/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 13
+text = "MISSION OBJECTIVE: LODGE EMERGENCY FIR FOR KRIPAL'S ABDUCTION"
+horizontal_alignment = 1
+
+[node name="ViewToggleBtn" type="Button" parent="PoliceUI/HUD"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 22.0
+offset_right = -20.0
+offset_bottom = 58.0
+grow_horizontal = 0
+text = "👁️ [V] VIEW: 1ST PERSON"
+
+[node name="DialogueBox" type="PanelContainer" parent="PoliceUI"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -440.0
+offset_top = -180.0
+offset_right = 440.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBox_GlassPanel")
+
+[node name="Margin" type="MarginContainer" parent="PoliceUI/DialogueBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="PoliceUI/DialogueBox/Margin"]
+layout_mode = 2
+
+[node name="SpeakerLabel" type="Label" parent="PoliceUI/DialogueBox/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "👮 थानेदार आर. के. शर्मा (INSPECTOR SHARMA)"
+
+[node name="DialogueText" type="Label" parent="PoliceUI/DialogueBox/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 16
+text = "नमस्ते। बताइए, इतनी रात को आप सब यहाँ किस लिए आए हैं? क्या परेशानी है?"
+autowrap_mode = 2
+
+[node name="AdvanceTip" type="Label" parent="PoliceUI/DialogueBox/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 0.8)
+theme_override_font_sizes/font_size = 12
+text = "[CLICK / SPACE TO CONTINUE]"
+horizontal_alignment = 2
+
+[node name="FIROverlay" type="Control" parent="PoliceUI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="PoliceUI/FIROverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -240.0
+offset_right = 310.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_FIRSheet")
+
+[node name="Margin" type="MarginContainer" parent="PoliceUI/FIROverlay/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="PoliceUI/FIROverlay/Panel/Margin"]
+layout_mode = 2
+
+[node name="GovHeader" type="Label" parent="PoliceUI/FIROverlay/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.2, 0.45, 1)
+theme_override_font_sizes/font_size = 15
+text = "GOVERNMENT OF MADHYA PRADESH — POLICE DEPT.
+BARWANI DISTRICT | PANSEMAL POLICE STATION"
+horizontal_alignment = 1
+
+[node name="FIRTitle" type="Label" parent="PoliceUI/FIROverlay/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 17
+text = "FIRST INFORMATION REPORT (F.I.R. #402/BHANGARH)"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="PoliceUI/FIROverlay/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="DetailsText" type="Label" parent="PoliceUI/FIROverlay/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.15, 0.18, 1)
+theme_override_font_sizes/font_size = 13
+text = "DATE & TIME: 22 NOVEMBER, 23:15 HOURS
+COMPLAINANTS: KRIPAL'S MOTHER, SAHIL, AASHUTOSH & WITNESS
+INCIDENT TYPE: ABDUCTION & CRIMINAL KIDNAPPING (SEC 363/364A IPC)
+MISSING PERSON: KRIPAL SISODIYA (AGE 16, CLASS 10)
+EVIDENCE COLLECTED: BLOOD STAINS, NOTE 'FIND ME AT BHANGARH'
+POLICE ACTION: INTER-STATE INQUIRY TRANSMITTED TO RAJASTHAN"
+
+[node name="StampContainer" type="CenterContainer" parent="PoliceUI/FIROverlay/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="StampLabel" type="Label" parent="PoliceUI/FIROverlay/Panel/Margin/VBox/StampContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.1, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0.85, 0.1, 0.1, 0.4)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+text = "★ REGISTERED & FILED — URGENT ACTION ★
+PANSEMAL POLICE STATION SEAL"
+horizontal_alignment = 1
+
+[node name="MissionCompleteCard" type="PanelContainer" parent="PoliceUI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -180.0
+offset_right = 340.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_GlassPanel")
+
+[node name="Margin" type="MarginContainer" parent="PoliceUI/MissionCompleteCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 26
+theme_override_constants/margin_bottom = 22
+
+[node name="VBox" type="VBoxContainer" parent="PoliceUI/MissionCompleteCard/Margin"]
+layout_mode = 2
+
+[node name="CardTitle" type="Label" parent="PoliceUI/MissionCompleteCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 18
+text = "✦ CHAPTER 1 : PART III — MISSION COMPLETE ✦"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="PoliceUI/MissionCompleteCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "EMERGENCY FIR OFFICIALLY LODGED AT PANSEMAL POLICE STATION"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="PoliceUI/MissionCompleteCard/Margin/VBox"]
+layout_mode = 2
+
+[node name="BodyText" type="Label" parent="PoliceUI/MissionCompleteCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "STATUS: CASE #402/BHANGARH OFFICIALLY LOGGED
+POLICE DISPATCH: TEAM MOVING TOMORROW AT 06:00 AM (INTER-STATE DELAYS)
+CRITICAL DECISION:
+Kripal cannot wait until morning. The occult force at Bhangarh fort is active tonight!
+You and your friends must take matters into your own hands!"
+autowrap_mode = 2
+
+[node name="ProceedBtn" type="Button" parent="PoliceUI/MissionCompleteCard/Margin/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "➔ STEP OUTSIDE & PREPARE FOR DEPARTURE"
+
+[node name="DepartureOverlay" type="ColorRect" parent="PoliceUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.04, 0.05, 0.08, 0.98)
+
+[node name="Subtitle" type="Label" parent="PoliceUI/DepartureOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -60.0
+offset_right = 400.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 17
+text = "रात 11:30 बजे... पानसेमल पुलिस थाने से बाहर..."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ChapterEndCard" type="PanelContainer" parent="PoliceUI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -200.0
+offset_right = 360.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_GlassPanel")
+
+[node name="Margin" type="MarginContainer" parent="PoliceUI/ChapterEndCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
+
+[node name="VBox" type="VBoxContainer" parent="PoliceUI/ChapterEndCard/Margin"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PoliceUI/ChapterEndCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 19
+text = "★ CHAPTER 1 : THE PANSEMAL CHRONICLES — 100% COMPLETE ★"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="PoliceUI/ChapterEndCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "PREPARING EXPEDITION TO BHANGARH FORT, RAJASTHAN"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="PoliceUI/ChapterEndCard/Margin/VBox"]
+layout_mode = 2
+
+[node name="Summary" type="Label" parent="PoliceUI/ChapterEndCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "✔ Classroom Mystery Investigated
+✔ Escape from St. Augustine School
+✔ Bicycle Journey through Thunderstorm
+✔ Kripal's Residence & Mother Informed
+✔ Emergency FIR Filed at Pansemal Police Station
+
+Sahil, Aashutosh, and you are packing high-power flashlights, EMF meters, cameras, and first-aid kits.
+In 30 minutes, you rendezvous at Sahil's car to embark on the dark desert highway to Bhangarh Ruins!"
+autowrap_mode = 2
+
+[node name="BtnBox" type="HBoxContainer" parent="PoliceUI/ChapterEndCard/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="StartCh2Btn" type="Button" parent="PoliceUI/ChapterEndCard/Margin/VBox/BtnBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "➔ PROCEED TO CHAPTER 2: BHANGARH RUINS"
+
+[node name="ReplayBtn" type="Button" parent="PoliceUI/ChapterEndCard/Margin/VBox/BtnBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "↺ REPLAY POLICE STATION"
