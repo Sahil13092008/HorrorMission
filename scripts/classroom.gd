@@ -522,11 +522,12 @@ func start_door_sequence():
 	subtitle.text = "🎯 मिशन: साहिल और आशुतोष के साथ कृपाल के घर की ओर निकलो [E दबाएं]"
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 
-	# Sahil and Aashutosh run/walk over to the door!
+	# Sahil and Aashutosh run/walk over to the door facing forward!
 	if char_sahil:
 		var tw_s = create_tween()
 		tw_s.tween_property(char_sahil, "position", Vector3(6.6, 0.0, 3.8), 2.0)
 		char_sahil.look_at(doorway.global_position, Vector3.UP)
+		char_sahil.rotation.y += PI
 		char_sahil.rotation.x = 0
 		char_sahil.rotation.z = 0
 		
@@ -534,6 +535,7 @@ func start_door_sequence():
 		var tw_a = create_tween()
 		tw_a.tween_property(char_aashutosh, "position", Vector3(6.6, 0.0, 5.2), 2.2)
 		char_aashutosh.look_at(doorway.global_position, Vector3.UP)
+		char_aashutosh.rotation.y += PI
 		char_aashutosh.rotation.x = 0
 		char_aashutosh.rotation.z = 0
 

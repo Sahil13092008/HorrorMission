@@ -4,9 +4,14 @@
 [ext_resource type="AudioStream" path="res://audio/street_ambience.wav" id="2_ambience"]
 [ext_resource type="AudioStream" path="res://audio/doorbell.wav" id="3_doorbell"]
 [ext_resource type="AudioStream" path="res://audio/home_door_open.wav" id="4_door_open"]
-[ext_resource type="AudioStream" path="res://audio/mummy_line_1.mp3" id="5_mummy1"]
-[ext_resource type="AudioStream" path="res://audio/mummy_line_2.mp3" id="6_mummy2"]
-[ext_resource type="AudioStream" path="res://audio/stone_footsteps.wav" id="7_footstep"]
+[ext_resource type="AudioStream" path="res://audio/stone_footsteps.wav" id="5_footstep"]
+[ext_resource type="AudioStream" path="res://audio/mummy_line_1.mp3" id="6_mummy1"]
+[ext_resource type="AudioStream" path="res://audio/player_talk_mummy.mp3" id="7_player_talk"]
+[ext_resource type="AudioStream" path="res://audio/sahil_talk_mummy.mp3" id="8_sahil_talk"]
+[ext_resource type="AudioStream" path="res://audio/aashu_talk_mummy.mp3" id="9_aashu_talk"]
+[ext_resource type="AudioStream" path="res://audio/mummy_crying.mp3" id="10_mummy_cry"]
+[ext_resource type="AudioStream" path="res://audio/player_comfort_mummy.mp3" id="11_player_comfort"]
+[ext_resource type="AudioStream" path="res://audio/sahil_police_plan.mp3" id="12_sahil_police"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat_Street"]
 sky_top_color = Color(0.04, 0.05, 0.12, 1)
@@ -32,7 +37,7 @@ radius = 0.35
 height = 1.75
 
 [sub_resource type="BoxShape3D" id="Box_DoorTrigger"]
-size = Vector3(3.0, 2.5, 3.0)
+size = Vector3(3.2, 2.5, 3.2)
 
 [sub_resource type="StandardMaterial3D" id="Mat_Asphalt"]
 albedo_color = Color(0.14, 0.15, 0.17, 1)
@@ -77,6 +82,30 @@ roughness = 0.85
 albedo_color = Color(0.68, 0.45, 0.35, 1)
 roughness = 0.85
 
+[sub_resource type="StandardMaterial3D" id="Mat_HouseWall3"]
+albedo_color = Color(0.45, 0.58, 0.68, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceStation"]
+albedo_color = Color(0.85, 0.86, 0.90, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceBlue"]
+albedo_color = Color(0.15, 0.30, 0.75, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceBeaconRed"]
+albedo_color = Color(1, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.1, 0.1, 1)
+emission_energy_multiplier = 4.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceBeaconBlue"]
+albedo_color = Color(0.1, 0.4, 1, 1)
+emission_enabled = true
+emission = Color(0.1, 0.4, 1, 1)
+emission_energy_multiplier = 4.5
+
 [sub_resource type="StandardMaterial3D" id="Mat_KripalHouse"]
 albedo_color = Color(0.65, 0.72, 0.80, 1)
 roughness = 0.75
@@ -86,11 +115,6 @@ albedo_color = Color(1, 0.88, 0.55, 1)
 emission_enabled = true
 emission = Color(1, 0.85, 0.45, 1)
 emission_energy_multiplier = 2.5
-
-[sub_resource type="StandardMaterial3D" id="Mat_GateIron"]
-albedo_color = Color(0.10, 0.11, 0.12, 1)
-metallic = 0.8
-roughness = 0.4
 
 [sub_resource type="StandardMaterial3D" id="Mat_DoorWood"]
 albedo_color = Color(0.36, 0.18, 0.10, 1)
@@ -136,7 +160,7 @@ albedo_color = Color(0.18, 0.24, 0.35, 1)
 roughness = 0.85
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_Radar"]
-bg_color = Color(0.04, 0.06, 0.10, 0.85)
+bg_color = Color(0.04, 0.06, 0.10, 0.88)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -147,8 +171,20 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
+[sub_resource type="StyleBoxFlat" id="StyleBox_TownMap"]
+bg_color = Color(0.03, 0.05, 0.08, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.85, 0.75, 0.25, 0.9)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
 [sub_resource type="StyleBoxFlat" id="StyleBox_Dialogue"]
-bg_color = Color(0.05, 0.06, 0.09, 0.94)
+bg_color = Color(0.05, 0.06, 0.09, 0.95)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -202,42 +238,42 @@ volume_db = 4.0
 volume_db = 6.0
 
 [node name="FootstepAudio" type="AudioStreamPlayer" parent="Audio"]
-stream = ExtResource("7_footstep")
+stream = ExtResource("5_footstep")
 volume_db = -2.0
 
 [node name="EnvironmentProps" type="Node3D" parent="."]
 
 [node name="RoadMain" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, -40)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, -35)
 use_collision = true
-size = Vector3(8.0, 0.1, 90.0)
+size = Vector3(8.0, 0.1, 100.0)
 material = SubResource("Mat_Asphalt")
 
 [node name="RoadCenterStripe" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -40)
-size = Vector3(0.22, 0.01, 88.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -35)
+size = Vector3(0.22, 0.01, 98.0)
 material = SubResource("Mat_RoadStripe")
 
 [node name="SidewalkLeft" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 0.1, -40)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 0.1, -35)
 use_collision = true
-size = Vector3(2.4, 0.2, 90.0)
+size = Vector3(2.4, 0.2, 100.0)
 material = SubResource("Mat_Sidewalk")
 
 [node name="CurbLeft" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 0.12, -40)
-size = Vector3(0.15, 0.24, 90.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 0.12, -35)
+size = Vector3(0.15, 0.24, 100.0)
 material = SubResource("Mat_Curb")
 
 [node name="SidewalkRight" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.1, -40)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.1, -35)
 use_collision = true
-size = Vector3(2.4, 0.2, 90.0)
+size = Vector3(2.4, 0.2, 100.0)
 material = SubResource("Mat_Sidewalk")
 
 [node name="CurbRight" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.12, -40)
-size = Vector3(0.15, 0.24, 90.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.12, -35)
+size = Vector3(0.15, 0.24, 100.0)
 material = SubResource("Mat_Curb")
 
 [node name="StreetLamps" type="Node3D" parent="EnvironmentProps"]
@@ -265,7 +301,7 @@ spot_range = 14.0
 spot_angle = 50.0
 
 [node name="Lamp2" type="Node3D" parent="EnvironmentProps/StreetLamps"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.8, 0, -25)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.8, 0, -28)
 [node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 radius = 0.08
@@ -287,7 +323,7 @@ spot_range = 14.0
 spot_angle = 50.0
 
 [node name="Lamp3" type="Node3D" parent="EnvironmentProps/StreetLamps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0, -45)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0, -48)
 [node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 radius = 0.08
@@ -309,7 +345,7 @@ spot_range = 14.0
 spot_angle = 50.0
 
 [node name="Lamp4" type="Node3D" parent="EnvironmentProps/StreetLamps"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.8, 0, -62)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.8, 0, -66)
 [node name="Pole" type="CSGCylinder3D" parent="EnvironmentProps/StreetLamps/Lamp4"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 radius = 0.08
@@ -333,92 +369,175 @@ spot_angle = 50.0
 [node name="Trees" type="Node3D" parent="EnvironmentProps"]
 
 [node name="Tree1" type="Node3D" parent="EnvironmentProps/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 0, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 0, -10)
 [node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 radius = 0.22
 height = 3.6
 material = SubResource("Mat_TreeTrunk")
-[node name="LeavesBottom" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree1"]
+[node name="Leaves" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
 radius = 1.6
 radial_segments = 10
 rings = 6
 material = SubResource("Mat_TreeLeaves")
-[node name="LeavesTop" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
-radius = 1.2
-radial_segments = 8
-rings = 5
-material = SubResource("Mat_TreeLeaves")
 
 [node name="Tree2" type="Node3D" parent="EnvironmentProps/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0, -32)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0, -22)
 [node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 radius = 0.22
 height = 3.6
 material = SubResource("Mat_TreeTrunk")
-[node name="LeavesBottom" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree2"]
+[node name="Leaves" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
 radius = 1.6
 radial_segments = 10
 rings = 6
 material = SubResource("Mat_TreeLeaves")
-[node name="LeavesTop" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
-radius = 1.2
-radial_segments = 8
-rings = 5
-material = SubResource("Mat_TreeLeaves")
 
 [node name="Tree3" type="Node3D" parent="EnvironmentProps/Trees"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 0, -54)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, 0, -40)
 [node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 radius = 0.22
 height = 3.6
 material = SubResource("Mat_TreeTrunk")
-[node name="LeavesBottom" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree3"]
+[node name="Leaves" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
 radius = 1.6
 radial_segments = 10
 rings = 6
 material = SubResource("Mat_TreeLeaves")
-[node name="LeavesTop" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
-radius = 1.2
-radial_segments = 8
-rings = 5
+
+[node name="Tree4" type="Node3D" parent="EnvironmentProps/Trees"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 0, -56)
+[node name="Trunk" type="CSGCylinder3D" parent="EnvironmentProps/Trees/Tree4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+radius = 0.22
+height = 3.6
+material = SubResource("Mat_TreeTrunk")
+[node name="Leaves" type="CSGSphere3D" parent="EnvironmentProps/Trees/Tree4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
+radius = 1.6
+radial_segments = 10
+rings = 6
 material = SubResource("Mat_TreeLeaves")
 
-[node name="RoadsideHouses" type="Node3D" parent="EnvironmentProps"]
+[node name="PansemalTownHouses" type="Node3D" parent="EnvironmentProps"]
 
-[node name="HouseLeft1" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 3.0, -18)
+[node name="SchoolArch" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 12)
+[node name="ArchPillarL" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SchoolArch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 2.5, 0)
 use_collision = true
-size = Vector3(8.0, 6.0, 18.0)
-material = SubResource("Mat_HouseWall1")
-[node name="Win1" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses/HouseLeft1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.4, -3)
-size = Vector3(0.15, 1.2, 1.8)
-material = SubResource("Mat_WindowWarm")
-
-[node name="HouseRight1" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5, 3.0, -32)
-use_collision = true
-size = Vector3(8.0, 6.0, 20.0)
+size = Vector3(1.0, 5.0, 1.0)
 material = SubResource("Mat_HouseWall2")
-[node name="Win2" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses/HouseRight1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 0.5, 2)
+[node name="ArchPillarR" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SchoolArch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 2.5, 0)
+use_collision = true
+size = Vector3(1.0, 5.0, 1.0)
+material = SubResource("Mat_HouseWall2")
+[node name="ArchBeam" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SchoolArch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
+use_collision = true
+size = Vector3(10.0, 0.8, 1.2)
+material = SubResource("Mat_HouseWall2")
+[node name="SchoolSign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SchoolArch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, -0.65)
+text = "🏫 पानसेमल हाई स्कूल (PANSEMAL HIGH SCHOOL)"
+font_size = 20
+outline_size = 5
+
+[node name="SahilHouse" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -20)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SahilHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
+use_collision = true
+size = Vector3(8.0, 6.0, 14.0)
+material = SubResource("Mat_HouseWall1")
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SahilHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 2.8, 0)
 size = Vector3(0.15, 1.2, 1.8)
 material = SubResource("Mat_WindowWarm")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SahilHouse"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 4.15, 2.2, 3.5)
+text = "🏠 साहिल निवास
+(SAHIL'S HOUSE)"
+font_size = 18
+outline_size = 4
 
-[node name="HouseLeft2" type="CSGBox3D" parent="EnvironmentProps/RoadsideHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 3.0, -50)
+[node name="PlayerHouse" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -35)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PlayerHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
 use_collision = true
-size = Vector3(8.0, 6.0, 20.0)
-material = SubResource("Mat_HouseWall1")
+size = Vector3(8.0, 6.0, 14.0)
+material = SubResource("Mat_HouseWall2")
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PlayerHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 2.8, 0)
+size = Vector3(0.15, 1.2, 1.8)
+material = SubResource("Mat_WindowWarm")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/PlayerHouse"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.15, 2.2, 3.5)
+text = "🏠 मेरा घर (YOU / PLAYER)
+(HERO'S RESIDENCE)"
+font_size = 18
+outline_size = 4
+
+[node name="AashutoshHouse" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -52)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/AashutoshHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
+use_collision = true
+size = Vector3(8.0, 6.0, 14.0)
+material = SubResource("Mat_HouseWall3")
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/AashutoshHouse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 2.8, 0)
+size = Vector3(0.15, 1.2, 1.8)
+material = SubResource("Mat_WindowWarm")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/AashutoshHouse"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 4.15, 2.2, 3.5)
+text = "🏠 आशुतोष का घर
+(AASHUTOSH'S HOUSE)"
+font_size = 18
+outline_size = 4
+
+[node name="PansemalPoliceStation" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 0, -66)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+use_collision = true
+size = Vector3(8.5, 7.0, 16.0)
+material = SubResource("Mat_PoliceStation")
+[node name="RoofStripe" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.75, 0)
+size = Vector3(8.7, 0.5, 16.2)
+material = SubResource("Mat_PoliceBlue")
+[node name="PoliceSign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.35, 4.2, 0)
+text = "🚓 पानसेमल पुलिस थाना
+PANSEMAL POLICE STATION"
+font_size = 22
+outline_size = 6
+[node name="BeaconRed" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3, 5.2, -1.5)
+size = Vector3(0.2, 0.35, 0.35)
+material = SubResource("Mat_PoliceBeaconRed")
+[node name="BeaconBlue" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3, 5.2, 1.5)
+size = Vector3(0.2, 0.35, 0.35)
+material = SubResource("Mat_PoliceBeaconBlue")
+[node name="PoliceLightRed" type="OmniLight3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 5.2, -1.5)
+light_color = Color(1, 0.1, 0.1, 1)
+light_energy = 3.5
+omni_range = 8.0
+[node name="PoliceLightBlue" type="OmniLight3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 5.2, 1.5)
+light_color = Color(0.1, 0.4, 1, 1)
+light_energy = 3.5
+omni_range = 8.0
 
 [node name="Pedestrians" type="Node3D" parent="EnvironmentProps"]
 
@@ -438,7 +557,7 @@ size = Vector3(0.35, 0.7, 0.22)
 material = SubResource("Mat_Jeans")
 
 [node name="Pedestrian2" type="Node3D" parent="EnvironmentProps/Pedestrians"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.6, 0.2, -40)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.6, 0.2, -45)
 [node name="Body" type="CSGBox3D" parent="EnvironmentProps/Pedestrians/Pedestrian2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 size = Vector3(0.4, 0.8, 0.25)
@@ -600,29 +719,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1.05, 0)
 size = Vector3(0.12, 0.52, 0.12)
 material = SubResource("Mat_SareeRed")
 
-[node name="Bangles" type="CSGCylinder3D" parent="KripalHouse/KripalMummy"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 0.85, 0)
-radius = 0.08
-height = 0.08
-material = SubResource("Mat_SareeGold")
-
 [node name="MummyNameTag" type="Label3D" parent="KripalHouse/KripalMummy"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
 text = "👩 KRIPAL'S MOTHER (कृपाल की माँ)"
 font_size = 18
 outline_size = 4
 
-[node name="MummySpotlight" type="SpotLight3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 3.2, 1.8)
-light_color = Color(1, 0.95, 0.85, 1)
-light_energy = 5.0
-spot_range = 6.0
-spot_angle = 45.0
-
 [node name="Companions" type="Node3D" parent="."]
 
 [node name="SahilCompanion" type="CharacterBody3D" parent="Companions"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.1, 0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0.1, 0.3)
 
 [node name="Body" type="CSGBox3D" parent="Companions/SahilCompanion"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
@@ -633,6 +739,11 @@ material = SubResource("Mat_Companion_Sahil")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
 size = Vector3(0.26, 0.28, 0.26)
 material = SubResource("Mat_MummySkin")
+
+[node name="Hair" type="CSGBox3D" parent="Companions/SahilCompanion/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+size = Vector3(0.28, 0.1, 0.28)
+material = SubResource("Mat_MummyHair")
 
 [node name="Pants" type="CSGBox3D" parent="Companions/SahilCompanion"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
@@ -647,7 +758,7 @@ font_size = 15
 outline_size = 3
 
 [node name="AashutoshCompanion" type="CharacterBody3D" parent="Companions"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.1, 0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0.1, 0.3)
 
 [node name="Body" type="CSGBox3D" parent="Companions/AashutoshCompanion"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
@@ -658,6 +769,11 @@ material = SubResource("Mat_Companion_Aashu")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
 size = Vector3(0.26, 0.28, 0.26)
 material = SubResource("Mat_MummySkin")
+
+[node name="Hair" type="CSGBox3D" parent="Companions/AashutoshCompanion/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+size = Vector3(0.28, 0.1, 0.28)
+material = SubResource("Mat_MummyHair")
 
 [node name="Pants" type="CSGBox3D" parent="Companions/AashutoshCompanion"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
@@ -672,7 +788,7 @@ font_size = 15
 outline_size = 3
 
 [node name="Player" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
@@ -721,14 +837,21 @@ theme_override_constants/margin_right = 25
 
 [node name="HBox" type="HBoxContainer" parent="StreetUI/HUDContainer"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 15
 
 [node name="ViewToggleBtn" type="Button" parent="StreetUI/HUDContainer/HBox"]
-custom_minimum_size = Vector2(230, 38)
+custom_minimum_size = Vector2(210, 38)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 text = "👁️ [V] कैमरा: 1st Person"
+
+[node name="MapToggleBtn" type="Button" parent="StreetUI/HUDContainer/HBox"]
+custom_minimum_size = Vector2(240, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 13
+text = "🗺️ [M] पानसेमल नगर का नक्शा"
 
 [node name="ControlsTip" type="Label" parent="StreetUI/HUDContainer/HBox"]
 layout_mode = 2
@@ -736,63 +859,117 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.85, 0.88, 0.95, 0.85)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 13
-text = "[W, A, S, D] चलना | [SHIFT] दौड़ना | [V] कैमरा व्यू | [F] टॉर्च | [E] बातचीत / डोरबेल"
+theme_override_font_sizes/font_size = 12
+text = "[W, A, S, D] चलना | [SHIFT] दौड़ना | [V] कैमरा | [M] शहर का नक्शा | [E] बातचीत"
 
 [node name="ObjectiveBanner" type="Label" parent="StreetUI"]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -380.0
+offset_left = -400.0
 offset_top = 62.0
-offset_right = 380.0
+offset_right = 400.0
 offset_bottom = 92.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 15
-text = "✦ मिशन: सड़क पर आगे बढ़ें और कृपाल के घर पहुँचकर डोरबेल बजाएं"
+text = "✦ पानसेमल मुख्य मार्ग: तीनों दोस्त साथ मिलकर कृपाल के घर पहुँचें और डोरबेल बजाएं"
 horizontal_alignment = 1
 
 [node name="MiniMapPanel" type="PanelContainer" parent="StreetUI"]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -220.0
+offset_left = -230.0
 offset_top = 15.0
-offset_right = -20.0
-offset_bottom = 225.0
+offset_right = -15.0
+offset_bottom = 230.0
 grow_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBox_Radar")
 
 [node name="Margin" type="MarginContainer" parent="StreetUI/MiniMapPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_bottom = 8
 
 [node name="VBox" type="VBoxContainer" parent="StreetUI/MiniMapPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
 [node name="RadarTitle" type="Label" parent="StreetUI/MiniMapPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 12
-text = "🌐 जीपीएस रडार मैप (GPS RADAR)"
+text = "🌐 पानसेमल नगर रडार"
 horizontal_alignment = 1
 
 [node name="RadarDisplay" type="Control" parent="StreetUI/MiniMapPanel/Margin/VBox"]
-custom_minimum_size = Vector2(176, 140)
+custom_minimum_size = Vector2(186, 142)
 layout_mode = 2
 
 [node name="DistanceLabel" type="Label" parent="StreetUI/MiniMapPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "📍 कृपाल का घर: 78m"
+horizontal_alignment = 1
+
+[node name="TownMapOverlay" type="PanelContainer" parent="StreetUI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -460.0
+offset_top = -280.0
+offset_right = 460.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_TownMap")
+
+[node name="Margin" type="MarginContainer" parent="StreetUI/TownMapOverlay"]
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="StreetUI/TownMapOverlay/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderHBox" type="HBoxContainer" parent="StreetUI/TownMapOverlay/Margin/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="StreetUI/TownMapOverlay/Margin/VBox/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "🗺️ पानसेमल नगर — आधिकारिक नक्शा (PANSEMAL TOWN MAP)"
+
+[node name="CloseMapBtn" type="Button" parent="StreetUI/TownMapOverlay/Margin/VBox/HeaderHBox"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+text = "✖ [M] बंद करें"
+
+[node name="MapCanvas" type="Control" parent="StreetUI/TownMapOverlay/Margin/VBox"]
+custom_minimum_size = Vector2(860, 370)
+layout_mode = 2
+
+[node name="LegendLabel" type="Label" parent="StreetUI/TownMapOverlay/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 0.9)
+theme_override_font_sizes/font_size = 13
+text = "संकेत: 🏫 स्कूल  |  🏠 साहिल  |  🏠 मेरा घर  |  🏠 आशुतोष  |  ⭐ कृपाल का घर (डोरबेल बजाएं)  |  🚓 पानसेमल पुलिस थाना (अगला पड़ाव)"
 horizontal_alignment = 1
 
 [node name="PromptLabel" type="Label" parent="StreetUI"]
@@ -841,9 +1018,9 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -460.0
-offset_top = -180.0
-offset_right = 460.0
+offset_left = -480.0
+offset_top = -185.0
+offset_right = 480.0
 offset_bottom = -25.0
 grow_horizontal = 2
 grow_vertical = 0
@@ -851,10 +1028,10 @@ theme_override_styles/panel = SubResource("StyleBox_Dialogue")
 
 [node name="Margin" type="MarginContainer" parent="StreetUI/DialogueBox"]
 layout_mode = 2
-theme_override_constants/margin_left = 22
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 22
-theme_override_constants/margin_bottom = 15
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 14
 
 [node name="VBox" type="VBoxContainer" parent="StreetUI/DialogueBox/Margin"]
 layout_mode = 2
@@ -909,9 +1086,9 @@ theme_override_constants/separation = 16
 
 [node name="HeaderBadge" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.35, 0.35, 0.9)
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 16
-text = "✦ मिशन पूरा — कृपाल की माँ से मिला सुराग ✦"
+text = "✦ अध्याय २: पानसेमल पुलिस थाना ✦"
 horizontal_alignment = 1
 
 [node name="HeaderTitle" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox"]
@@ -919,15 +1096,15 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 38
-text = "★ अध्याय २: भानगढ़ किले की ओर प्रस्थान ★"
+theme_override_font_sizes/font_size = 36
+text = "★ पानसेमल पुलिस स्टेशन की ओर प्रस्थान ★"
 horizontal_alignment = 1
 
 [node name="HeaderSub" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
 theme_override_font_sizes/font_size = 18
-text = "THE RESCUE EXPEDITION (भानगढ़ का रहस्य)"
+text = "THE REPORT AT PANSEMAL POLICE STATION"
 horizontal_alignment = 1
 
 [node name="BriefBox" type="PanelContainer" parent="StreetUI/NextChapterCard/Margin/VBox"]
@@ -949,15 +1126,16 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.45, 0.45, 1)
 theme_override_font_sizes/font_size = 18
-text = "🔴 मिशन अपडेट: कृपाल की माँ ने दिया ताबीज और नक्शा"
+text = "🔴 मिशन अपडेट: कृपाल की माँ को रोते देख टीम ने लिया फैसला"
 
 [node name="BriefText" type="Label" parent="StreetUI/NextChapterCard/Margin/VBox/BriefBox/BriefMargin/BriefVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.92, 0.92, 1)
 theme_override_font_sizes/font_size = 16
-text = "कृपाल की माँ ने रोते हुए पुराने तांत्रिक के श्राप का सच बताया और तांत्रिक से बचाव के लिए रक्षा-कवच और भानगढ़ का गुप्त नक्शा टीम को सौंप दिया।
-साहिल, आशुतोष और तुम अब पूरी तैयारी और हथियारों के साथ सीधे भानगढ़ किले की ओर कूच कर रहे हो!
-क्या तुम अपने भाई कृपाल को उस खौफनाक शैतान के चंगुल से ज़िंदा निकाल पाओगे?!"
+text = "कृपाल की माँ अपने लाडले बेटे के लापता होने की खबर सुनकर फूट-फूट कर रोने लगीं।
+तुमने आंटी को ढांढस बंधाया कि रोने से कुछ नहीं होगा, हमें तुरंत कदम उठाना होगा!
+साहिल, आशुतोष, तुम और कृपाल की माँ अब तुरंत पानसेमल पुलिस थाने जा रहे हैं ताकि पुलिस फोर्स के साथ कृपाल की खोजबीन शुरू की जा सके!
+क्या पुलिस इस खौफनाक शैतानी साए का सामना कर पाएगी?!"
 autowrap_mode = 2
 
 [node name="BtnBox" type="HBoxContainer" parent="StreetUI/NextChapterCard/Margin/VBox"]
@@ -965,17 +1143,17 @@ layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 20
 
-[node name="StartBhangarhBtn" type="Button" parent="StreetUI/NextChapterCard/Margin/VBox/BtnBox"]
+[node name="StartPoliceBtn" type="Button" parent="StreetUI/NextChapterCard/Margin/VBox/BtnBox"]
 custom_minimum_size = Vector2(340, 52)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBox_ActionBtn")
-text = "➔ भानगढ़ किले में प्रवेश करें (START MISSION)"
+text = "➔ पानसेमल पुलिस स्टेशन चलें (START)"
 
 [node name="ReplayStreetBtn" type="Button" parent="StreetUI/NextChapterCard/Margin/VBox/BtnBox"]
 custom_minimum_size = Vector2(250, 52)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_font_sizes/font_size = 16
-text = "🔄 गली का दृश्य पुनः खेलें"
+text = "🔄 दृश्य पुनः खेलें"
