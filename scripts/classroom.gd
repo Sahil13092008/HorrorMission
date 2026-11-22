@@ -107,7 +107,7 @@ var dialogue_lines = [
 		"color": Color(1.0, 0.85, 0.2),
 		"portrait": "sahil",
 		"pitch": 1.0,
-		"text": "\"अबे शांत हो जा! पहले गहरी सांस ले... शांत हो! क्या हुआ बता?! ला, मुझे दिखा ये पर्ची... 'फाइंड मी एट भानगढ़'?! अरे ये क्या बकवास है यार?!\""
+		"text": "\"अरे भाई, क्या हुआ तुझे? शांत हो। क्या हुआ बता? और यह पर्ची क्या है? मुझे दिखा। Find me at भानगढ़? अरे क्या है यार यह?\""
 	},
 	{
 		"speaker_id": "aashutosh",
@@ -115,7 +115,7 @@ var dialogue_lines = [
 		"color": Color(1.0, 0.45, 0.2),
 		"portrait": "aashutosh",
 		"pitch": 1.0,
-		"text": "\"भाई तू सच बोल रहा है?! जिस सेकंड तू चीखा... मेरा मोशन सेंसर पूरा लाल हो गया! और ये... अरे ये डेस्क देखो यार! यहाँ पंजे के खूनी निशान पड़े हैं!\""
+		"text": "\"भाई, तू सच बोल रहा है? जिस सेकंड तू चीखा उस सेकंड मेरा मोशन सेंसर चालू हो गया और... देख वहाँ पे डेस्क पे खून के निशान हैं, जैसे किसी ने खरोंच मारी हो।\""
 	},
 	{
 		"speaker_id": "player",
@@ -131,7 +131,7 @@ var dialogue_lines = [
 		"color": Color(1.0, 0.85, 0.2),
 		"portrait": "sahil",
 		"pitch": 1.0,
-		"text": "\"भानगढ़ किला... राजस्थान का भानगढ़?! अरे वहाँ तो सरकार ने बोर्ड लगाया है कि सूरज डूबने के बाद जो गया वो वापस नहीं आया... वो तांत्रिक का श्राप... वो सच है क्या?!\""
+		"text": "\"भानगढ़ किला? राजस्थान का भानगढ़? अरे हाँ, मुझे इसके बारे में पता है। वहाँ तो सरकार ने बोर्ड लगाया है कि जो भी सूरज डूबने के बाद गया, वो कभी वापस नहीं आया। और वो तांत्रिक का श्राप? क्या ये सब बातें सच हैं?\""
 	},
 	{
 		"speaker_id": "aashutosh",
@@ -139,7 +139,7 @@ var dialogue_lines = [
 		"color": Color(1.0, 0.45, 0.2),
 		"portrait": "aashutosh",
 		"pitch": 1.0,
-		"text": "\"तो कृपाल अभी उसी खंडहर में फंसा है यार! भाई हम सुबह का इंतज़ार नहीं कर सकते! हमारे पास ईएमएफ मीटर, थर्मल कैमरा और सारे ट्रैप्स हैं!\""
+		"text": "\"भाई, तो कृपाल अभी उस खंडहर में फंसा हुआ है। यार भाई, हम सुबह का इंतज़ार नहीं कर सकते। अभी हमारे पास ईएमएफ मीटर, थर्मल कैमरा और सारे ट्रैप्स हैं।\""
 	},
 	{
 		"speaker_id": "sahil",
@@ -147,7 +147,7 @@ var dialogue_lines = [
 		"color": Color(1.0, 0.85, 0.2),
 		"portrait": "sahil",
 		"pitch": 1.0,
-		"text": "\"चलो भाइयों कृपाल के घर... उसके घर पे ये बात बताते हैं! हमें तुरंत कृपाल के घर निकलना होगा!\""
+		"text": "\"कृपाल हमारा भाई है। हमें उसे बचाने जाना होगा। चलो हम कृपाल के घर चलते हैं और उसके घरवालों को यह बात बताते हैं।\""
 	},
 	{
 		"speaker_id": "mission",
@@ -346,22 +346,27 @@ func start_group_discussion():
 		heartbeat_audio.stream = sfx_heartbeat
 		heartbeat_audio.play()
 
-	# Sahil and Aashutosh walk over to Kripal's desk
+	# Smoothly position player 1.8m back from Kripal's desk so both friends are in full clear view!
+	if player:
+		var tw_p = create_tween()
+		tw_p.tween_property(player, "global_position", Vector3(-3.0, 0.0, -0.9), 1.2)
+
+	# Sahil and Aashutosh walk to stand beside Kripal's desk, facing the player directly!
 	if char_sahil:
 		var tw_s = create_tween()
-		tw_s.tween_property(char_sahil, "position", Vector3(-2.2, 0.0, -1.8), 1.8)
-		char_sahil.look_at(Vector3(-3.2, 0.0, -2.5), Vector3.UP)
+		tw_s.tween_property(char_sahil, "global_position", Vector3(-1.8, 0.0, -2.3), 1.6)
+		char_sahil.look_at(Vector3(-3.0, 0.0, -0.9), Vector3.UP)
 		char_sahil.rotation.x = 0
 		char_sahil.rotation.z = 0
 		
 	if char_aashutosh:
 		var tw_a = create_tween()
-		tw_a.tween_property(char_aashutosh, "position", Vector3(-3.8, 0.0, -1.6), 2.0)
-		char_aashutosh.look_at(Vector3(-3.2, 0.0, -2.5), Vector3.UP)
+		tw_a.tween_property(char_aashutosh, "global_position", Vector3(-4.2, 0.0, -2.3), 1.8)
+		char_aashutosh.look_at(Vector3(-3.0, 0.0, -0.9), Vector3.UP)
 		char_aashutosh.rotation.x = 0
 		char_aashutosh.rotation.z = 0
 
-	await get_tree().create_timer(1.2).timeout
+	await get_tree().create_timer(1.6).timeout
 
 	dialogue_index = 0
 	dialogue_box.visible = true
@@ -421,31 +426,50 @@ func highlight_speaker(speaker_id: String):
 	if speaker_id == "sahil":
 		if char_sahil and char_sahil.has_node("NameTag"):
 			char_sahil.get_node("NameTag").text = "🗣️ SAHIL (Speaking)\n[The Analyst]"
-		if player:
-			player.look_at_target_smoothly(Vector3(-2.2, 1.35, -1.8), 0.7)
-		if speaker_light:
-			speaker_light.position = Vector3(-2.2, 2.8, -1.8)
-			speaker_light.light_color = Color(1.0, 0.9, 0.4)
+		# Camera turns smoothly to focus squarely on Sahil's upper body and face!
+		if player and char_sahil:
+			player.look_at_target_smoothly(char_sahil.global_position + Vector3(0, 1.45, 0), 0.55)
+		# Spotlight illuminates Sahil brilliantly
+		if speaker_light and char_sahil:
+			speaker_light.position = char_sahil.global_position + Vector3(0, 2.4, 0.8)
+			speaker_light.light_color = Color(1.0, 0.92, 0.55)
+			speaker_light.light_energy = 4.0
+		# Sahil talks with subtle head motion
+		if char_sahil.has_node("HeadNode"):
+			var nod_tw = create_tween().set_loops(3)
+			nod_tw.tween_property(char_sahil.get_node("HeadNode"), "rotation_degrees:x", 6.0, 0.35)
+			nod_tw.tween_property(char_sahil.get_node("HeadNode"), "rotation_degrees:x", -3.0, 0.35)
 			
 	elif speaker_id == "aashutosh":
 		if char_aashutosh and char_aashutosh.has_node("NameTag"):
 			char_aashutosh.get_node("NameTag").text = "🗣️ AASHUTOSH (Speaking)\n[The Explorer]"
-		if player:
-			player.look_at_target_smoothly(Vector3(-3.8, 1.35, -1.6), 0.7)
-		if speaker_light:
-			speaker_light.position = Vector3(-3.8, 2.8, -1.6)
-			speaker_light.light_color = Color(1.0, 0.5, 0.2)
+		# Camera turns smoothly to focus squarely on Aashutosh's upper body and face!
+		if player and char_aashutosh:
+			player.look_at_target_smoothly(char_aashutosh.global_position + Vector3(0, 1.45, 0), 0.55)
+		# Spotlight illuminates Aashutosh brilliantly
+		if speaker_light and char_aashutosh:
+			speaker_light.position = char_aashutosh.global_position + Vector3(0, 2.4, 0.8)
+			speaker_light.light_color = Color(1.0, 0.65, 0.35)
+			speaker_light.light_energy = 4.0
+		# Aashutosh talks with animated head motion
+		if char_aashutosh.has_node("HeadNode"):
+			var nod_tw = create_tween().set_loops(3)
+			nod_tw.tween_property(char_aashutosh.get_node("HeadNode"), "rotation_degrees:x", 7.0, 0.3)
+			nod_tw.tween_property(char_aashutosh.get_node("HeadNode"), "rotation_degrees:x", -4.0, 0.3)
 			
 	elif speaker_id == "player":
+		# Camera looks down at Kripal's desk with claw scratches and note
 		if player:
-			player.look_at_target_smoothly(Vector3(-3.2, 0.75, -2.5), 0.65)
+			player.look_at_target_smoothly(Vector3(-3.0, 0.75, -2.5), 0.6)
 		if speaker_light:
-			speaker_light.position = Vector3(-3.0, 3.0, -2.5)
-			speaker_light.light_color = Color(0.4, 0.8, 1.0)
+			speaker_light.position = Vector3(-3.0, 2.5, -2.5)
+			speaker_light.light_color = Color(0.4, 0.85, 1.0)
+			speaker_light.light_energy = 3.0
 			
 	elif speaker_id == "mission":
-		if player:
-			player.look_at_target_smoothly(Vector3(-7.5, 2.5, 0.0), 0.8)
+		# Camera looks towards the exit doorway
+		if player and doorway:
+			player.look_at_target_smoothly(doorway.global_position + Vector3(0, 1.4, 0), 0.8)
 		if speaker_light:
 			speaker_light.visible = false
 
@@ -574,7 +598,7 @@ func show_bhangarh_map():
 		voice_audio.play()
 
 	if map_dialogue_feed:
-		map_dialogue_feed.text = "साहिल: \"नक्शा देखो! कृपाल का जीपीएस सिग्नल भानगढ़ किले के सबसे गहरे खंडहरों से आ रहा है... वो वहीं कहीं फंसा है!\""
+		map_dialogue_feed.text = "साहिल: \"चलो जल्दी गाड़ी में बैठो! पहले कृपाल के घर चलते हैं और उसके घरवालों को सब सच बताते हैं!\""
 
 	# After Sahil finishes, Aashutosh chimes in
 	await get_tree().create_timer(5.2).timeout
@@ -584,7 +608,7 @@ func show_bhangarh_map():
 		voice_audio.stream = voice_map_aashu
 		voice_audio.play()
 		if map_dialogue_feed:
-			map_dialogue_feed.text = "आशुतोष: \"वहाँ तो तांत्रिक की छतरी और पुराना राजमहल है भाई! वो सबसे खतरनाक जगह है! चलो तुरंत गाड़ी में बैठते हैं!\""
+			map_dialogue_feed.text = "आशुतोष: \"हाँ भाई, कृपाल की मम्मी-पापा बहुत परेशान होंगे! चलो तुरंत गाड़ी निकालते हैं!\""
 
 func pulse_radar_beacon():
 	if not ping_ring: return
@@ -596,7 +620,7 @@ func pulse_radar_beacon():
 
 func on_enter_bhangarh_clicked():
 	if map_dialogue_feed:
-		map_dialogue_feed.text = "🚨 कृपाल की लोकेशन से लाइव सिग्नल कनेक्ट हो रहा है... (ENTERING KRIPAL'S VIEW)"
+		map_dialogue_feed.text = "🚗 कृपाल के घर की ओर प्रस्थान... (HEADING TO KRIPAL'S HOUSE)"
 	
 	if enter_bhangarh_btn:
 		enter_bhangarh_btn.disabled = true
