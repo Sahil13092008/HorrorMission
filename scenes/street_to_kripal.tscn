@@ -503,10 +503,15 @@ size = Vector3(0.15, 0.24, 109.0)
 material = SubResource("Mat_Curb")
 
 [node name="KripalDriveway" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, -0.2, -85.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, -0.2, -81.0)
 use_collision = true
-size = Vector3(7.0, 0.8, 20.0)
+size = Vector3(7.0, 0.8, 26.0)
 material = SubResource("Mat_Sidewalk")
+
+[node name="KripalSideParkingSlot" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6, 0.05, -76.0)
+size = Vector3(3.6, 0.1, 6.5)
+material = SubResource("Mat_Asphalt")
 
 [node name="SidewalkRight2" type="CSGBox3D" parent="EnvironmentProps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, -0.2, -155.0)
@@ -2004,7 +2009,7 @@ size = Vector3(0.35, 0.7, 0.22)
 material = SubResource("Mat_Jeans")
 
 [node name="KripalCar" type="CharacterBody3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 5.4, 0.35, -85.0)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 5.6, 0.35, -76.0)
 
 [node name="CarBody" type="CSGBox3D" parent="KripalCar"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
@@ -2160,43 +2165,43 @@ outline_size = 8
 modulate = Color(1.0, 0.85, 0.2, 1)
 
 [node name="BoundaryWallL" type="CSGBox3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.0, -4.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.0, -6.2)
 use_collision = true
-size = Vector3(0.4, 2.0, 4.6)
+size = Vector3(0.4, 2.0, 5.5)
 material = SubResource("Mat_HouseWall1")
 
 [node name="BoundaryWallR" type="CSGBox3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.0, 4.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.0, 6.2)
 use_collision = true
-size = Vector3(0.4, 2.0, 4.6)
+size = Vector3(0.4, 2.0, 5.5)
 material = SubResource("Mat_HouseWall1")
 
 [node name="GatePillarL" type="CSGBox3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.25, -2.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.25, -3.2)
 use_collision = true
 size = Vector3(0.6, 2.5, 0.6)
 material = SubResource("Mat_HouseWall2")
 
 [node name="GateLanternL" type="OmniLight3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 2.6, -2.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 2.6, -3.2)
 light_color = Color(1.0, 0.85, 0.45, 1)
 light_energy = 3.2
 omni_range = 8.0
 
 [node name="GatePillarR" type="CSGBox3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.25, 2.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.25, 3.2)
 use_collision = true
 size = Vector3(0.6, 2.5, 0.6)
 material = SubResource("Mat_HouseWall2")
 
 [node name="GateLanternR" type="OmniLight3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 2.6, 2.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 2.6, 3.2)
 light_color = Color(1.0, 0.85, 0.45, 1)
 light_energy = 3.2
 omni_range = 8.0
 
 [node name="NamePlate" type="Label3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 2.0, 2.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9, 2.0, 3.2)
 billboard = 1
 text = "🏠 कृपाल निवास
 KRIPAL'S RESIDENCE"
@@ -2206,7 +2211,7 @@ outline_size = 6
 [node name="FrontYard" type="CSGBox3D" parent="KripalHouse"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.0, 0.05, 0)
 use_collision = true
-size = Vector3(4.5, 0.1, 14.0)
+size = Vector3(4.5, 0.1, 16.0)
 material = SubResource("Mat_Sidewalk")
 
 [node name="HouseStructure" type="CSGBox3D" parent="KripalHouse"]
@@ -2830,6 +2835,47 @@ spot_range = 28.0
 spot_angle = 35.0
 
 
+[node name="Companions" type="Node3D" parent="."]
+
+[node name="SahilCompanion" type="CharacterBody3D" parent="Companions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.1, 0.8)
+collision_layer = 2
+collision_mask = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Companions/SahilCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_Player")
+
+[node name="VisualModel" type="Node3D" parent="Companions/SahilCompanion"]
+
+[node name="Torso" type="CSGBox3D" parent="Companions/SahilCompanion/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+size = Vector3(0.44, 0.65, 0.28)
+material = SubResource("Mat_Companion_Sahil")
+
+[node name="Head" type="CSGBox3D" parent="Companions/SahilCompanion/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_MummySkin")
+
+[node name="Cap" type="CSGBox3D" parent="Companions/SahilCompanion/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.70, -0.05)
+size = Vector3(0.28, 0.10, 0.34)
+material = SubResource("Mat_PoliceBlue")
+
+[node name="Legs" type="CSGBox3D" parent="Companions/SahilCompanion/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+size = Vector3(0.38, 0.75, 0.24)
+material = SubResource("Mat_Jeans")
+
+[node name="NameTag" type="Label3D" parent="Companions/SahilCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, 0)
+billboard = 1
+text = "🧢 साहिल (SAHIL)"
+font_size = 18
+outline_size = 5
+modulate = Color(0.4, 0.85, 1.0, 1)
+
 [node name="CycleModel" type="Node3D" parent="Companions/SahilCompanion"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
@@ -2904,6 +2950,49 @@ light_energy = 3.2
 spot_range = 28.0
 spot_angle = 35.0
 
+[node name="AashutoshCompanion" type="CharacterBody3D" parent="Companions"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.1, 0.8)
+collision_layer = 2
+collision_mask = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Companions/AashutoshCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_Player")
+
+[node name="VisualModel" type="Node3D" parent="Companions/AashutoshCompanion"]
+
+[node name="Torso" type="CSGBox3D" parent="Companions/AashutoshCompanion/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+size = Vector3(0.44, 0.65, 0.28)
+material = SubResource("Mat_Companion_Aashu")
+
+[node name="Head" type="CSGBox3D" parent="Companions/AashutoshCompanion/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_MummySkin")
+
+[node name="Hair" type="CSGBox3D" parent="Companions/AashutoshCompanion/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.70, 0)
+size = Vector3(0.28, 0.12, 0.28)
+material = SubResource("Mat_MummyHair")
+
+[node name="Glasses" type="CSGBox3D" parent="Companions/AashutoshCompanion/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, -0.15)
+size = Vector3(0.24, 0.08, 0.06)
+material = SubResource("Mat_CarGlass")
+
+[node name="Legs" type="CSGBox3D" parent="Companions/AashutoshCompanion/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, 0)
+size = Vector3(0.38, 0.75, 0.24)
+material = SubResource("Mat_Jeans")
+
+[node name="NameTag" type="Label3D" parent="Companions/AashutoshCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, 0)
+billboard = 1
+text = "👓 आशुतोष (AASHUTOSH)"
+font_size = 18
+outline_size = 5
+modulate = Color(1.0, 0.75, 0.3, 1)
 
 [node name="CycleModel" type="Node3D" parent="Companions/AashutoshCompanion"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -2978,7 +3067,6 @@ light_color = Color(1, 0.95, 0.82, 1)
 light_energy = 3.2
 spot_range = 28.0
 spot_angle = 35.0
-
 
 [node name="LightningFlashUI" type="ColorRect" parent="StreetUI"]
 layout_mode = 1

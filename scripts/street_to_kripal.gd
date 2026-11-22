@@ -260,6 +260,20 @@ func start_school_exit_intro() -> void:
 	camera.position = Vector3(0, 1.35, -4.6)
 	camera.rotation_degrees = Vector3(-6.0, 180.0, 0.0)
 	
+	# Position all 3 friends side-by-side on their bicycles under school gate
+	if sahil:
+		sahil.visible = true
+		sahil.global_position = player.global_position + Vector3(-1.6, 0.0, 0.5)
+		sahil.rotation.y = player.rotation.y
+		if sahil_cycle: sahil_cycle.visible = true
+	if aashutosh:
+		aashutosh.visible = true
+		aashutosh.global_position = player.global_position + Vector3(1.6, 0.0, 0.5)
+		aashutosh.rotation.y = player.rotation.y
+		if aashu_cycle: aashu_cycle.visible = true
+	if player_cycle:
+		player_cycle.visible = true
+	
 	show_subtitle("⛈️ [तूफान, बारिश और बादलों की गर्जना]... सेंट ऑगस्टीन स्कूल से बाहर निकलते हुए...", 3.2)
 	trigger_lightning(true)
 	
@@ -442,7 +456,7 @@ func _physics_process(delta: float) -> void:
 		_update_walking_companions(delta)
 		
 		var dist_to_door: float = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
-		var dist_to_car: float = player.global_position.distance_to(Vector3(5.4, 0.35, -85.0))
+		var dist_to_car: float = player.global_position.distance_to(Vector3(5.6, 0.35, -76.0))
 		
 		if (is_near_door or dist_to_door < 4.0) and not door_opened:
 			is_near_door = true
@@ -682,17 +696,17 @@ func _update_walking_companions(delta: float) -> void:
 		kripal_mummy.global_position = kripal_mummy.global_position.lerp(target_m, 3.5 * delta)
 
 func _update_companions(delta: float, player_dir: Vector3) -> void:
-	if sahil:
-		var target_sahil_pos = player.global_position + Vector3(-1.4, 0, 0.4)
-		sahil.global_position = sahil.global_position.lerp(target_sahil_pos, 4.0 * delta)
-		if player_dir != Vector3.ZERO:
-			sahil.rotation.y = lerp_angle(sahil.rotation.y, player.rotation.y, 6.0 * delta)
+	if sahil and sahil.visible:
+		var flank_l = player.transform.basis * Vector3(-1.6, 0, 0.5)
+		var target_sahil_pos = player.global_position + flank_l
+		sahil.global_position = sahil.global_position.lerp(target_sahil_pos, 5.0 * delta)
+		sahil.rotation.y = lerp_angle(sahil.rotation.y, player.rotation.y, 7.0 * delta)
 			
-	if aashutosh:
-		var target_aashu_pos = player.global_position + Vector3(1.4, 0, 0.6)
-		aashutosh.global_position = aashutosh.global_position.lerp(target_aashu_pos, 4.0 * delta)
-		if player_dir != Vector3.ZERO:
-			aashutosh.rotation.y = lerp_angle(aashutosh.rotation.y, player.rotation.y, 6.0 * delta)
+	if aashutosh and aashutosh.visible:
+		var flank_r = player.transform.basis * Vector3(1.6, 0, 0.5)
+		var target_aashu_pos = player.global_position + flank_r
+		aashutosh.global_position = aashutosh.global_position.lerp(target_aashu_pos, 5.0 * delta)
+		aashutosh.rotation.y = lerp_angle(aashutosh.rotation.y, player.rotation.y, 7.0 * delta)
 
 func _process_pedestrians(delta: float) -> void:
 	if pedestrian1:
@@ -905,6 +919,8 @@ func start_door_interaction() -> void:
 	tw.parallel().tween_property(sahil, "global_position", Vector3(7.6, 0.1, -86.2), 1.2)
 	tw.parallel().tween_property(aashutosh, "global_position", Vector3(7.6, 0.1, -83.8), 1.2)
 	tw.parallel().tween_property(player, "rotation:y", deg_to_rad(90), 1.2)
+	if sahil: tw.parallel().tween_property(sahil, "rotation:y", deg_to_rad(90), 1.2)
+	if aashutosh: tw.parallel().tween_property(aashutosh, "rotation:y", deg_to_rad(90), 1.2)
 	
 	await tw.finished
 	
@@ -967,11 +983,11 @@ func end_dialogue_sequence() -> void:
 	# Aunty, Sahil, Aashutosh walk towards the car
 	var walk_tw = create_tween()
 	if kripal_mummy:
-		walk_tw.parallel().tween_property(kripal_mummy, "global_position", Vector3(4.5, 0.1, -84.2), 1.6)
+		walk_tw.parallel().tween_property(kripal_mummy, "global_position", Vector3(4.8, 0.1, -75.0), 1.6)
 	if sahil:
-		walk_tw.parallel().tween_property(sahil, "global_position", Vector3(4.5, 0.1, -85.8), 1.6)
+		walk_tw.parallel().tween_property(sahil, "global_position", Vector3(4.8, 0.1, -77.2), 1.6)
 	if aashutosh:
-		walk_tw.parallel().tween_property(aashutosh, "global_position", Vector3(6.2, 0.1, -85.8), 1.6)
+		walk_tw.parallel().tween_property(aashutosh, "global_position", Vector3(6.6, 0.1, -77.2), 1.6)
 		
 	objective_banner.text = "✦ कृपाल की कार में बैठें [E] और पानसेमल पुलिस स्टेशन ड्राइव करें"
 	show_subtitle("👩 कृपाल की माँ: 'कृपाल की गाड़ी बाहर खड़ी है... चलो सब इसमें बैठो, हम अभी पुलिस स्टेशन चलते हैं!'", 4.5)
