@@ -1,13 +1,11 @@
 extends Node3D
 
 # police_station.gd
-# Pansemal District Police Station: Emergency FIR sequence, dialogue with Inspector R.K. Sharma,
-# official registration of Kripal's abduction, and the midnight departure plan to Bhangarh.
-
-# Strict Rules:
-# - Posters, Buttons, Objectives, Alerts: 100% English
-# - Dialogues, Subtitles, Voice Audio: Natural Hindi
-# - [V] Toggle 1st Person & 3rd Person View
+# Pansemal District Police Station:
+# 1. Option to sit down on visitor chair with Aunty in front of Inspector R.K. Sharma.
+# 2. Complete dialogue in natural Hindi with audio & official FIR registration.
+# 3. Stepping outside: Sahil reassures Aunty ("आंटी आप टेंशन मत लीजिए, पुलिस कृपाल को जरूर ढूंढ निकालेगी!").
+# 4. Heading to respective homes, complete blackout, and suspenseful "2 DAYS LATER..." sequence!
 
 @onready var player: Node3D = $Player
 @onready var camera_pivot: Node3D = $Player/CameraPivot
@@ -28,9 +26,11 @@ extends Node3D
 @onready var stamp_thud_audio: AudioStreamPlayer = $Audio/StampThudAudio
 @onready var door_close_audio: AudioStreamPlayer = $Audio/DoorCloseAudio
 @onready var thunder_audio: AudioStreamPlayer = $Audio/ThunderAudio
+@onready var suspense_audio: AudioStreamPlayer = $Audio/SuspenseAudio
 
 # UI
 @onready var police_ui: CanvasLayer = $PoliceUI
+@onready var sit_prompt: Label = $PoliceUI/HUD/SitPrompt
 @onready var dialogue_box: PanelContainer = $PoliceUI/DialogueBox
 @onready var speaker_label: Label = $PoliceUI/DialogueBox/Margin/VBox/SpeakerLabel
 @onready var dialogue_text: Label = $PoliceUI/DialogueBox/Margin/VBox/DialogueText
@@ -41,19 +41,21 @@ extends Node3D
 @onready var proceed_departure_btn: Button = $PoliceUI/MissionCompleteCard/Margin/VBox/ProceedBtn
 @onready var departure_overlay: ColorRect = $PoliceUI/DepartureOverlay
 @onready var departure_subtitle: Label = $PoliceUI/DepartureOverlay/Subtitle
+@onready var two_days_later_screen: ColorRect = $PoliceUI/TwoDaysLaterScreen
 @onready var chapter_end_card: PanelContainer = $PoliceUI/ChapterEndCard
 @onready var start_chapter2_btn: Button = $PoliceUI/ChapterEndCard/Margin/VBox/BtnBox/StartCh2Btn
 @onready var replay_station_btn: Button = $PoliceUI/ChapterEndCard/Margin/VBox/BtnBox/ReplayBtn
 @onready var view_toggle_btn: Button = $PoliceUI/HUD/ViewToggleBtn
 
 # Camera & Settings
-var is_first_person: bool = true
+var is_first_person: bool = false
 var mouse_captured: bool = true
 var cam_rot_x: float = 0.0
 var cam_rot_y: float = 0.0
 const MOUSE_SENSITIVITY: float = 0.0028
 
 # State
+var is_seated: bool = false
 var dialogue_index: int = 0
 var can_advance_dialogue: bool = false
 var dialogue_in_progress: bool = false
@@ -68,7 +70,8 @@ var stream_sahil_1 = preload("res://audio/police_sahil_1.mp3")
 var stream_aashu_1 = preload("res://audio/police_aashu_1.mp3")
 var stream_thanedaar_2 = preload("res://audio/police_thanedaar_2.mp3")
 var stream_player_2 = preload("res://audio/police_player_2.mp3")
-var stream_sahil_plan = preload("res://audio/police_sahil_night_plan.mp3")
+var stream_sahil_comfort = preload("res://audio/sahil_comfort_aunty.mp3")
+var stream_suspense = preload("res://audio/suspense_2days_later.wav")
 
 # Dialogues Array (Pure Hindi Dialogues)
 var dialogues = [
@@ -127,7 +130,6 @@ func _ready() -> void:
 	dialogues[5]["audio"] = stream_thanedaar_2
 	dialogues[6]["audio"] = stream_player_2
 	
-	# Connect UI buttons
 	if proceed_departure_btn:
 		proceed_departure_btn.pressed.connect(_on_proceed_departure_pressed)
 	if start_chapter2_btn:
@@ -142,24 +144,28 @@ func _ready() -> void:
 	if fir_overlay: fir_overlay.visible = false
 	if mission_card: mission_card.visible = false
 	if departure_overlay: departure_overlay.visible = false
+	if two_days_later_screen: two_days_later_screen.visible = false
 	if chapter_end_card: chapter_end_card.visible = false
+	if sit_prompt:
+		sit_prompt.visible = true
+		sit_prompt.text = "🪑 [E] दबाकर कुर्सी पर बैठें (PRESS [E] TO SIT ON VISITOR CHAIR)"
 	
 	update_camera_mode()
 	
-	# Start ambient electric fan and radio
 	if fan_buzz_audio: fan_buzz_audio.play()
 	if radio_chatter_audio: radio_chatter_audio.play()
 	
-	# Start scene sequence after brief walk-in
-	start_police_sequence()
+	# Auto sit down after 3.0s if player doesn't press E
+	get_tree().create_timer(3.5).timeout.connect(func():
+		if not is_seated:
+			sit_down_on_chair()
+	)
 
 func _process(delta: float) -> void:
-	# Rotate ceiling fan
 	if ceiling_fan_blades and fan_speed > 0:
 		ceiling_fan_blades.rotate_y(fan_speed * delta)
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Mouse look when captured and not in modal UI
 	if event is InputEventMouseMotion and mouse_captured and not cutscene_active:
 		cam_rot_y -= event.relative.x * MOUSE_SENSITIVITY
 		cam_rot_x -= event.relative.y * MOUSE_SENSITIVITY
@@ -170,16 +176,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		if camera_pivot:
 			camera_pivot.rotation.x = cam_rot_x
 
-	# Toggle 1st / 3rd Person camera with [V]
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_V:
 			toggle_camera_mode()
-		elif event.keycode == KEY_SPACE or event.keycode == KEY_E or event.keycode == KEY_ENTER:
-			if dialogue_in_progress and can_advance_dialogue:
+		elif event.keycode == KEY_E or event.keycode == KEY_SPACE or event.keycode == KEY_ENTER:
+			if not is_seated:
+				sit_down_on_chair()
+			elif dialogue_in_progress and can_advance_dialogue:
 				advance_dialogue()
 
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if dialogue_in_progress and can_advance_dialogue:
+		if not is_seated:
+			sit_down_on_chair()
+		elif dialogue_in_progress and can_advance_dialogue:
 			advance_dialogue()
 
 func toggle_camera_mode() -> void:
@@ -189,17 +198,30 @@ func toggle_camera_mode() -> void:
 func update_camera_mode() -> void:
 	if not camera: return
 	if is_first_person:
-		camera.position = Vector3(0, 1.55, 0.0)
+		camera.position = Vector3(0, 1.45, 0.0)
 		if player_visual: player_visual.visible = false
 		if view_toggle_btn: view_toggle_btn.text = "👁️ [V] VIEW: 1ST PERSON"
 	else:
-		camera.position = Vector3(0, 1.75, 2.6)
+		camera.position = Vector3(0, 1.65, 2.4)
 		if player_visual: player_visual.visible = true
 		if view_toggle_btn: view_toggle_btn.text = "👁️ [V] VIEW: 3RD PERSON"
 
-func start_police_sequence() -> void:
-	await get_tree().create_timer(1.2).timeout
-	# Inspector Sharma looks up and starts dialogue
+func sit_down_on_chair() -> void:
+	if is_seated: return
+	is_seated = true
+	if sit_prompt: sit_prompt.visible = false
+	
+	# Smoothly seat player on right visitor chair and Aunty on left visitor chair
+	var tw = create_tween()
+	# Player sits on right chair at (0.55, 0.25, 0.4)
+	tw.parallel().tween_property(player, "position", Vector3(0.55, 0.1, 0.4), 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Aunty sits on left chair at (-0.55, 0.25, 0.4)
+	tw.parallel().tween_property(kripal_mummy, "position", Vector3(-0.55, 0.05, 0.4), 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Sahil and Aashutosh stand behind chairs
+	tw.parallel().tween_property(sahil, "position", Vector3(-1.1, 0, 1.0), 1.0)
+	tw.parallel().tween_property(aashutosh, "position", Vector3(1.1, 0, 1.0), 1.0)
+	
+	await tw.finished
 	start_dialogue_sequence()
 
 func start_dialogue_sequence() -> void:
@@ -228,15 +250,12 @@ func display_current_dialogue() -> void:
 	if advance_tip:
 		advance_tip.text = "[CLICK / SPACE TO CONTINUE]"
 		
-	# Play matching voice line
 	if voice_audio and d["audio"]:
 		voice_audio.stop()
 		voice_audio.stream = d["audio"]
 		voice_audio.play()
 		
-	# Trigger special FX on specific dialogue lines
 	if dialogue_index == 5:
-		# Line 6: Thanedaar files FIR -> writing SFX and FIR Overlay + Stamp!
 		trigger_fir_filing_fx()
 		
 	await get_tree().create_timer(0.6).timeout
@@ -248,18 +267,15 @@ func advance_dialogue() -> void:
 	display_current_dialogue()
 
 func trigger_fir_filing_fx() -> void:
-	# Scribble SFX
 	if paper_scribble_audio:
 		paper_scribble_audio.play()
 		
-	# Slide in FIR Document
 	if fir_overlay:
 		fir_overlay.visible = true
 		fir_overlay.modulate.a = 0.0
 		var tw = create_tween()
 		tw.tween_property(fir_overlay, "modulate:a", 1.0, 0.6)
 		
-	# After 1.4s, slam stamp down!
 	await get_tree().create_timer(1.4).timeout
 	if stamp_thud_audio:
 		stamp_thud_audio.play()
@@ -275,7 +291,6 @@ func end_dialogue_sequence() -> void:
 	dialogue_in_progress = false
 	if dialogue_box: dialogue_box.visible = false
 	
-	# Show Chapter 1 Part III Mission Complete Card
 	if mission_card:
 		mission_card.visible = true
 		mission_card.modulate.a = 0.0
@@ -293,7 +308,6 @@ func _on_proceed_departure_pressed() -> void:
 	if fir_overlay:
 		fir_overlay.visible = false
 		
-	# Start Departure Cutscene (Outside Police Station)
 	start_departure_cutscene()
 
 func start_departure_cutscene() -> void:
@@ -303,7 +317,7 @@ func start_departure_cutscene() -> void:
 	if door_close_audio:
 		door_close_audio.play()
 		
-	# Fade screen to dark night street
+	# Transition to street outside police station
 	if departure_overlay:
 		departure_overlay.visible = true
 		departure_overlay.modulate.a = 0.0
@@ -311,29 +325,48 @@ func start_departure_cutscene() -> void:
 		fade_tw.tween_property(departure_overlay, "modulate:a", 0.95, 0.8)
 		await fade_tw.finished
 		
-	# Distant thunder
 	if thunder_audio:
 		thunder_audio.play()
 		
-	# Sahil's night departure plan voice & text
+	# Sahil comforts Aunty: "आंटी आप टेंशन मत लीजिए, पुलिस कृपाल को जरूर ढूंढ निकालेगी!"
 	if departure_subtitle:
 		departure_subtitle.visible = true
-		departure_subtitle.text = "🧢 साहिल: \"पुलिस सुबह जाएगी, पर कृपाल के पास इतना वक्त नहीं हो सकता! चलो, सब अपने-अपने घर जाओ, जरूरी सामान (टॉर्च, कैमरा, बैटरी, फर्स्ट एड) पैक करो। हम आधे घंटे में मेरी गाड़ी के पास मिलते हैं और आज रात ही भानगढ़ निकलेंगे!\""
+		departure_subtitle.text = "🧢 साहिल: 'आंटी आप टेंशन मत लीजिए, पुलिस कृपाल को जरूर ढूंढ निकालेगी!'"
 		
-	if voice_audio and stream_sahil_plan:
+	if voice_audio and stream_sahil_comfort:
 		voice_audio.stop()
-		voice_audio.stream = stream_sahil_plan
+		voice_audio.stream = stream_sahil_comfort
 		voice_audio.play()
 		await voice_audio.finished
 	else:
-		await get_tree().create_timer(7.5).timeout
+		await get_tree().create_timer(3.5).timeout
 		
-	# Narrative line: Leaving for home to pack
+	# Everyone disperses to their respective homes
 	if departure_subtitle:
-		departure_subtitle.text = "रात 11:30 बजे... तीनों दोस्त अपनी-अपनी साइकिलों पर घर की ओर रवाना होते हैं... बैग पैक करके आज रात ही भानगढ़ निकलना होगा..."
+		departure_subtitle.text = "सब अपने-अपने घर चले जाते हैं... (साहिल अपने घर, आशुतोष अपने घर, और तू अपने घर)..."
 	await get_tree().create_timer(3.5).timeout
 	
-	# Show final Chapter 1 Completion & Chapter 2 Unlock Card
+	# Trigger the suspenseful "2 DAYS LATER..." Black Screen!
+	trigger_2_days_later_sequence()
+
+func trigger_2_days_later_sequence() -> void:
+	if departure_overlay:
+		departure_overlay.visible = false
+		
+	if two_days_later_screen:
+		two_days_later_screen.visible = true
+		two_days_later_screen.modulate.a = 0.0
+		var tw = create_tween()
+		tw.tween_property(two_days_later_screen, "modulate:a", 1.0, 1.2)
+		
+	# Play deep suspense atmosphere
+	if suspense_audio:
+		suspense_audio.play()
+		
+	# Wait 4.5 seconds for dramatic suspense
+	await get_tree().create_timer(4.5).timeout
+	
+	# Show Chapter End Card
 	if chapter_end_card:
 		chapter_end_card.visible = true
 		chapter_end_card.modulate.a = 0.0
@@ -344,7 +377,6 @@ func _on_start_chapter2_pressed() -> void:
 	if start_chapter2_btn:
 		start_chapter2_btn.disabled = true
 		start_chapter2_btn.text = "➔ LOADING CHAPTER 2: BHANGARH RUINS..."
-	# Transitions to Bhangarh Ruins (Chapter 2)
 	get_tree().change_scene_to_file("res://scenes/bhangarh_ruins.tscn")
 
 func _on_replay_station_pressed() -> void:

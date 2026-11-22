@@ -1,13 +1,11 @@
 # street_to_kripal.gd
-# Pansemal Town Street Journey: St. Augustine School -> Bicycle Ride in Thunderstorm -> Kripal's Residence
-# Features:
-# - St. Augustine School, Pansemal background with grand architecture & illuminated signboard
-# - 3 Bicycles (Player, Sahil, Aashutosh) with steering, headlight beams, pedaling & cycle bell [B]
-# - Stormy weather with crackling lightning strikes, rolling thunder & rain wind ambience
-# - Companions (Sahil & Aashutosh) riding bicycles alongside Player
-# - Pansemal Town Map & Radar tracking all 6 landmarks (St. Augustine, Sahil, Player, Aashu, Police, Kripal)
-# - 100% Spoken Hindi Dialogues with Kripal's Mother (mother weeping & Player comforting her)
-# - Chapter 1 Mission Poster in English (Pansemal Police Station FIR)
+# Pansemal Town Street Journey:
+# 1. St. Augustine School Exit & Bicycle Ride in Thunderstorm
+# 2. Arrive at Kripal's residence -> Option to DISMOUNT BICYCLE [E] & park on kickstand
+# 3. Walk to front door on foot -> Ring Doorbell [E] -> Convo with Kripal's Mother
+# 4. Kripal's family car parked outside -> Enter Driver Seat [E]
+# 5. Drive Kripal's car through Pansemal street to the Police Station (with Aunty & friends inside)
+# 6. Exit car with [BACKSPACE] -> Walk up Indian Brown Sandstone Police Station steps -> Enter [E]
 
 extends Node3D
 
@@ -20,6 +18,10 @@ extends Node3D
 @onready var thunder_audio: AudioStreamPlayer = $Audio/ThunderAudio
 @onready var cycle_audio: AudioStreamPlayer = $Audio/CycleAudio
 @onready var bell_audio: AudioStreamPlayer = $Audio/BellAudio
+@onready var car_start_audio: AudioStreamPlayer = $Audio/CarStartAudio
+@onready var car_engine_audio: AudioStreamPlayer = $Audio/CarEngineAudio
+@onready var car_door_open_audio: AudioStreamPlayer = $Audio/CarDoorOpenAudio
+@onready var car_door_close_audio: AudioStreamPlayer = $Audio/CarDoorCloseAudio
 
 # --- World & Environment ---
 @onready var moonlight: DirectionalLight3D = $Moonlight
@@ -38,6 +40,12 @@ extends Node3D
 @onready var police_light_red: OmniLight3D = $EnvironmentProps/PansemalTownHouses/PansemalPoliceStation/PoliceLightRed
 @onready var police_light_blue: OmniLight3D = $EnvironmentProps/PansemalTownHouses/PansemalPoliceStation/PoliceLightBlue
 
+# Kripal's Car & Parked Cycles
+@onready var kripal_car: CharacterBody3D = $KripalCar
+@onready var car_trigger: Area3D = $KripalCar/CarTrigger
+@onready var car_camera: Camera3D = $KripalCar/CarCameraPivot/CarCamera
+@onready var parked_bicycles: Node3D = $ParkedBicycles
+
 # --- Player Nodes ---
 @onready var player: CharacterBody3D = $Player
 @onready var camera_pivot: Node3D = $Player/CameraPivot
@@ -52,6 +60,7 @@ extends Node3D
 @onready var lightning_flash_ui: ColorRect = $StreetUI/LightningFlashUI
 @onready var view_toggle_btn: Button = $StreetUI/HUDContainer/HBox/ViewToggleBtn
 @onready var map_toggle_btn: Button = $StreetUI/HUDContainer/HBox/MapToggleBtn
+@onready var action_prompt: Label = $StreetUI/HUDContainer/ActionPrompt
 @onready var objective_banner: Label = $StreetUI/ObjectiveBanner
 @onready var mini_map_panel: PanelContainer = $StreetUI/MiniMapPanel
 @onready var radar_display: Control = $StreetUI/MiniMapPanel/Margin/VBox/RadarDisplay
@@ -59,27 +68,72 @@ extends Node3D
 @onready var town_map_overlay: PanelContainer = $StreetUI/TownMapOverlay
 @onready var close_map_btn: Button = $StreetUI/TownMapOverlay/Margin/VBox/HeaderHBox/CloseMapBtn
 @onready var map_canvas: Control = $StreetUI/TownMapOverlay/Margin/VBox/MapCanvas
-@onready var prompt_label: Label = $StreetUI/PromptLabel
-@onready var subtitle: Label = $StreetUI/Subtitle
 @onready var dialogue_box: PanelContainer = $StreetUI/DialogueBox
 @onready var speaker_label: Label = $StreetUI/DialogueBox/Margin/VBox/SpeakerLabel
 @onready var dialogue_text: Label = $StreetUI/DialogueBox/Margin/VBox/DialogueText
 @onready var advance_tip: Label = $StreetUI/DialogueBox/Margin/VBox/AdvanceTip
 @onready var next_chapter_card: ColorRect = $StreetUI/NextChapterCard
 @onready var start_police_btn: Button = $StreetUI/NextChapterCard/Margin/VBox/BtnBox/StartPoliceBtn
-@onready var replay_street_btn: Button = $StreetUI/NextChapterCard/Margin/VBox/BtnBox/ReplayStreetBtn
+@onready var replay_btn: Button = $StreetUI/NextChapterCard/Margin/VBox/BtnBox/ReplayStreetBtn
+@onready var prompt_label: Label = $StreetUI/PromptLabel
+@onready var subtitle: Label = $StreetUI/Subtitle
 
-# --- Preloaded Audio Streams ---
-var stream_storm_ambience: AudioStream = preload("res://audio/storm_rain_wind.wav")
+# --- State Enums ---
+enum PlayerMode {
+	CYCLING,         # Initial bicycle ride through thunderstorm
+	FOOT_KRIPAL,     # Dismounted from cycle, walking to Kripal's door
+	DRIVING_CAR,     # Driving Kripal's car with Aunty & friends to Police Station
+	FOOT_POLICE      # Exited car at Police Station, entering station
+}
+var current_mode: PlayerMode = PlayerMode.CYCLING
+
+# Movement & Physics Constants
+const CYCLE_SPEED: float = 7.5
+const SPRINT_CYCLE_SPEED: float = 12.0
+const WALK_SPEED: float = 3.6
+const ACCEL: float = 18.0
+const MOUSE_SENSITIVITY: float = 0.0028
+var gravity: float = 9.8
+
+# Car Physics
+var car_speed: float = 0.0
+const CAR_MAX_SPEED: float = 12.5
+const CAR_ACCEL: float = 7.5
+const CAR_STEER_SPEED: float = 1.8
+
+# Camera & Input State
+var is_first_person: bool = false
+var camera_rot_x: float = 0.0
+var mouse_captured: bool = true
+var is_cycling: bool = true
+var cycle_bob_timer: float = 0.0
+var cycle_tilt: float = 0.0
+
+# Interaction Flags
+var can_dismount: bool = false
+var is_near_door: bool = false
+var is_near_car: bool = false
+var is_near_police_door: bool = false
+var door_opened: bool = false
+var cutscene_active: bool = false
+var is_town_map_open: bool = false
+var dialogue_in_progress: bool = false
+var dialogue_index: int = 0
+var can_advance_dialogue: bool = false
+
+# Weather & Atmosphere Timers
+var lightning_timer: float = 3.5
+var is_lightning_flashing: bool = false
+var pulse_time: float = 0.0
+
+# Preloaded Audio
+var stream_cycle_riding: AudioStream = preload("res://audio/cycle_riding.wav")
+var stream_cycle_bell: AudioStream = preload("res://audio/cycle_bell.wav")
 var stream_thunder_strike: AudioStream = preload("res://audio/thunder_strike.wav")
 var stream_thunder_distant: AudioStream = preload("res://audio/thunder_distant.wav")
-var stream_cycle_bell: AudioStream = preload("res://audio/cycle_bell.wav")
-var stream_cycle_riding: AudioStream = preload("res://audio/cycle_riding.wav")
+var stream_storm_ambience: AudioStream = preload("res://audio/storm_rain_wind.wav")
 
-var stream_sahil_warning: AudioStream = preload("res://audio/storm_sahil_warning.mp3")
-var stream_aashu_hurry: AudioStream = preload("res://audio/storm_aashu_hurry.mp3")
-var stream_player_go: AudioStream = preload("res://audio/storm_player_go.mp3")
-
+# Dialogues with Kripal's Mother
 var stream_mummy_1: AudioStream = preload("res://audio/mummy_line_1.mp3")
 var stream_player_talk: AudioStream = preload("res://audio/player_talk_mummy.mp3")
 var stream_sahil_talk: AudioStream = preload("res://audio/sahil_talk_mummy.mp3")
@@ -88,96 +142,64 @@ var stream_mummy_crying: AudioStream = preload("res://audio/mummy_crying.mp3")
 var stream_player_comfort: AudioStream = preload("res://audio/player_comfort_mummy.mp3")
 var stream_sahil_police: AudioStream = preload("res://audio/sahil_police_plan.mp3")
 
-# --- Movement Variables ---
-const CYCLE_SPEED: float = 9.8
-const SPRINT_CYCLE_SPEED: float = 14.5
-const ACCEL: float = 14.0
-const MOUSE_SENSITIVITY: float = 0.0028
-var gravity: float = 9.8
-
-var camera_rot_x: float = 0.0
-var is_third_person: bool = true
-var is_flashlight_on: bool = true
-var cycle_bob_timer: float = 0.0
-var cycle_tilt: float = 0.0
-
-# --- State Variables ---
-var is_cycling: bool = true
-var is_near_door: bool = false
-var is_near_police_door: bool = false
-var cutscene_active: bool = false
-var door_opened: bool = false
-var dialogue_in_progress: bool = false
-var dialogue_index: int = 0
-var can_advance_dialogue: bool = false
-var pulse_time: float = 0.0
-var is_town_map_open: bool = false
-
-# Lightning System
-var lightning_timer: float = 4.0
-var is_lightning_flashing: bool = false
-
-# Pedestrians patrol speed
-var ped1_z_speed: float = -1.4
-var ped2_z_speed: float = 1.3
-
-# All Town Landmarks (Coordinates in world space)
+# Landmarks
 var landmarks = {
-	"school": {"name": "सेंट ऑगस्टीन स्कूल (ST. AUGUSTINE)", "pos": Vector3(0, 0, 16), "color": Color(0.2, 0.7, 1.0)},
-	"sahil": {"name": "साहिल निवास", "pos": Vector3(-11, 0, -20), "color": Color(1.0, 0.75, 0.2)},
-	"player": {"name": "मेरा घर", "pos": Vector3(11, 0, -35), "color": Color(0.3, 0.9, 0.4)},
-	"aashu": {"name": "आशुतोष का घर", "pos": Vector3(-11, 0, -52), "color": Color(0.85, 0.45, 1.0)},
+	"school": {"name": "सेंट ऑगस्टीन स्कूल", "pos": Vector3(0, 0, 16), "color": Color(0.9, 0.7, 0.2)},
+	"sahil_home": {"name": "साहिल निवास", "pos": Vector3(-11.5, 0, -20), "color": Color(1.0, 0.75, 0.2)},
+	"player_home": {"name": "मेरा घर", "pos": Vector3(11.5, 0, -32), "color": Color(0.3, 0.9, 0.4)},
+	"aashu_home": {"name": "आशुतोष निवास", "pos": Vector3(-11.5, 0, -48), "color": Color(0.85, 0.45, 1.0)},
 	"police": {"name": "पानसेमल पुलिस थाना", "pos": Vector3(11.5, 0, -66), "color": Color(0.2, 0.5, 1.0)},
 	"kripal": {"name": "कृपाल निवास", "pos": Vector3(0, 0, -78), "color": Color(1.0, 0.25, 0.25)}
 }
 
-# 100% Spoken Hindi Dialogue with Kripal's Mother
 var dialogues = [
 	{
 		"speaker": "👩 कृपाल की माँ (KRIPAL'S MOTHER)",
-		"text": "अरे बेटा, तुम सब इतनी रात को यहाँ? क्या बात है? और कृपाल कहाँ है? वो तो तुम लोगों के साथ ही स्कूल में था ना?",
-		"audio": null,
-		"color": Color(1.0, 0.75, 0.4, 1.0)
+		"color": Color(1.0, 0.45, 0.65),
+		"text": "अरे साहिल, आशुतोष? तुम दोनों इतनी रात को यहाँ? और कृपाल कहाँ है? वो तो तुम लोगों के साथ ही था ना स्कूल में?",
+		"audio": null
 	},
 	{
-		"speaker": "👤 खिलाड़ी (YOU / PLAYER)",
-		"text": "आंटी जी... कृपाल के साथ बहुत भयानक हादसा हुआ है! क्लासरूम में एक अजीब खौफनाक साया आया और वो कृपाल को घसीट कर गायब कर ले गया!",
-		"audio": null,
-		"color": Color(0.3, 0.9, 1.0, 1.0)
+		"speaker": "🎒 तू (PLAYER)",
+		"color": Color(0.4, 0.9, 1.0),
+		"text": "आंटी... स्कूल की छुट्टी के बाद जब हम बाहर जाने लगे, तब क्लासरूम में अचानक लाइट चली गई और बहुत अजीब आवाज़ें आईं...",
+		"audio": null
 	},
 	{
-		"speaker": "👦 साहिल (SAHIL)",
-		"text": "हाँ आंटी, उसकी डेस्क पर खून से लिखा नोट मिला है! कोई तांत्रिक शक्ति उसे उठा ले गई है!",
-		"audio": null,
-		"color": Color(1.0, 0.75, 0.2, 1.0)
+		"speaker": "🧢 साहिल (SAHIL)",
+		"color": Color(1.0, 0.35, 0.35),
+		"text": "हाँ आंटी, लाइट आने पर कृपाल अपनी डेस्क से गायब था! और उसकी डेस्क पर खून से सनी एक पर्ची मिली...",
+		"audio": null
 	},
 	{
 		"speaker": "👓 आशुतोष (AASHUTOSH)",
-		"text": "और आंटी, मेरे सेंसर्स ने भी वहाँ बहुत खतरनाक रीडिंग पकड़ी थी... कोई शैतानी ताकत थी वहाँ!",
-		"audio": null,
-		"color": Color(1.0, 0.5, 0.2, 1.0)
+		"color": Color(0.5, 0.7, 1.0),
+		"text": "उस पर्ची पर लिखा था — 'FIND ME AT BHANGARH'... आंटी, क्या कृपाल ने कभी भानगढ़ के बारे में कुछ बताया था?",
+		"audio": null
 	},
 	{
 		"speaker": "👩 कृपाल की माँ (KRIPAL'S MOTHER) 😭 [रोते हुए]",
-		"text": "हे भगवान! नहीं... मेरा कृपाल! हे ईश्वर, मेरे बच्चे के साथ क्या हो गया?! (रोते हुए) मेरा बेटा कहाँ चला गया... मुझे मेरे कृपाल को ला दो बच्चों... हे भगवान, मैं क्या करूँ!",
-		"audio": null,
-		"color": Color(1.0, 0.4, 0.4, 1.0)
+		"color": Color(1.0, 0.45, 0.65),
+		"text": "हे भगवान! भानगढ़?! नहीं... वो पुराना तांत्रिक का श्राप! कृपाल के दादाजी हमेशा कहते थे कि हमारे परिवार पर किसी काले साये की नज़र है! बच्चों, तुम्हें कृपाल को बचाना होगा! मैं तुम्हें भानगढ़ का पुराना नक्शा और ताबीज देती हूँ!",
+		"audio": null
 	},
 	{
-		"speaker": "👤 खिलाड़ी (YOU / PLAYER) 🗣️ [ढांढस बंधाते हुए]",
-		"text": "आंटी जी, आप रोइए मत! बिल्कुल मत घबराइए... हम सब अभी तुरंत पानसेमल पुलिस स्टेशन चलते हैं और रिपोर्ट लिखवाते हैं! हम कृपाल को सही-सलामत वापस लाएँगे!",
-		"audio": null,
-		"color": Color(0.3, 0.9, 1.0, 1.0)
+		"speaker": "🎒 तू (PLAYER)",
+		"color": Color(0.4, 0.9, 1.0),
+		"text": "आंटी, आप रोइए मत! हम कृपाल को कुछ नहीं होने देंगे। चलिए, हम अभी पानसेमल पुलिस स्टेशन चलते हैं और कम्प्लेन लिखाते हैं!",
+		"audio": null
 	},
 	{
-		"speaker": "👦 साहिल (SAHIL) 🗣️ [दृढ़ निश्चय]",
-		"text": "हाँ आंटी, चलो देर मत करो! सब लोग पानसेमल पुलिस थाने चलो!",
-		"audio": null,
-		"color": Color(1.0, 0.75, 0.2, 1.0)
+		"speaker": "🧢 साहिल (SAHIL)",
+		"color": Color(1.0, 0.35, 0.35),
+		"text": "हाँ आंटी, बाहर कृपाल की गाड़ी खड़ी है! चलिए सब गाड़ी में बैठिए, हम अभी सीधे पुलिस थाने चलते हैं!",
+		"audio": null
 	}
 ]
 
 func _ready() -> void:
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	
 	dialogues[0]["audio"] = stream_mummy_1
 	dialogues[1]["audio"] = stream_player_talk
 	dialogues[2]["audio"] = stream_sahil_talk
@@ -186,15 +208,11 @@ func _ready() -> void:
 	dialogues[5]["audio"] = stream_player_comfort
 	dialogues[6]["audio"] = stream_sahil_police
 	
-	# Start in 3rd person by default so user sees the bicycle & characters immediately
-	is_third_person = true
 	update_camera_mode()
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
-	# Start Storm & Rain Ambience loop
 	if ambience_audio and stream_storm_ambience:
 		ambience_audio.stream = stream_storm_ambience
-		ambience_audio.volume_db = -6.0
+		ambience_audio.volume_db = -4.0
 		ambience_audio.play()
 		
 	if view_toggle_btn:
@@ -205,8 +223,8 @@ func _ready() -> void:
 		close_map_btn.pressed.connect(toggle_town_map)
 	if start_police_btn:
 		start_police_btn.pressed.connect(_on_start_police_pressed)
-	if replay_street_btn:
-		replay_street_btn.pressed.connect(_on_replay_street_pressed)
+	if replay_btn:
+		replay_btn.pressed.connect(_on_replay_street_pressed)
 		
 	if radar_display:
 		radar_display.draw.connect(_on_radar_draw)
@@ -219,122 +237,105 @@ func _ready() -> void:
 	if police_door_trigger:
 		police_door_trigger.body_entered.connect(_on_police_trigger_entered)
 		police_door_trigger.body_exited.connect(_on_police_trigger_exited)
+	if car_trigger:
+		car_trigger.body_entered.connect(_on_car_trigger_entered)
+		car_trigger.body_exited.connect(_on_car_trigger_exited)
 		
-	if prompt_label: prompt_label.visible = false
 	if dialogue_box: dialogue_box.visible = false
 	if next_chapter_card: next_chapter_card.visible = false
-	if town_map_overlay: town_map_overlay.visible = false
+	if prompt_label: prompt_label.visible = false
 	if kripal_mummy: kripal_mummy.visible = false
-	if lightning_flash_ui: lightning_flash_ui.color.a = 0.0
+	if action_prompt: action_prompt.visible = false
+	if parked_bicycles: parked_bicycles.visible = false
 	
-	# Initial positioning at St. Augustine School Gate facing street (-Z)
-	player.global_position = Vector3(0, 0.1, 10.5)
-	player.rotation.y = 0.0
-	sahil.global_position = Vector3(-1.6, 0.1, 10.5)
-	sahil.rotation.y = 0.0
-	aashutosh.global_position = Vector3(1.6, 0.1, 10.5)
-	aashutosh.rotation.y = 0.0
-	
-	# Start Opening Stormy School Departure Sequence
 	start_school_exit_intro()
 
 func start_school_exit_intro() -> void:
 	cutscene_active = true
-	objective_banner.text = "✦ सेंट ऑगस्टीन स्कूल, पानसेमल से प्रस्थान • तूफान और तेज बिजलियां!"
-	
-	# Cinematic camera: in front of boys looking back at St. Augustine School!
-	visual_model.visible = true
 	camera.position = Vector3(0, 1.35, -4.6)
 	camera.rotation_degrees = Vector3(-6.0, 180.0, 0.0)
 	
-	# Initial lightning strike illuminates St. Augustine School in background
-	await get_tree().create_timer(0.4).timeout
+	show_subtitle("⛈️ [तूफान, बारिश और बादलों की गर्जना]... सेंट ऑगस्टीन स्कूल से बाहर निकलते हुए...", 3.2)
 	trigger_lightning(true)
 	
-	# Sahil warns about weather
-	await get_tree().create_timer(1.0).timeout
-	if voice_audio and stream_sahil_warning:
-		voice_audio.stop()
-		voice_audio.stream = stream_sahil_warning
-		voice_audio.play()
-	show_subtitle("👦 साहिल: 'मौसम अचानक कितना भयानक हो गया है... आसमान में बिजलियां कड़क रही हैं!'", 3.2)
+	await get_tree().create_timer(1.8).timeout
+	show_subtitle("🧢 साहिल: 'मौसम बहुत खराब हो रहा है! तेज साइकिल चलाओ, कृपाल के घर पहुँचना है!'", 2.8)
 	
-	# Aashutosh urgency
-	await get_tree().create_timer(3.4).timeout
-	if voice_audio and stream_aashu_hurry:
-		voice_audio.stop()
-		voice_audio.stream = stream_aashu_hurry
-		voice_audio.play()
-	show_subtitle("👓 आशुतोष: 'हाँ भाई, जल्दी साइकिल पे बैठो! तूफान आने से पहले कृपाल के घर पहुँचना है!'", 3.5)
-	
-	# Player gives go signal
-	await get_tree().create_timer(3.7).timeout
-	if voice_audio and stream_player_go:
-		voice_audio.stop()
-		voice_audio.stream = stream_player_go
-		voice_audio.play()
-	show_subtitle("👤 खिलाड़ी: 'चलो भाइयो, तेजी से साइकिल चलाओ! [W, A, S, D से साइकिल चलाएं | B से घंटी बजाएं]'", 3.2)
-	
-	await get_tree().create_timer(2.6).timeout
-	
-	# Smooth camera sweep to 3rd person riding position behind the player
-	var cam_tw = create_tween().set_parallel(true)
+	await get_tree().create_timer(2.4).timeout
+	var cam_tw = create_tween()
 	cam_tw.tween_property(camera, "position", Vector3(0, 0.75, 3.4), 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	cam_tw.tween_property(camera, "rotation_degrees", Vector3.ZERO, 1.4).set_trans(Tween.TRANS_QUAD)
 	
 	await cam_tw.finished
 	cutscene_active = false
-	objective_banner.text = "🚲 मिशन: तीनों दोस्त साइकिल से कृपाल के घर की ओर बढ़ें [W, A, S, D | SHIFT तेज | B घंटी]"
+	objective_banner.text = "✦ MISSION: RIDE BICYCLE IN THUNDERSTORM TO KRIPAL'S HOUSE [WASD / SHIFT]"
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-		if not cutscene_active and not is_town_map_open:
-			player.rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
+	if event is InputEventMouseMotion and mouse_captured and not cutscene_active and not is_town_map_open:
+		if current_mode != PlayerMode.DRIVING_CAR:
+			player.rotation.y -= event.relative.x * MOUSE_SENSITIVITY
 			camera_rot_x -= event.relative.y * MOUSE_SENSITIVITY
 			camera_rot_x = clamp(camera_rot_x, -deg_to_rad(75), deg_to_rad(75))
 			camera_pivot.rotation.x = camera_rot_x
-			
+
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_ESCAPE:
-			if is_town_map_open:
-				toggle_town_map()
-			elif Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-			else:
-				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-				
+		if event.keycode == KEY_M:
+			toggle_town_map()
 		elif event.keycode == KEY_V:
 			toggle_camera_mode()
-			
-		elif event.keycode == KEY_M:
-			toggle_town_map()
-			
-		elif event.keycode == KEY_B:
+		elif event.keycode == KEY_B and current_mode == PlayerMode.CYCLING and not cutscene_active:
 			ring_cycle_bell()
-			
-		elif event.keycode == KEY_F:
-			is_flashlight_on = !is_flashlight_on
-			if flashlight: flashlight.visible = is_flashlight_on
-				
-		elif event.keycode in [KEY_E, KEY_SPACE, KEY_ENTER]:
-			if is_near_door and not cutscene_active:
-				start_door_interaction()
-			elif dialogue_in_progress and can_advance_dialogue:
-				advance_dialogue()
-				
+		elif event.keycode == KEY_BACKSPACE and current_mode == PlayerMode.DRIVING_CAR:
+			exit_car()
+		elif event.keycode == KEY_E or event.keycode == KEY_SPACE or event.keycode == KEY_ENTER:
+			handle_interaction()
+
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if is_town_map_open: return
-		if Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE and not next_chapter_card.visible and not is_town_map_open:
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-			
-		if is_near_door and not cutscene_active:
-			start_door_interaction()
-		elif is_near_police_door and not cutscene_active:
-			_on_start_police_pressed()
-		elif dialogue_in_progress and can_advance_dialogue:
+		if dialogue_in_progress and can_advance_dialogue:
 			advance_dialogue()
-		elif not cutscene_active and not is_town_map_open:
+
+func handle_interaction() -> void:
+	if dialogue_in_progress and can_advance_dialogue:
+		advance_dialogue()
+		return
+		
+	if cutscene_active: return
+	
+	if current_mode == PlayerMode.CYCLING:
+		if can_dismount:
+			dismount_bicycle()
+		else:
 			ring_cycle_bell()
+	elif current_mode == PlayerMode.FOOT_KRIPAL:
+		if is_near_door and not door_opened:
+			start_door_interaction()
+		elif is_near_car and door_opened:
+			enter_car()
+	elif current_mode == PlayerMode.DRIVING_CAR:
+		if abs(car_speed) < 2.0:
+			exit_car()
+	elif current_mode == PlayerMode.FOOT_POLICE:
+		if is_near_police_door:
+			_on_start_police_pressed()
+
+func dismount_bicycle() -> void:
+	current_mode = PlayerMode.FOOT_KRIPAL
+	is_cycling = false
+	can_dismount = false
+	if action_prompt: action_prompt.visible = false
+	
+	# Hide riding cycle meshes on player and companions
+	if player_cycle: player_cycle.visible = false
+	if sahil_cycle: sahil_cycle.visible = false
+	if aashu_cycle: aashu_cycle.visible = false
+	
+	# Spawn parked bicycles beside the road
+	if parked_bicycles:
+		parked_bicycles.visible = true
+		parked_bicycles.global_position = player.global_position + Vector3(1.2, 0, 0)
+		
+	objective_banner.text = "✦ कृपाल के घर के सामने पहुँच गए! सामने वाले दरवाजे की घंटी [E] बजाएं"
+	show_subtitle("🚲 [साइकिल पार्क की]... सामने कृपाल का घर है, दरवाजे पर जाएँ और डोरबेल बजाएं!", 3.5)
 
 func ring_cycle_bell() -> void:
 	if bell_audio and stream_cycle_bell:
@@ -343,7 +344,6 @@ func ring_cycle_bell() -> void:
 	show_subtitle("🔔 [साइकिल की घंटी: ट्रिन-ट्रिन!]", 1.2)
 
 func _process(delta: float) -> void:
-	# Lightning Storm Controller
 	lightning_timer -= delta
 	if lightning_timer <= 0.0 and not is_lightning_flashing:
 		lightning_timer = randf_range(4.5, 9.0)
@@ -354,14 +354,12 @@ func trigger_lightning(is_close: bool = false) -> void:
 	if is_lightning_flashing: return
 	is_lightning_flashing = true
 	
-	# Sound
 	if thunder_audio:
 		thunder_audio.stream = stream_thunder_strike if is_close else stream_thunder_distant
 		thunder_audio.pitch_scale = randf_range(0.9, 1.1)
 		thunder_audio.volume_db = 4.0 if is_close else 0.0
 		thunder_audio.play()
 		
-	# Lightning flash sequence (burst 1 -> dip -> burst 2 -> fade)
 	var max_energy: float = 9.5 if is_close else 5.0
 	var flash_alpha: float = 0.50 if is_close else 0.25
 	
@@ -379,7 +377,7 @@ func trigger_lightning(is_close: bool = false) -> void:
 		tw_ui.tween_property(lightning_flash_ui, "color:a", flash_alpha * 0.8, 0.08)
 		tw_ui.tween_property(lightning_flash_ui, "color:a", 0.0, 0.45).set_ease(Tween.EASE_OUT)
 		
-	if is_close and camera and not cutscene_active:
+	if is_close and camera and not cutscene_active and current_mode != PlayerMode.DRIVING_CAR:
 		var base_y = camera.position.y
 		var cam_tw = create_tween()
 		cam_tw.tween_property(camera, "position:y", base_y + 0.08, 0.04)
@@ -399,22 +397,59 @@ func _physics_process(delta: float) -> void:
 		var flash = sin(pulse_time * 8.0)
 		police_light_red.light_energy = 5.0 if flash > 0 else 0.5
 		police_light_blue.light_energy = 5.0 if flash <= 0 else 0.5
-	
+		
 	if cutscene_active or is_town_map_open:
 		if not player.is_on_floor():
 			player.velocity.y -= gravity * delta
 			player.move_and_slide()
-		if cycle_audio and cycle_audio.playing:
-			cycle_audio.stop()
+		if cycle_audio and cycle_audio.playing: cycle_audio.stop()
 		return
 		
-	# Check if reached Kripal's house front yard gate
-	if player.global_position.z <= -68.0 and is_cycling:
-		is_cycling = false
-		objective_banner.text = "✦ कृपाल निवास पहुँच गए! साइकिल खड़ी करके सामने वाले दरवाजे की घंटी [E] बजाएं"
-		show_subtitle("🚲 [साइकिल पार्क की]... सामने कृपाल का घर है, दरवाजे पर जाएँ और डोरबेल बजाएं!", 4.0)
+	# MODE 1: CYCLING
+	if current_mode == PlayerMode.CYCLING:
+		# Check if approaching Kripal's house to show dismount option
+		if player.global_position.z <= -62.0:
+			can_dismount = true
+			if action_prompt:
+				action_prompt.visible = true
+				action_prompt.text = "🚲 [E] दबाकर साइकिल से उतरें (PRESS [E] TO DISMOUNT BICYCLE)"
+				
+		_handle_cycling_movement(delta)
 		
-	# WASD Bicycle Riding Movement
+	# MODE 2: FOOT AT KRIPAL HOUSE
+	elif current_mode == PlayerMode.FOOT_KRIPAL:
+		_handle_foot_movement(delta)
+		_update_walking_companions(delta)
+		
+		if is_near_door and not door_opened:
+			if action_prompt:
+				action_prompt.visible = true
+				action_prompt.text = "🔔 [E] दबाकर डोरबेल बजाएं (PRESS [E] TO RING DOORBELL)"
+		elif is_near_car and door_opened:
+			if action_prompt:
+				action_prompt.visible = true
+				action_prompt.text = "🚗 [E] दबाकर कार में बैठें और चलाएं (PRESS [E] TO DRIVE CAR)"
+		else:
+			if action_prompt and not can_advance_dialogue:
+				action_prompt.visible = false
+				
+	# MODE 3: DRIVING CAR
+	elif current_mode == PlayerMode.DRIVING_CAR:
+		_handle_car_driving(delta)
+		
+	# MODE 4: FOOT AT POLICE STATION
+	elif current_mode == PlayerMode.FOOT_POLICE:
+		_handle_foot_movement(delta)
+		_update_walking_companions(delta)
+		
+		if is_near_police_door:
+			if action_prompt:
+				action_prompt.visible = true
+				action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
+		else:
+			if action_prompt: action_prompt.visible = false
+
+func _handle_cycling_movement(delta: float) -> void:
 	var input_dir: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	if Input.is_key_pressed(KEY_A): input_dir.x -= 1.0
 	if Input.is_key_pressed(KEY_D): input_dir.x += 1.0
@@ -435,301 +470,295 @@ func _physics_process(delta: float) -> void:
 		player.velocity.x = move_toward(player.velocity.x, direction.x * max_speed, ACCEL * delta)
 		player.velocity.z = move_toward(player.velocity.z, direction.z * max_speed, ACCEL * delta)
 		
-		# Cycle Riding Sound
 		if cycle_audio:
-			if not cycle_audio.playing:
-				cycle_audio.play()
+			if not cycle_audio.playing: cycle_audio.play()
 			cycle_audio.pitch_scale = lerp(0.85, 1.45, player.velocity.length() / SPRINT_CYCLE_SPEED)
 			
-		# Cycle pedaling bobbing & banking tilt
 		cycle_bob_timer += delta * (16.0 if is_sprinting else 10.0)
 		var target_tilt = -input_dir.x * 0.14
 		cycle_tilt = lerp(cycle_tilt, target_tilt, 8.0 * delta)
 	else:
 		player.velocity.x = move_toward(player.velocity.x, 0, ACCEL * 1.8 * delta)
 		player.velocity.z = move_toward(player.velocity.z, 0, ACCEL * 1.8 * delta)
-		cycle_tilt = lerp(cycle_tilt, 0.0, 10.0 * delta)
-		if cycle_audio and cycle_audio.playing:
-			cycle_audio.stop()
-			
-	# Apply cycle tilt and pedaling bob to VisualModel
-	if visual_model:
-		visual_model.rotation.z = cycle_tilt
-		var ped_bob = sin(cycle_bob_timer) * 0.03 if direction != Vector3.ZERO else 0.0
-		visual_model.position.y = ped_bob
+		cycle_tilt = lerp(cycle_tilt, 0.0, 6.0 * delta)
+		if cycle_audio and cycle_audio.playing: cycle_audio.stop()
 		
 	player.move_and_slide()
-	
-	# Companions ride bicycles alongside player
 	_update_companions(delta, direction)
 
+func _handle_foot_movement(delta: float) -> void:
+	if cycle_audio and cycle_audio.playing: cycle_audio.stop()
+	
+	var input_dir: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	if Input.is_key_pressed(KEY_A): input_dir.x -= 1.0
+	if Input.is_key_pressed(KEY_D): input_dir.x += 1.0
+	if Input.is_key_pressed(KEY_W): input_dir.y -= 1.0
+	if Input.is_key_pressed(KEY_S): input_dir.y += 1.0
+	input_dir = input_dir.normalized()
+	
+	var direction: Vector3 = (player.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	
+	if not player.is_on_floor():
+		player.velocity.y -= gravity * delta
+	else:
+		player.velocity.y = 0.0
+		
+	if direction != Vector3.ZERO:
+		player.velocity.x = direction.x * WALK_SPEED
+		player.velocity.z = direction.z * WALK_SPEED
+		if footstep_audio and not footstep_audio.playing:
+			footstep_audio.pitch_scale = randf_range(0.9, 1.1)
+			footstep_audio.play()
+	else:
+		player.velocity.x = move_toward(player.velocity.x, 0, ACCEL * delta)
+		player.velocity.z = move_toward(player.velocity.z, 0, ACCEL * delta)
+		
+	player.move_and_slide()
+
+func _handle_car_driving(delta: float) -> void:
+	var forward_input: float = 0.0
+	var steer_input: float = 0.0
+	
+	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("ui_up"):
+		forward_input += 1.0
+	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("ui_down"):
+		forward_input -= 1.0
+	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("ui_left"):
+		steer_input += 1.0
+	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("ui_right"):
+		steer_input -= 1.0
+		
+	# Accelerate or brake/reverse
+	if forward_input > 0:
+		car_speed = move_toward(car_speed, CAR_MAX_SPEED, CAR_ACCEL * delta)
+	elif forward_input < 0:
+		car_speed = move_toward(car_speed, -CAR_MAX_SPEED * 0.45, CAR_ACCEL * 1.2 * delta)
+	else:
+		car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 0.6 * delta)
+		
+	# Steer car
+	if abs(car_speed) > 0.1 and steer_input != 0.0:
+		var dir_factor = 1.0 if car_speed >= 0 else -1.0
+		kripal_car.rotate_y(steer_input * CAR_STEER_SPEED * delta * dir_factor)
+		
+	# Move car along its forward basis (car front points along Z in our model)
+	var car_fwd = kripal_car.transform.basis.z.normalized()
+	kripal_car.velocity = car_fwd * car_speed
+	kripal_car.move_and_slide()
+	
+	# Sync player position with car
+	player.global_position = kripal_car.global_position
+	
+	# Engine audio modulation
+	if car_engine_audio:
+		car_engine_audio.pitch_scale = lerp(0.85, 1.55, abs(car_speed) / CAR_MAX_SPEED)
+		
+	# HUD update
+	if action_prompt:
+		action_prompt.visible = true
+		action_prompt.text = "🚗 [W/A/S/D] DRIVE CAR | [BACKSPACE] EXIT CAR (गाड़ी से बाहर निकलें)"
+
+func enter_car() -> void:
+	current_mode = PlayerMode.DRIVING_CAR
+	if action_prompt: action_prompt.text = "🚗 [W/A/S/D] DRIVE CAR | [BACKSPACE] EXIT CAR (गाड़ी से बाहर निकलें)"
+	
+	if car_door_open_audio: car_door_open_audio.play()
+	await get_tree().create_timer(0.3).timeout
+	if car_door_close_audio: car_door_close_audio.play()
+	if car_start_audio: car_start_audio.play()
+	
+	await get_tree().create_timer(0.8).timeout
+	if car_engine_audio:
+		car_engine_audio.play()
+		
+	# Hide player and companions visual models inside car
+	if visual_model: visual_model.visible = false
+	if kripal_mummy: kripal_mummy.visible = false
+	if sahil: sahil.visible = false
+	if aashutosh: aashutosh.visible = false
+	
+	# Switch to car chase camera
+	if car_camera: car_camera.make_current()
+	
+	objective_banner.text = "✦ DRIVE KRIPAL'S CAR TO PANSEMAL POLICE STATION (RADAR TRACKS POLICE)"
+	show_subtitle("🚗 [कार स्टार्ट हुई]... पानसेमल पुलिस स्टेशन की ओर ड्राइव करें!", 3.2)
+
+func exit_car() -> void:
+	current_mode = PlayerMode.FOOT_POLICE
+	car_speed = 0.0
+	if car_engine_audio: car_engine_audio.stop()
+	
+	if car_door_open_audio: car_door_open_audio.play()
+	if car_door_close_audio: car_door_close_audio.play()
+	
+	# Restore player camera & character models
+	if camera: camera.make_current()
+	if visual_model: visual_model.visible = true
+	
+	# Place player on road next to driver door
+	player.global_position = kripal_car.global_position + kripal_car.transform.basis.x * (-2.2)
+	
+	# Position companions outside car
+	if kripal_mummy:
+		kripal_mummy.visible = true
+		kripal_mummy.global_position = player.global_position + Vector3(-0.8, 0, 0.4)
+	if sahil:
+		sahil.visible = true
+		sahil.global_position = player.global_position + Vector3(1.0, 0, 0.6)
+	if aashutosh:
+		aashutosh.visible = true
+		aashutosh.global_position = player.global_position + Vector3(-1.4, 0, 0.8)
+		
+	objective_banner.text = "✦ पानसेमल पुलिस थाने की सीढ़ियां चढ़ें और अंदर प्रवेश करें [E]"
+	show_subtitle("🚓 [गाड़ी से बाहर निकले]... सामने पानसेमल पुलिस थाना है, अंदर चलें!", 3.5)
+	if action_prompt:
+		action_prompt.visible = true
+		action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
+
+func _update_walking_companions(delta: float) -> void:
+	# Companions follow player on foot
+	if sahil and sahil.visible:
+		var target_s = player.global_position + Vector3(1.2, 0, 0.8)
+		sahil.global_position = sahil.global_position.lerp(target_s, 3.5 * delta)
+	if aashutosh and aashutosh.visible:
+		var target_a = player.global_position + Vector3(-1.2, 0, 0.8)
+		aashutosh.global_position = aashutosh.global_position.lerp(target_a, 3.5 * delta)
+	if kripal_mummy and kripal_mummy.visible and current_mode == PlayerMode.FOOT_POLICE:
+		var target_m = player.global_position + Vector3(-0.6, 0, 1.2)
+		kripal_mummy.global_position = kripal_mummy.global_position.lerp(target_m, 3.5 * delta)
+
 func _update_companions(delta: float, player_dir: Vector3) -> void:
-	if not sahil or not aashutosh or not player: return
-	
-	# Position Sahil on Left (-1.6m), Aashutosh on Right (+1.6m) side-by-side with player
-	var p_trans: Transform3D = player.global_transform
-	var sahil_target: Vector3 = p_trans.origin - p_trans.basis.x * 1.6 + p_trans.basis.z * 0.15
-	var aashu_target: Vector3 = p_trans.origin + p_trans.basis.x * 1.6 + p_trans.basis.z * 0.15
-	
-	sahil.global_position = sahil.global_position.lerp(sahil_target, 7.0 * delta)
-	aashutosh.global_position = aashutosh.global_position.lerp(aashu_target, 7.0 * delta)
-	
-	# Cycling bobbing animation for companions
-	var bob_s: float = sin(cycle_bob_timer) * 0.03 if player_dir != Vector3.ZERO else 0.0
-	var bob_a: float = cos(cycle_bob_timer) * 0.03 if player_dir != Vector3.ZERO else 0.0
-	sahil.position.y = 0.1 + bob_s
-	aashutosh.position.y = 0.1 + bob_a
-	
-	# Facing direction: companions match player facing
-	sahil.rotation.y = lerp_angle(sahil.rotation.y, player.rotation.y, 8.0 * delta)
-	aashutosh.rotation.y = lerp_angle(aashutosh.rotation.y, player.rotation.y, 8.0 * delta)
+	if sahil:
+		var target_sahil_pos = player.global_position + Vector3(-1.4, 0, 0.4)
+		sahil.global_position = sahil.global_position.lerp(target_sahil_pos, 4.0 * delta)
+		if player_dir != Vector3.ZERO:
+			sahil.rotation.y = lerp_angle(sahil.rotation.y, player.rotation.y, 6.0 * delta)
+			
+	if aashutosh:
+		var target_aashu_pos = player.global_position + Vector3(1.4, 0, 0.6)
+		aashutosh.global_position = aashutosh.global_position.lerp(target_aashu_pos, 4.0 * delta)
+		if player_dir != Vector3.ZERO:
+			aashutosh.rotation.y = lerp_angle(aashutosh.rotation.y, player.rotation.y, 6.0 * delta)
 
 func _process_pedestrians(delta: float) -> void:
 	if pedestrian1:
-		pedestrian1.position.z += ped1_z_speed * delta
-		if pedestrian1.position.z < -65.0:
-			pedestrian1.position.z = -65.0
-			ped1_z_speed = 1.4
-			pedestrian1.rotation.y = deg_to_rad(180)
-		elif pedestrian1.position.z > 2.0:
-			pedestrian1.position.z = 2.0
-			ped1_z_speed = -1.4
-			pedestrian1.rotation.y = 0.0
-			
+		pedestrian1.position.z -= delta * 0.9
+		if pedestrian1.position.z < -65.0: pedestrian1.position.z = -15.0
 	if pedestrian2:
-		pedestrian2.position.z += ped2_z_speed * delta
-		if pedestrian2.position.z > 2.0:
-			pedestrian2.position.z = 2.0
-			ped2_z_speed = -1.3
-			pedestrian2.rotation.y = 0.0
-		elif pedestrian2.position.z < -68.0:
-			pedestrian2.position.z = -68.0
-			ped2_z_speed = 1.3
-			pedestrian2.rotation.y = deg_to_rad(180)
+		pedestrian2.position.z += delta * 0.8
+		if pedestrian2.position.z > -10.0: pedestrian2.position.z = -60.0
 
 func _update_radar_hud() -> void:
-	if not player: return
-	var dist: float = player.global_position.distance_to(Vector3(0, 0, -78))
 	if distance_label:
-		distance_label.text = "📍 कृपाल का घर: %dm" % int(dist)
+		var target_pos = landmarks["police"]["pos"] if (current_mode == PlayerMode.DRIVING_CAR or door_opened) else landmarks["kripal"]["pos"]
+		var target_name = "थाना पानसेमल" if (current_mode == PlayerMode.DRIVING_CAR or door_opened) else "कृपाल निवास"
+		var dist = player.global_position.distance_to(target_pos)
+		distance_label.text = "%s: %d m" % [target_name, int(dist)]
 	if radar_display:
 		radar_display.queue_redraw()
 
 func _on_radar_draw() -> void:
 	if not radar_display or not player: return
-	var size = radar_display.size
-	var center = size * 0.5
-	var radar_radius = min(size.x, size.y) * 0.48
+	var center = radar_display.size / 2.0
+	var radar_radius = min(center.x, center.y) - 6.0
 	
-	# Radar background & grid
-	radar_display.draw_circle(center, radar_radius, Color(0.04, 0.08, 0.14, 0.9))
-	radar_display.draw_arc(center, radar_radius, 0, TAU, 32, Color(0.2, 0.8, 1.0, 0.7), 2.0)
-	radar_display.draw_arc(center, radar_radius * 0.66, 0, TAU, 24, Color(0.15, 0.5, 0.7, 0.35), 1.0)
-	radar_display.draw_arc(center, radar_radius * 0.33, 0, TAU, 16, Color(0.15, 0.5, 0.7, 0.25), 1.0)
-	radar_display.draw_line(Vector2(center.x, center.y - radar_radius), Vector2(center.x, center.y + radar_radius), Color(0.15, 0.5, 0.7, 0.3), 1.0)
-	radar_display.draw_line(Vector2(center.x - radar_radius, center.y), Vector2(center.x + radar_radius, center.y), Color(0.15, 0.5, 0.7, 0.3), 1.0)
+	radar_display.draw_circle(center, radar_radius, Color(0.04, 0.08, 0.12, 0.85))
+	radar_display.draw_arc(center, radar_radius, 0, TAU, 32, Color(0.18, 0.45, 0.8, 0.6), 1.5)
 	
-	# Sweep effect
-	var sweep_angle = fmod(pulse_time * 2.5, TAU)
-	var sweep_end = center + Vector2(cos(sweep_angle), sin(sweep_angle)) * radar_radius
-	radar_display.draw_line(center, sweep_end, Color(0.3, 0.9, 1.0, 0.6), 1.5)
-	
-	var radar_range_m: float = 65.0
-	var scale_factor: float = radar_radius / radar_range_m
-	var p_pos: Vector3 = player.global_position
-	
-	var world_to_radar = func(w_pos: Vector3) -> Vector2:
-		var dx: float = (w_pos.x - p_pos.x) * scale_factor
-		var dz: float = (w_pos.z - p_pos.z) * scale_factor
-		return Vector2(center.x + dx, center.y + dz)
-		
-	# Draw Landmarks on Radar
 	for key in landmarks:
 		var lm = landmarks[key]
-		var r_pos: Vector2 = world_to_radar.call(lm["pos"])
-		if center.distance_to(r_pos) < radar_radius - 4.0:
-			if key == "kripal":
-				var pulse: float = (sin(pulse_time * 6.0) + 1.0) * 0.5
-				radar_display.draw_circle(r_pos, 5.0 + pulse * 2.0, Color(1.0, 0.2, 0.2, 1.0))
-				radar_display.draw_circle(r_pos, 2.5, Color(1.0, 1.0, 0.8, 1.0))
-			elif key == "police":
-				var p_color: Color = Color(1.0, 0.1, 0.1) if sin(pulse_time * 8.0) > 0 else Color(0.1, 0.4, 1.0)
-				radar_display.draw_circle(r_pos, 4.0, p_color)
-			elif key == "school":
-				radar_display.draw_circle(r_pos, 4.2, Color(0.3, 0.75, 1.0, 1.0))
-			else:
-				radar_display.draw_circle(r_pos, 3.8, lm["color"])
-				
-	# Trees
-	if trees_parent:
-		for tree in trees_parent.get_children():
-			var r_tree: Vector2 = world_to_radar.call(tree.global_position)
-			if center.distance_to(r_tree) < radar_radius - 2.0:
-				radar_display.draw_circle(r_tree, 2.8, Color(0.2, 0.85, 0.3, 0.7))
-				
-	# Pedestrians
-	if pedestrian1:
-		var r_ped1: Vector2 = world_to_radar.call(pedestrian1.global_position)
-		if center.distance_to(r_ped1) < radar_radius - 2.0:
-			radar_display.draw_circle(r_ped1, 3.2, Color(1.0, 0.85, 0.2, 0.9))
-	if pedestrian2:
-		var r_ped2: Vector2 = world_to_radar.call(pedestrian2.global_position)
-		if center.distance_to(r_ped2) < radar_radius - 2.0:
-			radar_display.draw_circle(r_ped2, 3.2, Color(1.0, 0.85, 0.2, 0.9))
-			
-	# Companions
-	if sahil:
-		var r_sahil: Vector2 = world_to_radar.call(sahil.global_position)
-		if center.distance_to(r_sahil) < radar_radius - 2.0:
-			radar_display.draw_circle(r_sahil, 3.5, Color(1.0, 0.75, 0.2, 1.0))
-	if aashutosh:
-		var r_aashu: Vector2 = world_to_radar.call(aashutosh.global_position)
-		if center.distance_to(r_aashu) < radar_radius - 2.0:
-			radar_display.draw_circle(r_aashu, 3.5, Color(0.85, 0.45, 1.0, 1.0))
-			
-	# Player Arrow
-	var p_forward: Vector3 = -player.global_transform.basis.z
-	var angle: float = atan2(p_forward.x, -p_forward.z)
-	var arrow_size: float = 7.0
-	var tip: Vector2 = center + Vector2(sin(angle), -cos(angle)) * arrow_size
-	var left: Vector2 = center + Vector2(sin(angle + 2.5), -cos(angle + 2.5)) * (arrow_size * 0.7)
-	var right: Vector2 = center + Vector2(sin(angle - 2.5), -cos(angle - 2.5)) * (arrow_size * 0.7)
-	radar_display.draw_colored_polygon(PackedVector2Array([tip, left, center, right]), Color(0.2, 1.0, 0.4, 1.0))
+		var rel_3d = lm["pos"] - player.global_position
+		var angle = -player.rotation.y
+		var rot_x = rel_3d.x * cos(angle) - rel_3d.z * sin(angle)
+		var rot_z = rel_3d.x * sin(angle) + rel_3d.z * cos(angle)
+		
+		var scale_factor = 0.85
+		var pos_2d = center + Vector2(rot_x * scale_factor, rot_z * scale_factor)
+		
+		if pos_2d.distance_to(center) <= radar_radius - 4.0:
+			radar_display.draw_circle(pos_2d, 4.0, lm["color"])
 
 func toggle_town_map() -> void:
-	is_town_map_open = !is_town_map_open
+	is_town_map_open = not is_town_map_open
 	if town_map_overlay:
 		town_map_overlay.visible = is_town_map_open
-		if is_town_map_open:
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-			map_canvas.queue_redraw()
-		else:
-			if not next_chapter_card.visible:
-				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	if is_town_map_open:
+		mouse_captured = false
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		if map_canvas: map_canvas.queue_redraw()
+	else:
+		mouse_captured = true
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _on_map_canvas_draw() -> void:
 	if not map_canvas: return
-	var size = map_canvas.size
-	
-	# Blueprint Background grid
-	map_canvas.draw_rect(Rect2(Vector2.ZERO, size), Color(0.06, 0.09, 0.15, 1.0), true)
-	for x in range(0, int(size.x), 40):
-		map_canvas.draw_line(Vector2(x, 0), Vector2(x, size.y), Color(0.12, 0.18, 0.28, 0.3), 1.0)
-	for y in range(0, int(size.y), 40):
-		map_canvas.draw_line(Vector2(0, y), Vector2(size.x, y), Color(0.12, 0.18, 0.28, 0.3), 1.0)
-		
-	# Draw Main Road
-	var road_center_x = size.x * 0.5
-	var road_w = 70.0
-	map_canvas.draw_rect(Rect2(road_center_x - road_w*0.5, 20, road_w, size.y - 40), Color(0.18, 0.20, 0.24, 1.0), true)
-	map_canvas.draw_line(Vector2(road_center_x, 20), Vector2(road_center_x, size.y - 20), Color(0.9, 0.85, 0.3, 0.8), 2.0)
-	
-	# Draw Cross Streets
-	map_canvas.draw_rect(Rect2(40, 110, size.x - 80, 42), Color(0.16, 0.18, 0.22, 0.9), true)
-	map_canvas.draw_rect(Rect2(40, 240, size.x - 80, 42), Color(0.16, 0.18, 0.22, 0.9), true)
-	
-	# Street Names
-	var font = ThemeDB.fallback_font
-	map_canvas.draw_string(font, Vector2(road_center_x + 45, 136), "मंदिर मार्ग (TEMPLE RD)", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.7, 0.75, 0.8))
-	map_canvas.draw_string(font, Vector2(road_center_x + 45, 266), "स्टेशन मार्ग (STATION RD)", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.7, 0.75, 0.8))
-	map_canvas.draw_string(font, Vector2(road_center_x - 14, 50), "पानसेमल मुख्य बाजार मार्ग", HORIZONTAL_ALIGNMENT_CENTER, -1, 13, Color(1, 0.9, 0.4))
-	
-	# Plot Buildings on Town Map
-	var town_pts = [
-		{"name": "🏫 सेंट ऑगस्टीन स्कूल\n(ST. AUGUSTINE SCHOOL)", "pos": Vector2(road_center_x, 42), "color": Color(0.2, 0.7, 1.0), "size": Vector2(160, 36)},
-		{"name": "🏠 साहिल निवास\n(SAHIL'S HOUSE)", "pos": Vector2(road_center_x - 160, 115), "color": Color(1.0, 0.75, 0.2), "size": Vector2(130, 32)},
-		{"name": "🏠 मेरा घर\n(PLAYER'S HOUSE)", "pos": Vector2(road_center_x + 160, 175), "color": Color(0.3, 0.9, 0.4), "size": Vector2(130, 32)},
-		{"name": "🏠 आशुतोष का घर\n(AASHUTOSH'S HOUSE)", "pos": Vector2(road_center_x - 160, 245), "color": Color(0.85, 0.45, 1.0), "size": Vector2(130, 32)},
-		{"name": "🚓 पानसेमल पुलिस थाना\n(POLICE STATION)", "pos": Vector2(road_center_x + 165, 290), "color": Color(0.2, 0.5, 1.0), "size": Vector2(145, 36)},
-		{"name": "⭐ कृपाल निवास [TARGET]\n(KRIPAL'S HOUSE)", "pos": Vector2(road_center_x, 340), "color": Color(1.0, 0.25, 0.25), "size": Vector2(150, 36)}
-	]
-	
-	for pt in town_pts:
-		var p = pt["pos"]
-		var s = pt["size"]
-		var rect = Rect2(p.x - s.x * 0.5, p.y - s.y * 0.5, s.x, s.y)
-		map_canvas.draw_rect(rect, pt["color"] * 0.35, true)
-		map_canvas.draw_rect(rect, pt["color"], false, 2.0)
-		map_canvas.draw_string(font, Vector2(rect.position.x + 8, rect.position.y + 16), pt["name"], HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
-		
-	# Draw Player Current Position Marker
-	var norm_z = clamp((-player.global_position.z + 12.0) / 90.0, 0.0, 1.0)
-	var player_map_y = lerp(45.0, 340.0, norm_z)
-	var player_pt = Vector2(road_center_x, player_map_y)
-	map_canvas.draw_circle(player_pt, 7.0, Color(0.2, 1.0, 0.4, 1.0))
-	map_canvas.draw_circle(player_pt, 3.5, Color(1.0, 1.0, 1.0, 1.0))
-	map_canvas.draw_string(font, Vector2(player_pt.x + 12, player_pt.y + 4), "◄ आप यहाँ हैं (YOU ARE HERE)", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.2, 1.0, 0.4))
+	var c_size = map_canvas.size
+	map_canvas.draw_rect(Rect2(Vector2.ZERO, c_size), Color(0.05, 0.08, 0.12, 1.0))
+	var road_center_x = c_size.x * 0.5
+	map_canvas.draw_line(Vector2(road_center_x, 40), Vector2(road_center_x, c_size.y - 40), Color(0.85, 0.75, 0.35, 0.7), 2.0)
 
 func toggle_camera_mode() -> void:
-	is_third_person = !is_third_person
+	is_first_person = not is_first_person
 	update_camera_mode()
 
 func update_camera_mode() -> void:
 	if not camera or not visual_model: return
-	if is_third_person:
+	if is_first_person:
+		camera.position = Vector3(0, 0.35, -0.15)
+		visual_model.visible = false
+		if view_toggle_btn: view_toggle_btn.text = "👁️ [V] कैमरा: 1st Person"
+	else:
 		camera.position = Vector3(0, 0.75, 3.4)
 		visual_model.visible = true
 		if view_toggle_btn: view_toggle_btn.text = "👁️ [V] कैमरा: 3rd Person"
-	else:
-		camera.position = Vector3(0, 0.35, -0.15)
-		visual_model.visible = true # Keep handlebars visible in first person cycling!
-		if view_toggle_btn: view_toggle_btn.text = "👁️ [V] कैमरा: 1st Person"
 
 func _on_door_trigger_entered(body: Node3D) -> void:
 	if body == player and not door_opened:
 		is_near_door = true
-		if prompt_label: prompt_label.visible = true
 
 func _on_door_trigger_exited(body: Node3D) -> void:
 	if body == player:
 		is_near_door = false
-		if prompt_label and not cutscene_active: prompt_label.visible = false
 
 func _on_police_trigger_entered(body: Node3D) -> void:
-	if body == player:
+	if body == player or (kripal_car and body == kripal_car):
 		is_near_police_door = true
-		show_subtitle("🚓 [E] दबाकर पानसेमल पुलिस स्टेशन में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)", 5.0)
 
 func _on_police_trigger_exited(body: Node3D) -> void:
-	if body == player:
+	if body == player or (kripal_car and body == kripal_car):
 		is_near_police_door = false
+
+func _on_car_trigger_entered(body: Node3D) -> void:
+	if body == player:
+		is_near_car = true
+
+func _on_car_trigger_exited(body: Node3D) -> void:
+	if body == player:
+		is_near_car = false
 
 func start_door_interaction() -> void:
 	if cutscene_active: return
 	cutscene_active = true
 	door_opened = true
 	is_near_door = false
-	if prompt_label: prompt_label.visible = false
-	if is_town_map_open: toggle_town_map()
-	if cycle_audio and cycle_audio.playing: cycle_audio.stop()
-		
-	# Play Doorbell Chime
+	if action_prompt: action_prompt.visible = false
+	
 	if doorbell_audio:
 		doorbell_audio.play()
 		
 	show_subtitle("🔔 [डोरबेल बजी: डिंग-डोंग]... अंदर से किसी के आने की आहट सुनाई दे रही है...", 2.5)
 	
-	# Position player and companions neatly facing the door
 	var tw = create_tween()
 	tw.tween_property(player, "global_position", Vector3(0, 0.1, -73.2), 1.2)
 	tw.parallel().tween_property(sahil, "global_position", Vector3(-1.4, 0.1, -73.4), 1.2)
 	tw.parallel().tween_property(aashutosh, "global_position", Vector3(1.4, 0.1, -73.4), 1.2)
 	tw.parallel().tween_property(player, "rotation:y", deg_to_rad(180), 1.2)
-	tw.parallel().tween_property(camera_pivot, "rotation:x", deg_to_rad(5), 1.2)
 	
 	await tw.finished
-	
-	# Switch to cinematic dialogue camera
-	is_third_person = true
-	update_camera_mode()
-	camera.position = Vector3(0, 0.8, 3.8)
-	
-	await get_tree().create_timer(1.2).timeout
 	
 	if home_door_audio:
 		home_door_audio.play()
 		
-	# Swing door open 80 degrees
 	var door_tw = create_tween()
 	door_tw.tween_property(door_hinge, "rotation_degrees:y", 80.0, 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	
@@ -740,8 +769,6 @@ func start_door_interaction() -> void:
 		mummy_tw.tween_property(kripal_mummy, "position:z", 0.1, 1.2)
 		
 	await door_tw.finished
-	await get_tree().create_timer(0.5).timeout
-	
 	start_dialogue_sequence()
 
 func start_dialogue_sequence() -> void:
@@ -763,17 +790,16 @@ func display_current_dialogue() -> void:
 		speaker_label.modulate = d["color"]
 	if dialogue_text:
 		dialogue_text.text = d["text"]
+	if advance_tip:
+		advance_tip.text = "[CLICK / SPACE TO CONTINUE]"
 		
-	# Play full spoken voice line
-	if d["audio"] != null and voice_audio:
+	if voice_audio and d["audio"]:
 		voice_audio.stop()
 		voice_audio.stream = d["audio"]
 		voice_audio.play()
 		
-	# Dynamic delay based on voice line length
-	await get_tree().create_timer(1.2).timeout
+	await get_tree().create_timer(0.6).timeout
 	can_advance_dialogue = true
-	if advance_tip: advance_tip.text = "[CLICK या E / SPACE दबाएं ▶]"
 
 func advance_dialogue() -> void:
 	if not can_advance_dialogue: return
@@ -782,17 +808,25 @@ func advance_dialogue() -> void:
 
 func end_dialogue_sequence() -> void:
 	dialogue_in_progress = false
+	cutscene_active = false
 	if dialogue_box: dialogue_box.visible = false
 	if subtitle: subtitle.text = ""
+	
+	# Aunty, Sahil, Aashutosh walk towards the car
+	var walk_tw = create_tween()
+	if kripal_mummy:
+		walk_tw.parallel().tween_property(kripal_mummy, "global_position", Vector3(2.4, 0.1, -73.2), 1.6)
+	if sahil:
+		walk_tw.parallel().tween_property(sahil, "global_position", Vector3(1.8, 0.1, -74.2), 1.6)
+	if aashutosh:
+		walk_tw.parallel().tween_property(aashutosh, "global_position", Vector3(4.5, 0.1, -74.2), 1.6)
 		
-	# Show Chapter 1 Mission Card: Pansemal Police Station
-	if next_chapter_card:
-		next_chapter_card.visible = true
-		next_chapter_card.modulate.a = 0.0
-		var tw = create_tween()
-		tw.tween_property(next_chapter_card, "modulate:a", 1.0, 0.8)
-		
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	objective_banner.text = "✦ कृपाल की कार में बैठें [E] और पानसेमल पुलिस स्टेशन ड्राइव करें"
+	show_subtitle("👩 कृपाल की माँ: 'कृपाल की गाड़ी बाहर खड़ी है... चलो सब इसमें बैठो, हम अभी पुलिस स्टेशन चलते हैं!'", 4.5)
+	
+	if action_prompt:
+		action_prompt.visible = true
+		action_prompt.text = "🚗 [E] दबाकर कार में बैठें और चलाएं (PRESS [E] TO DRIVE CAR)"
 
 func show_subtitle(text: String, duration: float) -> void:
 	if not subtitle: return
@@ -806,8 +840,7 @@ func show_subtitle(text: String, duration: float) -> void:
 func _on_start_police_pressed() -> void:
 	if start_police_btn:
 		start_police_btn.disabled = true
-		start_police_btn.text = "🚓 RUSHING TO PANSEMAL POLICE STATION..."
-	# Loops or transitions to next mission scene
+		start_police_btn.text = "🚓 ENTERING PANSEMAL POLICE STATION..."
 	var tw = create_tween()
 	if next_chapter_card:
 		tw.tween_property(next_chapter_card, "modulate:a", 0.0, 0.4)

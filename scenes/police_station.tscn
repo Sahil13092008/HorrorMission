@@ -7,6 +7,7 @@
 [ext_resource type="AudioStream" path="res://audio/police_stamp_thud.wav" id="5_stamp_thud"]
 [ext_resource type="AudioStream" path="res://audio/station_door_close.wav" id="6_door_close"]
 [ext_resource type="AudioStream" path="res://audio/thunder_distant.wav" id="7_thunder"]
+[ext_resource type="AudioStream" path="res://audio/suspense_2days_later.wav" id="8_suspense"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
 sky_top_color = Color(0.04, 0.06, 0.12, 1)
@@ -429,6 +430,32 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0.12)
 size = Vector3(0.18, 0.015, 0.08)
 material = SubResource("Mat_PoliceDarkBrown")
 
+[node name="VisitorChairLeft" type="Node3D" parent="OfficeProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0, 0.4)
+
+[node name="Seat" type="CSGBox3D" parent="OfficeProps/VisitorChairLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+size = Vector3(0.55, 0.08, 0.5)
+material = SubResource("Mat_DeskWood")
+
+[node name="Backrest" type="CSGBox3D" parent="OfficeProps/VisitorChairLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0.22)
+size = Vector3(0.55, 0.48, 0.06)
+material = SubResource("Mat_DeskWood")
+
+[node name="VisitorChairRight" type="Node3D" parent="OfficeProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 0, 0.4)
+
+[node name="Seat" type="CSGBox3D" parent="OfficeProps/VisitorChairRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+size = Vector3(0.55, 0.08, 0.5)
+material = SubResource("Mat_DeskWood")
+
+[node name="Backrest" type="CSGBox3D" parent="OfficeProps/VisitorChairRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0.22)
+size = Vector3(0.55, 0.48, 0.06)
+material = SubResource("Mat_DeskWood")
+
 [node name="InspectorChair" type="Node3D" parent="OfficeProps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.8)
 
@@ -701,6 +728,10 @@ volume_db = 0.0
 stream = ExtResource("7_thunder")
 volume_db = -6.0
 
+[node name="SuspenseAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("8_suspense")
+volume_db = 2.0
+
 [node name="PoliceUI" type="CanvasLayer" parent="."]
 
 [node name="HUD" type="Control" parent="PoliceUI"]
@@ -750,6 +781,26 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 13
 text = "MISSION OBJECTIVE: LODGE EMERGENCY FIR FOR KRIPAL'S ABDUCTION"
+horizontal_alignment = 1
+
+[node name="SitPrompt" type="Label" parent="PoliceUI/HUD"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = 80.0
+offset_right = 300.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 18
+text = "🪑 [E] दबाकर कुर्सी पर बैठें (PRESS [E] TO SIT ON CHAIR)"
 horizontal_alignment = 1
 
 [node name="ViewToggleBtn" type="Button" parent="PoliceUI/HUD"]
@@ -979,6 +1030,56 @@ theme_override_font_sizes/font_size = 17
 text = "रात 11:30 बजे... पानसेमल पुलिस थाने से बाहर..."
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="TwoDaysLaterScreen" type="ColorRect" parent="PoliceUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="VBox" type="VBoxContainer" parent="PoliceUI/TwoDaysLaterScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -90.0
+offset_right = 380.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="DaysTitle" type="Label" parent="PoliceUI/TwoDaysLaterScreen/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 48
+text = "2 DAYS LATER..."
+horizontal_alignment = 1
+
+[node name="HindiSub" type="Label" parent="PoliceUI/TwoDaysLaterScreen/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+text = "(२ दिन बाद...)"
+horizontal_alignment = 1
+
+[node name="NarrativeSub" type="Label" parent="PoliceUI/TwoDaysLaterScreen/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.92, 0.9)
+theme_override_font_sizes/font_size = 15
+text = "दो दिन बीत चुके हैं... पुलिस की तरफ से कोई खबर नहीं आई...
+कृपाल का अभी तक कोई सुराग नहीं मिला..."
+horizontal_alignment = 1
 
 [node name="ChapterEndCard" type="PanelContainer" parent="PoliceUI"]
 layout_mode = 1

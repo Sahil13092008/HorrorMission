@@ -13,6 +13,10 @@
 [ext_resource type="AudioStream" path="res://audio/player_comfort_mummy.mp3" id="11_player_comfort"]
 [ext_resource type="AudioStream" path="res://audio/sahil_police_plan.mp3" id="12_sahil_police"]
 [ext_resource type="AudioStream" path="res://audio/storm_rain_wind.wav" id="13_storm_ambience"]
+[ext_resource type="AudioStream" path="res://audio/car_engine_start.wav" id="20_car_start"]
+[ext_resource type="AudioStream" path="res://audio/car_engine_loop.wav" id="21_car_loop"]
+[ext_resource type="AudioStream" path="res://audio/car_door_open.wav" id="22_car_door_open"]
+[ext_resource type="AudioStream" path="res://audio/car_door_close.wav" id="23_car_door_close"]
 [ext_resource type="AudioStream" path="res://audio/thunder_strike.wav" id="14_thunder_strike"]
 [ext_resource type="AudioStream" path="res://audio/thunder_distant.wav" id="15_thunder_distant"]
 [ext_resource type="AudioStream" path="res://audio/cycle_bell.wav" id="16_cycle_bell"]
@@ -94,8 +98,34 @@ roughness = 0.85
 albedo_color = Color(0.45, 0.58, 0.68, 1)
 roughness = 0.85
 
+[sub_resource type="StandardMaterial3D" id="Mat_CarPaint"]
+albedo_color = Color(0.92, 0.93, 0.95, 1)
+metallic = 0.82
+roughness = 0.22
+
+[sub_resource type="StandardMaterial3D" id="Mat_CarGlass"]
+transparency = 1
+albedo_color = Color(0.12, 0.15, 0.2, 0.85)
+metallic = 0.85
+roughness = 0.1
+
+[sub_resource type="StandardMaterial3D" id="Mat_CarTire"]
+albedo_color = Color(0.1, 0.1, 0.12, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_CarHeadlightGlow"]
+albedo_color = Color(1, 0.98, 0.88, 1)
+emission_enabled = true
+emission = Color(1, 0.98, 0.88, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_CarTailGlow"]
+albedo_color = Color(1, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.1, 0.1, 1)
+emission_energy_multiplier = 4.0
 [sub_resource type="StandardMaterial3D" id="Mat_PoliceStation"]
-albedo_color = Color(0.85, 0.86, 0.90, 1)
+albedo_color = Color(0.68, 0.52, 0.38, 1)
 roughness = 0.65
 
 [sub_resource type="StandardMaterial3D" id="Mat_PoliceBlue"]
@@ -315,6 +345,42 @@ volume_db = -8.0
 [node name="BellAudio" type="AudioStreamPlayer" parent="Audio"]
 stream = ExtResource("16_cycle_bell")
 volume_db = -4.0
+
+
+[node name="CarStartAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("20_car_start")
+volume_db = 1.0
+
+[node name="CarEngineAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("21_car_loop")
+volume_db = -4.0
+
+[node name="CarDoorOpenAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("22_car_door_open")
+volume_db = 0.0
+
+[node name="CarDoorCloseAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("23_car_door_close")
+volume_db = 1.0
+
+[node name="ParkedBicycles" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.1, -66.5)
+visible = false
+
+[node name="Cycle1" type="CSGBox3D" parent="ParkedBicycles"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, 0, 0.45, 0)
+size = Vector3(0.2, 0.8, 1.4)
+material = SubResource("Mat_Asphalt")
+
+[node name="Cycle2" type="CSGBox3D" parent="ParkedBicycles"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, -0.6, 0.45, 0.2)
+size = Vector3(0.2, 0.8, 1.4)
+material = SubResource("Mat_Asphalt")
+
+[node name="Cycle3" type="CSGBox3D" parent="ParkedBicycles"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, 0.6, 0.45, -0.2)
+size = Vector3(0.2, 0.8, 1.4)
+material = SubResource("Mat_Asphalt")
 
 [node name="EnvironmentProps" type="Node3D" parent="."]
 
@@ -708,6 +774,37 @@ material = SubResource("Mat_PoliceStation")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.75, 0)
 size = Vector3(8.7, 0.5, 16.2)
 material = SubResource("Mat_PoliceBlue")
+[node name="PorticoStairs" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0.35, 0)
+use_collision = true
+size = Vector3(1.6, 0.7, 4.5)
+material = SubResource("Mat_Sidewalk")
+
+[node name="PorticoPillarL" type="CSGCylinder3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 2.5, -1.8)
+use_collision = true
+radius = 0.22
+height = 5.0
+material = SubResource("Mat_PoliceStation")
+
+[node name="PorticoPillarR" type="CSGCylinder3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 2.5, 1.8)
+use_collision = true
+radius = 0.22
+height = 5.0
+material = SubResource("Mat_PoliceStation")
+
+[node name="AshokStambhEmblem" type="CSGCylinder3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -4.38, 5.8, 0)
+radius = 0.42
+height = 0.08
+material = SubResource("Mat_RoadStripe")
+
+[node name="PoliceDoor" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3, 1.8, 0)
+size = Vector3(0.2, 2.6, 1.8)
+material = SubResource("Mat_PoliceBlue")
+
 [node name="PoliceSign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.35, 4.2, 0)
 text = "🚓 पानसेमल पुलिस थाना
@@ -771,6 +868,124 @@ material = SubResource("Mat_MummySkin")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 size = Vector3(0.35, 0.7, 0.22)
 material = SubResource("Mat_Jeans")
+
+[node name="KripalCar" type="CharacterBody3D" parent="."]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, 3.4, 0.35, -73.2)
+
+[node name="CarBody" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+use_collision = true
+size = Vector3(1.9, 0.65, 4.2)
+material = SubResource("Mat_CarPaint")
+
+[node name="Cabin" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, -0.2)
+use_collision = true
+size = Vector3(1.68, 0.65, 2.3)
+material = SubResource("Mat_CarPaint")
+
+[node name="Windshield" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 0.94, -0.34, 0, 0.34, 0.94, 0, 0.95, 0.95)
+size = Vector3(1.64, 0.55, 0.3)
+material = SubResource("Mat_CarGlass")
+
+[node name="RearWindow" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 0.94, 0.34, 0, -0.34, 0.94, 0, 0.95, -1.35)
+size = Vector3(1.64, 0.55, 0.3)
+material = SubResource("Mat_CarGlass")
+
+[node name="SideWindowL" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.84, 0.95, -0.2)
+size = Vector3(0.05, 0.45, 2.1)
+material = SubResource("Mat_CarGlass")
+
+[node name="SideWindowR" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.84, 0.95, -0.2)
+size = Vector3(0.05, 0.45, 2.1)
+material = SubResource("Mat_CarGlass")
+
+[node name="WheelFL" type="CSGCylinder3D" parent="KripalCar"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, -0.98, 0, 1.25)
+radius = 0.34
+height = 0.22
+material = SubResource("Mat_CarTire")
+
+[node name="WheelFR" type="CSGCylinder3D" parent="KripalCar"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0.98, 0, 1.25)
+radius = 0.34
+height = 0.22
+material = SubResource("Mat_CarTire")
+
+[node name="WheelRL" type="CSGCylinder3D" parent="KripalCar"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, -0.98, 0, -1.25)
+radius = 0.34
+height = 0.22
+material = SubResource("Mat_CarTire")
+
+[node name="WheelRR" type="CSGCylinder3D" parent="KripalCar"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0.98, 0, -1.25)
+radius = 0.34
+height = 0.22
+material = SubResource("Mat_CarTire")
+
+[node name="HeadlightL" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.65, 0.4, 2.12)
+size = Vector3(0.35, 0.15, 0.06)
+material = SubResource("Mat_CarHeadlightGlow")
+
+[node name="HeadlightR" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65, 0.4, 2.12)
+size = Vector3(0.35, 0.15, 0.06)
+material = SubResource("Mat_CarHeadlightGlow")
+
+[node name="SpotLightL" type="SpotLight3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.65, 0.4, 2.2)
+light_color = Color(1, 0.98, 0.88, 1)
+light_energy = 3.5
+spot_range = 30.0
+spot_angle = 45.0
+
+[node name="SpotLightR" type="SpotLight3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65, 0.4, 2.2)
+light_color = Color(1, 0.98, 0.88, 1)
+light_energy = 3.5
+spot_range = 30.0
+spot_angle = 45.0
+
+[node name="TailLightL" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.65, 0.42, -2.12)
+size = Vector3(0.35, 0.14, 0.06)
+material = SubResource("Mat_CarTailGlow")
+
+[node name="TailLightR" type="CSGBox3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65, 0.42, -2.12)
+size = Vector3(0.35, 0.14, 0.06)
+material = SubResource("Mat_CarTailGlow")
+
+[node name="PlateFront" type="Label3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 2.13)
+text = "MP-46-KR-2024"
+font_size = 14
+outline_size = 4
+
+[node name="PlateRear" type="Label3D" parent="KripalCar"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.18, -2.13)
+text = "MP-46-KR-2024"
+font_size = 14
+outline_size = 4
+
+[node name="CarTrigger" type="Area3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.8, 0.2)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KripalCar/CarTrigger"]
+shape = SubResource("Box_DoorTrigger")
+
+[node name="CarCameraPivot" type="Node3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+
+[node name="CarCamera" type="Camera3D" parent="KripalCar/CarCameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.966, 0.259, 0, -0.259, 0.966, 0, 1.2, -5.2)
+fov = 74.0
 
 [node name="KripalHouse" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -78)
@@ -1062,6 +1277,26 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 12
 text = "[W, A, S, D] चलना | [SHIFT] दौड़ना | [V] कैमरा | [M] शहर का नक्शा | [E] बातचीत"
+
+[node name="ActionPrompt" type="Label" parent="StreetUI/HUDContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = 70.0
+offset_right = 350.0
+offset_bottom = 115.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 18
+text = "🚲 [E] दबाकर साइकिल से उतरें (PRESS [E] TO DISMOUNT)"
+horizontal_alignment = 1
 
 [node name="ObjectiveBanner" type="Label" parent="StreetUI"]
 anchors_preset = 5
