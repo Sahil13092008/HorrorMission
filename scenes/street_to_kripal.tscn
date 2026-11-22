@@ -12,6 +12,14 @@
 [ext_resource type="AudioStream" path="res://audio/mummy_crying.mp3" id="10_mummy_cry"]
 [ext_resource type="AudioStream" path="res://audio/player_comfort_mummy.mp3" id="11_player_comfort"]
 [ext_resource type="AudioStream" path="res://audio/sahil_police_plan.mp3" id="12_sahil_police"]
+[ext_resource type="AudioStream" path="res://audio/storm_rain_wind.wav" id="13_storm_ambience"]
+[ext_resource type="AudioStream" path="res://audio/thunder_strike.wav" id="14_thunder_strike"]
+[ext_resource type="AudioStream" path="res://audio/thunder_distant.wav" id="15_thunder_distant"]
+[ext_resource type="AudioStream" path="res://audio/cycle_bell.wav" id="16_cycle_bell"]
+[ext_resource type="AudioStream" path="res://audio/cycle_riding.wav" id="17_cycle_riding"]
+[ext_resource type="AudioStream" path="res://audio/storm_sahil_warning.mp3" id="18_sahil_warning"]
+[ext_resource type="AudioStream" path="res://audio/storm_aashu_hurry.mp3" id="19_aashu_hurry"]
+[ext_resource type="AudioStream" path="res://audio/storm_player_go.mp3" id="20_player_go"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat_Street"]
 sky_top_color = Color(0.04, 0.05, 0.12, 1)
@@ -26,11 +34,11 @@ sky_material = SubResource("SkyMat_Street")
 background_mode = 2
 sky = SubResource("Sky_Street")
 ambient_light_source = 2
-ambient_light_color = Color(0.20, 0.22, 0.32, 1)
-ambient_light_energy = 0.55
+ambient_light_color = Color(0.12, 0.14, 0.22, 1)
+ambient_light_energy = 0.42
 fog_enabled = true
-fog_light_color = Color(0.10, 0.12, 0.18, 1)
-fog_density = 0.012
+fog_light_color = Color(0.06, 0.08, 0.14, 1)
+fog_density = 0.022
 
 [sub_resource type="CapsuleShape3D" id="Capsule_Player"]
 radius = 0.35
@@ -207,6 +215,55 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+
+[sub_resource type="StandardMaterial3D" id="Mat_SchoolBrick"]
+albedo_color = Color(0.60, 0.32, 0.25, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_SchoolTrim"]
+albedo_color = Color(0.85, 0.82, 0.76, 1)
+roughness = 0.70
+
+[sub_resource type="StandardMaterial3D" id="Mat_SchoolRoof"]
+albedo_color = Color(0.16, 0.20, 0.26, 1)
+roughness = 0.50
+
+[sub_resource type="StandardMaterial3D" id="Mat_SchoolClock"]
+albedo_color = Color(1.0, 0.96, 0.82, 1)
+emission_enabled = true
+emission = Color(1.0, 0.95, 0.75, 1)
+emission_energy_multiplier = 1.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_CycleMetal"]
+albedo_color = Color(0.30, 0.30, 0.33, 1)
+metallic = 0.85
+roughness = 0.25
+
+[sub_resource type="StandardMaterial3D" id="Mat_CycleBlack"]
+albedo_color = Color(0.12, 0.12, 0.14, 1)
+metallic = 0.4
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_CycleRed"]
+albedo_color = Color(0.85, 0.14, 0.14, 1)
+metallic = 0.5
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_CycleBlue"]
+albedo_color = Color(0.14, 0.35, 0.88, 1)
+metallic = 0.5
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Mat_CycleTire"]
+albedo_color = Color(0.08, 0.08, 0.09, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_CycleHeadlight"]
+albedo_color = Color(1.0, 0.98, 0.85, 1)
+emission_enabled = true
+emission = Color(1.0, 0.98, 0.85, 1)
+emission_energy_multiplier = 2.2
+
 [node name="StreetToKripal" type="Node3D"]
 script = ExtResource("1_street")
 
@@ -215,14 +272,20 @@ environment = SubResource("Environment_Street")
 
 [node name="Moonlight" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 10, 20, 10)
-light_color = Color(0.70, 0.75, 0.92, 1)
-light_energy = 0.45
+light_color = Color(0.50, 0.60, 0.80, 1)
+light_energy = 0.25
+shadow_enabled = true
+
+[node name="LightningLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 0, 25, 0)
+light_color = Color(0.88, 0.94, 1, 1)
+light_energy = 0.0
 shadow_enabled = true
 
 [node name="Audio" type="Node" parent="."]
 
 [node name="AmbienceAudio" type="AudioStreamPlayer" parent="Audio"]
-stream = ExtResource("2_ambience")
+stream = ExtResource("13_storm_ambience")
 volume_db = -4.0
 autoplay = true
 
@@ -240,6 +303,18 @@ volume_db = 6.0
 [node name="FootstepAudio" type="AudioStreamPlayer" parent="Audio"]
 stream = ExtResource("5_footstep")
 volume_db = -2.0
+
+[node name="ThunderAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("14_thunder_strike")
+volume_db = 2.0
+
+[node name="CycleAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("17_cycle_riding")
+volume_db = -8.0
+
+[node name="BellAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("16_cycle_bell")
+volume_db = -4.0
 
 [node name="EnvironmentProps" type="Node3D" parent="."]
 
@@ -445,9 +520,128 @@ size = Vector3(10.0, 0.8, 1.2)
 material = SubResource("Mat_HouseWall2")
 [node name="SchoolSign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SchoolArch"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, -0.65)
-text = "🏫 पानसेमल हाई स्कूल (PANSEMAL HIGH SCHOOL)"
+text = "🏫 ST. AUGUSTINE SCHOOL, PANSEMAL
+(सेंट ऑगस्टीन स्कूल, पानसेमल)"
 font_size = 20
 outline_size = 5
+
+
+[node name="StAugustineSchool" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 24)
+
+[node name="CampusGround" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+use_collision = true
+size = Vector3(44, 0.2, 26)
+material = SubResource("Mat_Sidewalk")
+
+[node name="MainBuilding" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.75, 2.0)
+use_collision = true
+size = Vector3(28, 11.5, 12)
+material = SubResource("Mat_SchoolBrick")
+
+[node name="LeftWing" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 4.75, 2.0)
+use_collision = true
+size = Vector3(14, 9.5, 10)
+material = SubResource("Mat_SchoolBrick")
+
+[node name="RightWing" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 4.75, 2.0)
+use_collision = true
+size = Vector3(14, 9.5, 10)
+material = SubResource("Mat_SchoolBrick")
+
+[node name="ClockTower" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.25, -4.5)
+use_collision = true
+size = Vector3(7.2, 16.5, 5.0)
+material = SubResource("Mat_SchoolBrick")
+
+[node name="TowerRoof" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.8, -4.5)
+size = Vector3(7.6, 1.2, 5.4)
+material = SubResource("Mat_SchoolRoof")
+
+[node name="ClockFace" type="CSGCylinder3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 13.8, -7.05)
+radius = 1.15
+height = 0.15
+material = SubResource("Mat_SchoolClock")
+
+[node name="GrandSchoolSign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.0, -7.05)
+text = "ST. AUGUSTINE SCHOOL, PANSEMAL"
+font_size = 32
+outline_size = 8
+
+[node name="GrandSchoolSignHindi" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.9, -7.05)
+text = "सेंट ऑगस्टीन हायर सेकेंडरी स्कूल, पानसेमल"
+font_size = 21
+outline_size = 6
+
+[node name="EntrancePortico" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, -6.8)
+size = Vector3(8.5, 0.6, 4.2)
+material = SubResource("Mat_SchoolRoof")
+
+[node name="PorticoPillarL" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 2.4, -8.6)
+size = Vector3(0.6, 4.8, 0.6)
+material = SubResource("Mat_SchoolTrim")
+
+[node name="PorticoPillarR" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 2.4, -8.6)
+size = Vector3(0.6, 4.8, 0.6)
+material = SubResource("Mat_SchoolTrim")
+
+[node name="EntranceSteps" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -7.5)
+size = Vector3(9.0, 0.5, 3.2)
+material = SubResource("Mat_SchoolTrim")
+
+[node name="MainDoors" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, -4.05)
+size = Vector3(3.2, 4.0, 0.2)
+material = SubResource("Mat_DoorWood")
+
+[node name="WinF1L" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 2.5, -4.05)
+size = Vector3(3.5, 2.2, 0.15)
+material = SubResource("Mat_WindowWarm")
+
+[node name="WinF1R" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 2.5, -4.05)
+size = Vector3(3.5, 2.2, 0.15)
+material = SubResource("Mat_WindowWarm")
+
+[node name="WinF2L" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 7.5, -4.05)
+size = Vector3(3.5, 2.2, 0.15)
+material = SubResource("Mat_WindowWarm")
+
+[node name="WinF2R" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 7.5, -4.05)
+size = Vector3(3.5, 2.2, 0.15)
+material = SubResource("Mat_WindowWarm")
+
+[node name="WinLeftWing" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.0, 5.0, -3.05)
+size = Vector3(7.0, 2.5, 0.15)
+material = SubResource("Mat_WindowWarm")
+
+[node name="WinRightWing" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.0, 5.0, -3.05)
+size = Vector3(7.0, 2.5, 0.15)
+material = SubResource("Mat_WindowWarm")
+
+[node name="PorticoLantern" type="OmniLight3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, -7.5)
+light_color = Color(1, 0.85, 0.5, 1)
+light_energy = 2.5
+omni_range = 10.0
 
 [node name="SahilHouse" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -20)
@@ -1157,3 +1351,238 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_font_sizes/font_size = 16
 text = "🔄 REPLAY SCENE"
+
+[node name="CycleModel" type="Node3D" parent="Player/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="FrameTop" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, -0.05)
+size = Vector3(0.06, 0.06, 0.78)
+material = SubResource("Mat_CycleBlack")
+
+[node name="FrameDown" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 0.819152, 0.573576, 0, -0.573576, 0.819152, 0, 0.48, -0.15)
+size = Vector3(0.06, 0.06, 0.85)
+material = SubResource("Mat_CycleBlack")
+
+[node name="SeatPost" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.58, 0.22)
+size = Vector3(0.06, 0.65, 0.06)
+material = SubResource("Mat_CycleMetal")
+
+[node name="Saddle" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 0.25)
+size = Vector3(0.22, 0.06, 0.32)
+material = SubResource("Mat_CycleTire")
+
+[node name="Handlebar" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94, -0.45)
+size = Vector3(0.68, 0.05, 0.05)
+material = SubResource("Mat_CycleMetal")
+
+[node name="HandleGripL" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, 0.94, -0.45)
+size = Vector3(0.12, 0.07, 0.07)
+material = SubResource("Mat_CycleTire")
+
+[node name="HandleGripR" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 0.94, -0.45)
+size = Vector3(0.12, 0.07, 0.07)
+material = SubResource("Mat_CycleTire")
+
+[node name="FrontFork" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0.55, -0.48)
+size = Vector3(0.14, 0.72, 0.05)
+material = SubResource("Mat_CycleMetal")
+
+[node name="FrontWheel" type="CSGCylinder3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0.36, -0.55)
+radius = 0.36
+height = 0.06
+material = SubResource("Mat_CycleTire")
+
+[node name="RearWheel" type="CSGCylinder3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0.36, 0.52)
+radius = 0.36
+height = 0.06
+material = SubResource("Mat_CycleTire")
+
+[node name="HeadlightHousing" type="CSGCylinder3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.88, -0.54)
+radius = 0.08
+height = 0.12
+material = SubResource("Mat_CycleMetal")
+
+[node name="HeadlightGlass" type="CSGCylinder3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.88, -0.61)
+radius = 0.075
+height = 0.02
+material = SubResource("Mat_CycleHeadlight")
+
+[node name="HeadlightBeam" type="SpotLight3D" parent="Player/VisualModel/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.62)
+light_color = Color(1, 0.95, 0.82, 1)
+light_energy = 3.2
+spot_range = 28.0
+spot_angle = 35.0
+
+
+[node name="CycleModel" type="Node3D" parent="Companions/SahilCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="FrameTop" type="CSGBox3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, -0.05)
+size = Vector3(0.06, 0.06, 0.78)
+material = SubResource("Mat_CycleRed")
+
+[node name="FrameDown" type="CSGBox3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 0.819152, 0.573576, 0, -0.573576, 0.819152, 0, 0.48, -0.15)
+size = Vector3(0.06, 0.06, 0.85)
+material = SubResource("Mat_CycleRed")
+
+[node name="SeatPost" type="CSGBox3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.58, 0.22)
+size = Vector3(0.06, 0.65, 0.06)
+material = SubResource("Mat_CycleMetal")
+
+[node name="Saddle" type="CSGBox3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 0.25)
+size = Vector3(0.22, 0.06, 0.32)
+material = SubResource("Mat_CycleTire")
+
+[node name="Handlebar" type="CSGBox3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94, -0.45)
+size = Vector3(0.68, 0.05, 0.05)
+material = SubResource("Mat_CycleMetal")
+
+[node name="HandleGripL" type="CSGBox3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, 0.94, -0.45)
+size = Vector3(0.12, 0.07, 0.07)
+material = SubResource("Mat_CycleTire")
+
+[node name="HandleGripR" type="CSGBox3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 0.94, -0.45)
+size = Vector3(0.12, 0.07, 0.07)
+material = SubResource("Mat_CycleTire")
+
+[node name="FrontFork" type="CSGBox3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0.55, -0.48)
+size = Vector3(0.14, 0.72, 0.05)
+material = SubResource("Mat_CycleMetal")
+
+[node name="FrontWheel" type="CSGCylinder3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0.36, -0.55)
+radius = 0.36
+height = 0.06
+material = SubResource("Mat_CycleTire")
+
+[node name="RearWheel" type="CSGCylinder3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0.36, 0.52)
+radius = 0.36
+height = 0.06
+material = SubResource("Mat_CycleTire")
+
+[node name="HeadlightHousing" type="CSGCylinder3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.88, -0.54)
+radius = 0.08
+height = 0.12
+material = SubResource("Mat_CycleMetal")
+
+[node name="HeadlightGlass" type="CSGCylinder3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.88, -0.61)
+radius = 0.075
+height = 0.02
+material = SubResource("Mat_CycleHeadlight")
+
+[node name="HeadlightBeam" type="SpotLight3D" parent="Companions/SahilCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.62)
+light_color = Color(1, 0.95, 0.82, 1)
+light_energy = 3.2
+spot_range = 28.0
+spot_angle = 35.0
+
+
+[node name="CycleModel" type="Node3D" parent="Companions/AashutoshCompanion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="FrameTop" type="CSGBox3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, -0.05)
+size = Vector3(0.06, 0.06, 0.78)
+material = SubResource("Mat_CycleBlue")
+
+[node name="FrameDown" type="CSGBox3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 0.819152, 0.573576, 0, -0.573576, 0.819152, 0, 0.48, -0.15)
+size = Vector3(0.06, 0.06, 0.85)
+material = SubResource("Mat_CycleBlue")
+
+[node name="SeatPost" type="CSGBox3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.58, 0.22)
+size = Vector3(0.06, 0.65, 0.06)
+material = SubResource("Mat_CycleMetal")
+
+[node name="Saddle" type="CSGBox3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 0.25)
+size = Vector3(0.22, 0.06, 0.32)
+material = SubResource("Mat_CycleTire")
+
+[node name="Handlebar" type="CSGBox3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94, -0.45)
+size = Vector3(0.68, 0.05, 0.05)
+material = SubResource("Mat_CycleMetal")
+
+[node name="HandleGripL" type="CSGBox3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, 0.94, -0.45)
+size = Vector3(0.12, 0.07, 0.07)
+material = SubResource("Mat_CycleTire")
+
+[node name="HandleGripR" type="CSGBox3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 0.94, -0.45)
+size = Vector3(0.12, 0.07, 0.07)
+material = SubResource("Mat_CycleTire")
+
+[node name="FrontFork" type="CSGBox3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0.55, -0.48)
+size = Vector3(0.14, 0.72, 0.05)
+material = SubResource("Mat_CycleMetal")
+
+[node name="FrontWheel" type="CSGCylinder3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0.36, -0.55)
+radius = 0.36
+height = 0.06
+material = SubResource("Mat_CycleTire")
+
+[node name="RearWheel" type="CSGCylinder3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0.36, 0.52)
+radius = 0.36
+height = 0.06
+material = SubResource("Mat_CycleTire")
+
+[node name="HeadlightHousing" type="CSGCylinder3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.88, -0.54)
+radius = 0.08
+height = 0.12
+material = SubResource("Mat_CycleMetal")
+
+[node name="HeadlightGlass" type="CSGCylinder3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.88, -0.61)
+radius = 0.075
+height = 0.02
+material = SubResource("Mat_CycleHeadlight")
+
+[node name="HeadlightBeam" type="SpotLight3D" parent="Companions/AashutoshCompanion/CycleModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.62)
+light_color = Color(1, 0.95, 0.82, 1)
+light_energy = 3.2
+spot_range = 28.0
+spot_angle = 35.0
+
+
+[node name="LightningFlashUI" type="ColorRect" parent="StreetUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.9, 0.95, 1, 0)
