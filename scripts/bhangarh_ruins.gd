@@ -24,8 +24,9 @@ extends Node3D
 @onready var signal_lost_card = $CutsceneUI/SignalLostCard
 @onready var continue_btn = $CutsceneUI/SignalLostCard/Margin/VBox/ContinueBtn
 
-var voice_wakeup = preload("res://audio/hindi_kripal_wakeup.mp3")
-var voice_freeze = preload("res://audio/hindi_kripal_freeze.mp3")
+var voice_wake_1 = preload("res://audio/kripal_wake_1.mp3")
+var voice_wake_2 = preload("res://audio/kripal_wake_2.mp3")
+var voice_freeze = preload("res://audio/kripal_freeze.mp3")
 
 var camera_shake_trauma: float = 0.0
 var original_cam_pos: Vector3 = Vector3.ZERO
@@ -72,47 +73,54 @@ func _process(delta):
 func start_bhangarh_cutscene():
 	# 1. Groggily waking up in pitch darkness
 	subtitle.text = "..."
-	await get_tree().create_timer(1.2).timeout
+	await get_tree().create_timer(1.0).timeout
 	
 	# Eyes blinking open
 	var blink_tw = create_tween()
 	blink_tw.tween_property(blink_top, "position:y", -240.0, 1.2)
 	blink_tw.parallel().tween_property(blink_bottom, "position:y", 620.0, 1.2)
-	
-	subtitle.text = "कृपाल: \"उफ्फ... मेरा सिर... कहाँ हूँ मैं...?\""
-	subtitle.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+	await blink_tw.finished
 
-	await get_tree().create_timer(1.6).timeout
+	await get_tree().create_timer(0.3).timeout
+
+	# 1st dialogue: Groggy awakening
+	subtitle.text = "कृपाल: \"अरे... मेरा सिर बहुत दर्द कर रहा है... मैं कहाँ आ गया?!\""
+	subtitle.add_theme_color_override("font_color", Color(0.92, 0.92, 0.92))
+
+	if voice_audio and voice_wake_1:
+		voice_audio.stream = voice_wake_1
+		voice_audio.play()
+		await voice_audio.finished
+
+	await get_tree().create_timer(0.4).timeout
 
 	# Kripal stands up and camera rises to eye level
 	var rise_tw = create_tween().set_parallel(true)
-	rise_tw.tween_property(kripal_model, "position:y", 0.0, 2.0).set_trans(Tween.TRANS_QUAD)
-	rise_tw.tween_property(kripal_model, "rotation_degrees:z", 0.0, 2.0).set_trans(Tween.TRANS_QUAD)
-	rise_tw.tween_property(camera, "position", Vector3(0.0, 1.5, 0.0), 2.0).set_trans(Tween.TRANS_QUAD)
-	rise_tw.tween_property(camera, "rotation_degrees", Vector3(0.0, 0.0, 0.0), 2.0).set_trans(Tween.TRANS_QUAD)
+	rise_tw.tween_property(kripal_model, "position:y", 0.0, 1.8).set_trans(Tween.TRANS_QUAD)
+	rise_tw.tween_property(kripal_model, "rotation_degrees:z", 0.0, 1.8).set_trans(Tween.TRANS_QUAD)
+	rise_tw.tween_property(camera, "position", Vector3(0.0, 1.5, 0.0), 1.8).set_trans(Tween.TRANS_QUAD)
+	rise_tw.tween_property(camera, "rotation_degrees", Vector3(0.0, 0.0, 0.0), 1.8).set_trans(Tween.TRANS_QUAD)
 	
 	await rise_tw.finished
 	original_cam_pos = camera.position
 
 	# 2. Looking around confused at the ancient pillars and shadows
 	subtitle.text = "कृपाल: \"ये... ये कैसी जगह है? चारों तरफ सिर्फ अंधेरा और पुराने पत्थर हैं...\""
+	subtitle.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 	
 	# Pan left looking at pillars
 	var look_tw = create_tween()
-	look_tw.tween_property(camera, "rotation_degrees:y", 38.0, 1.4).set_trans(Tween.TRANS_SINE)
-	look_tw.tween_interval(0.5)
-	# Pan right looking at broken archway
-	look_tw.tween_property(camera, "rotation_degrees:y", -42.0, 1.8).set_trans(Tween.TRANS_SINE)
+	look_tw.tween_property(camera, "rotation_degrees:y", 38.0, 1.3).set_trans(Tween.TRANS_SINE)
 	look_tw.tween_interval(0.4)
-	look_tw.tween_property(camera, "rotation_degrees:y", 0.0, 1.0).set_trans(Tween.TRANS_SINE)
+	# Pan right looking at broken archway
+	look_tw.tween_property(camera, "rotation_degrees:y", -42.0, 1.5).set_trans(Tween.TRANS_SINE)
+	look_tw.tween_interval(0.3)
+	look_tw.tween_property(camera, "rotation_degrees:y", 0.0, 0.9).set_trans(Tween.TRANS_SINE)
 	
 	await look_tw.finished
+	await get_tree().create_timer(0.3).timeout
 
 	# 3. Frantically calling out for Sahil & Aashutosh in Hindi!
-	if voice_audio and voice_wakeup:
-		voice_audio.stream = voice_wakeup
-		voice_audio.play()
-
 	subtitle.text = "कृपाल: \"साहिल! आशुतोष! कहाँ हो भाई तुम लोग?! कोई है यहाँ?!\""
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
 
@@ -120,7 +128,12 @@ func start_bhangarh_cutscene():
 		heartbeat_audio.volume_db = -8.0
 		heartbeat_audio.play()
 
-	await get_tree().create_timer(4.8).timeout
+	if voice_audio and voice_wake_2:
+		voice_audio.stream = voice_wake_2
+		voice_audio.play()
+		await voice_audio.finished
+
+	await get_tree().create_timer(0.4).timeout
 
 	# 4. Taking cautious footsteps forward
 	subtitle.text = "कृपाल: \"मुझे यहाँ से बाहर निकलने का रास्ता ढूँढना होगा...\""
@@ -144,12 +157,9 @@ func start_bhangarh_cutscene():
 		var tw_mute = create_tween()
 		tw_mute.tween_property(ambience_audio, "volume_db", -30.0, 0.6)
 
-	await get_tree().create_timer(0.8).timeout
+	await get_tree().create_timer(0.6).timeout
 
 	# Chilling whisper: "Kripaaaal..."
-	if whisper_audio:
-		whisper_audio.play()
-
 	subtitle.text = "खौफनाक साया (गहरी फुसफुसाहट): \"...कृपा...ल...\""
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.2, 0.2))
 
@@ -158,17 +168,22 @@ func start_bhangarh_cutscene():
 		heartbeat_audio.volume_db = 4.0
 		heartbeat_audio.pitch_scale = 1.35
 
-	await get_tree().create_timer(2.6).timeout
+	if whisper_audio:
+		whisper_audio.play()
+		await whisper_audio.finished
+
+	await get_tree().create_timer(0.3).timeout
 
 	# Kripal whispers in trembling terror
-	if voice_audio and voice_freeze:
-		voice_audio.stream = voice_freeze
-		voice_audio.play()
-
 	subtitle.text = "कृपाल (कांपती आवाज़ में): \"क... कौन है वहाँ?! कौन बोल रहा है?!\""
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.8, 0.4))
 
-	await get_tree().create_timer(2.2).timeout
+	if voice_audio and voice_freeze:
+		voice_audio.stream = voice_freeze
+		voice_audio.play()
+		await voice_audio.finished
+
+	await get_tree().create_timer(0.3).timeout
 
 	# 6. Turning around 180 degrees & JUMPSCARE!
 	# Enable ghost entity behind him

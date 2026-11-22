@@ -184,6 +184,91 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StandardMaterial3D" id="Mat_Skin"]
+albedo_color = Color(0.84, 0.66, 0.52, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_Hair_Black"]
+albedo_color = Color(0.07, 0.06, 0.06, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_Hair_Brown"]
+albedo_color = Color(0.24, 0.15, 0.10, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_Eye_White"]
+albedo_color = Color(0.96, 0.96, 0.98, 1)
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_Eye_Pupil"]
+albedo_color = Color(0.12, 0.08, 0.06, 1)
+roughness = 0.1
+
+[sub_resource type="StandardMaterial3D" id="Mat_Eye_Shine"]
+albedo_color = Color(1, 1, 1, 1)
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_Lips"]
+albedo_color = Color(0.68, 0.44, 0.40, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil_Jacket"]
+albedo_color = Color(0.14, 0.16, 0.19, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil_Cargo"]
+albedo_color = Color(0.22, 0.24, 0.27, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="Mat_Aashu_Hoodie"]
+albedo_color = Color(0.58, 0.13, 0.16, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="Mat_Aashu_Jeans"]
+albedo_color = Color(0.20, 0.30, 0.46, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_Kripal_Coat"]
+albedo_color = Color(0.44, 0.40, 0.28, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="Mat_Kripal_Pants"]
+albedo_color = Color(0.22, 0.22, 0.21, 1)
+roughness = 0.75
+
+[sub_resource type="StandardMaterial3D" id="Mat_Leather_Belt"]
+albedo_color = Color(0.20, 0.12, 0.07, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Mat_Metal_Buckle"]
+albedo_color = Color(0.85, 0.85, 0.88, 1)
+metallic = 0.9
+roughness = 0.25
+
+[sub_resource type="StandardMaterial3D" id="Mat_Boots_Black"]
+albedo_color = Color(0.08, 0.08, 0.08, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_Boots_Brown"]
+albedo_color = Color(0.26, 0.16, 0.10, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sneakers_Sole"]
+albedo_color = Color(0.92, 0.92, 0.94, 1)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_Glasses_Frame"]
+albedo_color = Color(0.06, 0.06, 0.06, 1)
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_Glasses_Lens"]
+transparency = 1
+albedo_color = Color(0.75, 0.88, 1.0, 0.35)
+roughness = 0.1
+
+
 [node name="Classroom" type="Node3D" unique_id=405003882]
 script = ExtResource("1_class")
 
@@ -589,19 +674,240 @@ dialogue_after = "MY EMF METER WENT OFF THE CHARTS! The whole room spiked to Lev
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_npc")
 
-[node name="Body" type="CSGBox3D" parent="Characters/Sahil" unique_id=374242888]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
-size = Vector3(0.55, 1.25, 0.38)
-material = SubResource("Mat_Sahil")
+[node name="HeadNode" type="Node3D" parent="Characters/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
 
-[node name="Head" type="CSGBox3D" parent="Characters/Sahil" unique_id=121057743]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, 0)
-size = Vector3(0.35, 0.35, 0.35)
+[node name="HeadBase" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_Skin")
 
-[node name="EMFMeter" type="CSGBox3D" parent="Characters/Sahil" unique_id=1268351175]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 1.05, 0.25)
-size = Vector3(0.12, 0.22, 0.08)
-material = SubResource("Mat_EMF_Glow")
+[node name="Jaw" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
+size = Vector3(0.22, 0.11, 0.22)
+material = SubResource("Mat_Skin")
+
+[node name="EarL" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+[node name="EarR" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+[node name="EyeL_White" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+[node name="EyeL_Pupil" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+[node name="EyeL_Shine" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.056, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+[node name="EyeR_White" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+[node name="EyeR_Pupil" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+[node name="EyeR_Shine" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.068, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+[node name="BrowL" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(0.996, 0.087, 0, -0.087, 0.996, 0, 0, 0, 1, -0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Black")
+
+[node name="BrowR" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(0.996, -0.087, 0, 0.087, 0.996, 0, 0, 0, 1, 0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Black")
+
+[node name="NoseBridge" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, 0.142)
+size = Vector3(0.026, 0.06, 0.03)
+material = SubResource("Mat_Skin")
+
+[node name="NoseTip" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, 0.152)
+size = Vector3(0.034, 0.024, 0.03)
+material = SubResource("Mat_Skin")
+
+[node name="Mouth" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.078, 0.133)
+size = Vector3(0.07, 0.02, 0.012)
+material = SubResource("Mat_Lips")
+
+[node name="HairTop" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155, -0.015)
+size = Vector3(0.29, 0.075, 0.29)
+material = SubResource("Mat_Hair_Black")
+
+[node name="HairBack" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -0.135)
+size = Vector3(0.28, 0.22, 0.055)
+material = SubResource("Mat_Hair_Black")
+
+[node name="HairSideL" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Black")
+
+[node name="HairSideR" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Black")
+
+[node name="HairFringe" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0.12)
+size = Vector3(0.24, 0.045, 0.055)
+material = SubResource("Mat_Hair_Black")
+
+[node name="Neck" type="CSGCylinder3D" parent="Characters/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30, 0)
+radius = 0.068
+height = 0.11
+material = SubResource("Mat_Skin")
+
+[node name="TorsoNode" type="Node3D" parent="Characters/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)
+
+[node name="Chest" type="CSGBox3D" parent="Characters/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0)
+size = Vector3(0.44, 0.38, 0.25)
+material = SubResource("Mat_Sahil_Jacket")
+
+[node name="Collar" type="CSGBox3D" parent="Characters/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33, 0.015)
+size = Vector3(0.24, 0.065, 0.22)
+material = SubResource("Mat_Sahil_Jacket")
+
+[node name="ZipperLine" type="CSGBox3D" parent="Characters/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0.127)
+size = Vector3(0.02, 0.36, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+[node name="PocketL" type="CSGBox3D" parent="Characters/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Sahil_Jacket")
+
+[node name="PocketR" type="CSGBox3D" parent="Characters/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Sahil_Jacket")
+
+[node name="Abdomen" type="CSGBox3D" parent="Characters/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+size = Vector3(0.40, 0.18, 0.23)
+material = SubResource("Mat_Sahil_Jacket")
+
+[node name="Belt" type="CSGBox3D" parent="Characters/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0)
+size = Vector3(0.41, 0.06, 0.24)
+material = SubResource("Mat_Leather_Belt")
+
+[node name="BeltBuckle" type="CSGBox3D" parent="Characters/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0.123)
+size = Vector3(0.075, 0.05, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+[node name="EMFMeter" type="CSGBox3D" parent="Characters/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, -0.14, 0.14)
+size = Vector3(0.11, 0.18, 0.055)
+material = SubResource("Mat_Boots_Black")
+
+[node name="EMFLedGreen" type="CSGBox3D" parent="Characters/Sahil/TorsoNode/EMFMeter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.025, 0.045, 0.03)
+size = Vector3(0.018, 0.018, 0.008)
+material = SubResource("Mat_Eye_Shine")
+
+[node name="ArmsNode" type="Node3D" parent="Characters/Sahil"]
+
+[node name="ArmL_Upper" type="CSGBox3D" parent="Characters/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Sahil_Jacket")
+
+[node name="ArmL_Forearm" type="CSGBox3D" parent="Characters/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Sahil_Jacket")
+
+[node name="HandL" type="CSGBox3D" parent="Characters/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+[node name="ArmR_Upper" type="CSGBox3D" parent="Characters/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Sahil_Jacket")
+
+[node name="ArmR_Forearm" type="CSGBox3D" parent="Characters/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Sahil_Jacket")
+
+[node name="HandR" type="CSGBox3D" parent="Characters/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+[node name="LegsNode" type="Node3D" parent="Characters/Sahil"]
+
+[node name="LegL_Thigh" type="CSGBox3D" parent="Characters/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Sahil_Cargo")
+
+[node name="LegL_Shin" type="CSGBox3D" parent="Characters/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Sahil_Cargo")
+
+[node name="BootL_Base" type="CSGBox3D" parent="Characters/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Black")
+
+[node name="BootL_Sole" type="CSGBox3D" parent="Characters/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
+
+[node name="LegR_Thigh" type="CSGBox3D" parent="Characters/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Sahil_Cargo")
+
+[node name="LegR_Shin" type="CSGBox3D" parent="Characters/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Sahil_Cargo")
+
+[node name="BootR_Base" type="CSGBox3D" parent="Characters/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Black")
+
+[node name="BootR_Sole" type="CSGBox3D" parent="Characters/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
 
 [node name="NameTag" type="Label3D" parent="Characters/Sahil" unique_id=928560041]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)
@@ -622,19 +928,250 @@ dialogue_after = "HE WAS JUST SITTING RIGHT THERE! How could he vanish in 5 seco
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_npc")
 
-[node name="Body" type="CSGBox3D" parent="Characters/Aashutosh" unique_id=738134204]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
-size = Vector3(0.52, 1.22, 0.36)
-material = SubResource("Mat_Aashutosh")
+[node name="HeadNode" type="Node3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
 
-[node name="Head" type="CSGBox3D" parent="Characters/Aashutosh" unique_id=1563309277]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
-size = Vector3(0.35, 0.35, 0.35)
+[node name="HeadBase" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_Skin")
 
-[node name="Headphones" type="CSGBox3D" parent="Characters/Aashutosh" unique_id=1971053065]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0.05)
-size = Vector3(0.42, 0.1, 0.38)
-material = SubResource("Mat_MetalLegs")
+[node name="Jaw" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
+size = Vector3(0.22, 0.11, 0.22)
+material = SubResource("Mat_Skin")
+
+[node name="EarL" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+[node name="EarR" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+[node name="EyeL_White" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+[node name="EyeL_Pupil" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+[node name="EyeL_Shine" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.056, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+[node name="EyeR_White" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+[node name="EyeR_Pupil" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+[node name="EyeR_Shine" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.068, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+[node name="BrowL" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(0.996, 0.087, 0, -0.087, 0.996, 0, 0, 0, 1, -0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Brown")
+
+[node name="BrowR" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(0.996, -0.087, 0, 0.087, 0.996, 0, 0, 0, 1, 0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Brown")
+
+[node name="NoseBridge" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, 0.142)
+size = Vector3(0.026, 0.06, 0.03)
+material = SubResource("Mat_Skin")
+
+[node name="NoseTip" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, 0.152)
+size = Vector3(0.034, 0.024, 0.03)
+material = SubResource("Mat_Skin")
+
+[node name="Mouth" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.078, 0.133)
+size = Vector3(0.07, 0.02, 0.012)
+material = SubResource("Mat_Lips")
+
+[node name="HairTop" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155, -0.015)
+size = Vector3(0.29, 0.075, 0.29)
+material = SubResource("Mat_Hair_Brown")
+
+[node name="HairBack" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -0.135)
+size = Vector3(0.28, 0.22, 0.055)
+material = SubResource("Mat_Hair_Brown")
+
+[node name="HairSideL" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Brown")
+
+[node name="HairSideR" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Brown")
+
+[node name="HairFringe" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0.12)
+size = Vector3(0.24, 0.045, 0.055)
+material = SubResource("Mat_Hair_Brown")
+
+[node name="HeadphonesBand" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 0)
+size = Vector3(0.32, 0.028, 0.10)
+material = SubResource("Mat_Boots_Black")
+
+[node name="HeadphoneCupL" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.155, 0, 0)
+size = Vector3(0.045, 0.10, 0.10)
+material = SubResource("Mat_Boots_Black")
+
+[node name="HeadphoneCupR" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.155, 0, 0)
+size = Vector3(0.045, 0.10, 0.10)
+material = SubResource("Mat_Boots_Black")
+
+[node name="Neck" type="CSGCylinder3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30, 0)
+radius = 0.068
+height = 0.11
+material = SubResource("Mat_Skin")
+
+[node name="TorsoNode" type="Node3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)
+
+[node name="Chest" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0)
+size = Vector3(0.44, 0.38, 0.25)
+material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="Collar" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33, 0.015)
+size = Vector3(0.24, 0.065, 0.22)
+material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="ZipperLine" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0.127)
+size = Vector3(0.02, 0.36, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+[node name="PocketL" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="PocketR" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="Abdomen" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+size = Vector3(0.40, 0.18, 0.23)
+material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="Belt" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0)
+size = Vector3(0.41, 0.06, 0.24)
+material = SubResource("Mat_Leather_Belt")
+
+[node name="BeltBuckle" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0.123)
+size = Vector3(0.075, 0.05, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+[node name="Backpack" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.10, -0.20)
+size = Vector3(0.34, 0.38, 0.16)
+material = SubResource("Mat_Boots_Brown")
+
+[node name="ArmsNode" type="Node3D" parent="Characters/Aashutosh"]
+
+[node name="ArmL_Upper" type="CSGBox3D" parent="Characters/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="ArmL_Forearm" type="CSGBox3D" parent="Characters/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="HandL" type="CSGBox3D" parent="Characters/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+[node name="ArmR_Upper" type="CSGBox3D" parent="Characters/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="ArmR_Forearm" type="CSGBox3D" parent="Characters/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="HandR" type="CSGBox3D" parent="Characters/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+[node name="LegsNode" type="Node3D" parent="Characters/Aashutosh"]
+
+[node name="LegL_Thigh" type="CSGBox3D" parent="Characters/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Aashu_Jeans")
+
+[node name="LegL_Shin" type="CSGBox3D" parent="Characters/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Aashu_Jeans")
+
+[node name="BootL_Base" type="CSGBox3D" parent="Characters/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Brown")
+
+[node name="BootL_Sole" type="CSGBox3D" parent="Characters/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
+
+[node name="LegR_Thigh" type="CSGBox3D" parent="Characters/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Aashu_Jeans")
+
+[node name="LegR_Shin" type="CSGBox3D" parent="Characters/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Aashu_Jeans")
+
+[node name="BootR_Base" type="CSGBox3D" parent="Characters/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Brown")
+
+[node name="BootR_Sole" type="CSGBox3D" parent="Characters/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
 
 [node name="NameTag" type="Label3D" parent="Characters/Aashutosh" unique_id=1964780275]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)
@@ -654,19 +1191,255 @@ dialogue_before = "The thermal camera has been detecting random temperature drop
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_npc")
 
-[node name="Body" type="CSGBox3D" parent="Characters/Kripal" unique_id=1786380304]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
-size = Vector3(0.5, 1.2, 0.35)
-material = SubResource("Mat_Kripal")
+[node name="HeadNode" type="Node3D" parent="Characters/Kripal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
 
-[node name="Head" type="CSGBox3D" parent="Characters/Kripal" unique_id=1445893082]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
-size = Vector3(0.35, 0.35, 0.35)
+[node name="HeadBase" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_Skin")
 
-[node name="ThermalCam" type="CSGBox3D" parent="Characters/Kripal" unique_id=2050195356]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1, 0.25)
-size = Vector3(0.15, 0.18, 0.18)
-material = SubResource("Mat_MetalLegs")
+[node name="Jaw" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
+size = Vector3(0.22, 0.11, 0.22)
+material = SubResource("Mat_Skin")
+
+[node name="EarL" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+[node name="EarR" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+[node name="EyeL_White" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+[node name="EyeL_Pupil" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+[node name="EyeL_Shine" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.056, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+[node name="EyeR_White" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+[node name="EyeR_Pupil" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+[node name="EyeR_Shine" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.068, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+[node name="BrowL" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(0.996, 0.087, 0, -0.087, 0.996, 0, 0, 0, 1, -0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Black")
+
+[node name="BrowR" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(0.996, -0.087, 0, 0.087, 0.996, 0, 0, 0, 1, 0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Black")
+
+[node name="NoseBridge" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, 0.142)
+size = Vector3(0.026, 0.06, 0.03)
+material = SubResource("Mat_Skin")
+
+[node name="NoseTip" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, 0.152)
+size = Vector3(0.034, 0.024, 0.03)
+material = SubResource("Mat_Skin")
+
+[node name="Mouth" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.078, 0.133)
+size = Vector3(0.07, 0.02, 0.012)
+material = SubResource("Mat_Lips")
+
+[node name="HairTop" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155, -0.015)
+size = Vector3(0.29, 0.075, 0.29)
+material = SubResource("Mat_Hair_Black")
+
+[node name="HairBack" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -0.135)
+size = Vector3(0.28, 0.22, 0.055)
+material = SubResource("Mat_Hair_Black")
+
+[node name="HairSideL" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Black")
+
+[node name="HairSideR" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Black")
+
+[node name="HairFringe" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0.12)
+size = Vector3(0.24, 0.045, 0.055)
+material = SubResource("Mat_Hair_Black")
+
+[node name="GlassesFrame" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.148)
+size = Vector3(0.21, 0.05, 0.018)
+material = SubResource("Mat_Glasses_Frame")
+
+[node name="GlassesLensL" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.15)
+size = Vector3(0.065, 0.04, 0.008)
+material = SubResource("Mat_Glasses_Lens")
+
+[node name="GlassesLensR" type="CSGBox3D" parent="Characters/Kripal/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.15)
+size = Vector3(0.065, 0.04, 0.008)
+material = SubResource("Mat_Glasses_Lens")
+
+[node name="Neck" type="CSGCylinder3D" parent="Characters/Kripal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30, 0)
+radius = 0.068
+height = 0.11
+material = SubResource("Mat_Skin")
+
+[node name="TorsoNode" type="Node3D" parent="Characters/Kripal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)
+
+[node name="Chest" type="CSGBox3D" parent="Characters/Kripal/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0)
+size = Vector3(0.44, 0.38, 0.25)
+material = SubResource("Mat_Kripal_Coat")
+
+[node name="Collar" type="CSGBox3D" parent="Characters/Kripal/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33, 0.015)
+size = Vector3(0.24, 0.065, 0.22)
+material = SubResource("Mat_Kripal_Coat")
+
+[node name="ZipperLine" type="CSGBox3D" parent="Characters/Kripal/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0.127)
+size = Vector3(0.02, 0.36, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+[node name="PocketL" type="CSGBox3D" parent="Characters/Kripal/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Kripal_Coat")
+
+[node name="PocketR" type="CSGBox3D" parent="Characters/Kripal/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Kripal_Coat")
+
+[node name="Abdomen" type="CSGBox3D" parent="Characters/Kripal/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+size = Vector3(0.40, 0.18, 0.23)
+material = SubResource("Mat_Kripal_Coat")
+
+[node name="Belt" type="CSGBox3D" parent="Characters/Kripal/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0)
+size = Vector3(0.41, 0.06, 0.24)
+material = SubResource("Mat_Leather_Belt")
+
+[node name="BeltBuckle" type="CSGBox3D" parent="Characters/Kripal/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0.123)
+size = Vector3(0.075, 0.05, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+[node name="ThermalCamSling" type="CSGBox3D" parent="Characters/Kripal/TorsoNode"]
+transform = Transform3D(0.906, -0.423, 0, 0.423, 0.906, 0, 0, 0, 1, 0.20, 0.06, 0.14)
+size = Vector3(0.13, 0.18, 0.11)
+material = SubResource("Mat_Boots_Black")
+
+[node name="ThermalScreen" type="CSGBox3D" parent="Characters/Kripal/TorsoNode/ThermalCamSling"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.057)
+size = Vector3(0.09, 0.11, 0.01)
+material = SubResource("Mat_Eye_Shine")
+
+[node name="ArmsNode" type="Node3D" parent="Characters/Kripal"]
+
+[node name="ArmL_Upper" type="CSGBox3D" parent="Characters/Kripal/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Kripal_Coat")
+
+[node name="ArmL_Forearm" type="CSGBox3D" parent="Characters/Kripal/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Kripal_Coat")
+
+[node name="HandL" type="CSGBox3D" parent="Characters/Kripal/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+[node name="ArmR_Upper" type="CSGBox3D" parent="Characters/Kripal/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Kripal_Coat")
+
+[node name="ArmR_Forearm" type="CSGBox3D" parent="Characters/Kripal/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Kripal_Coat")
+
+[node name="HandR" type="CSGBox3D" parent="Characters/Kripal/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+[node name="LegsNode" type="Node3D" parent="Characters/Kripal"]
+
+[node name="LegL_Thigh" type="CSGBox3D" parent="Characters/Kripal/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Kripal_Pants")
+
+[node name="LegL_Shin" type="CSGBox3D" parent="Characters/Kripal/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Kripal_Pants")
+
+[node name="BootL_Base" type="CSGBox3D" parent="Characters/Kripal/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Brown")
+
+[node name="BootL_Sole" type="CSGBox3D" parent="Characters/Kripal/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Boots_Black")
+
+[node name="LegR_Thigh" type="CSGBox3D" parent="Characters/Kripal/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Kripal_Pants")
+
+[node name="LegR_Shin" type="CSGBox3D" parent="Characters/Kripal/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Kripal_Pants")
+
+[node name="BootR_Base" type="CSGBox3D" parent="Characters/Kripal/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Brown")
+
+[node name="BootR_Sole" type="CSGBox3D" parent="Characters/Kripal/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Boots_Black")
 
 [node name="NameTag" type="Label3D" parent="Characters/Kripal" unique_id=1574742833]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)
