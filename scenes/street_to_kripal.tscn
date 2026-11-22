@@ -51,8 +51,43 @@ height = 1.75
 [sub_resource type="BoxShape3D" id="Box_DoorTrigger"]
 size = Vector3(3.2, 2.5, 3.2)
 
+[sub_resource type="BoxShape3D" id="Box_PoliceDoorTrigger"]
+size = Vector3(14.0, 5.0, 24.0)
+
 [sub_resource type="BoxShape3D" id="Box_CarTrigger"]
-size = Vector3(4.8, 2.5, 5.2)
+size = Vector3(5.5, 2.8, 5.8)
+
+[sub_resource type="StandardMaterial3D" id="Mat_SkyBeacon"]
+shading_mode = 0
+albedo_color = Color(0.18, 0.78, 1.0, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="Mat_ZebraStripe"]
+albedo_color = Color(0.96, 0.96, 0.96, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Mat_CinemaNeon"]
+albedo_color = Color(1.0, 0.85, 0.15, 1)
+emission_enabled = true
+emission = Color(1.0, 0.8, 0.1, 1)
+emission_energy_multiplier = 4.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_SBI_Blue"]
+albedo_color = Color(0.06, 0.22, 0.62, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Mat_ClinicGreen"]
+albedo_color = Color(0.15, 0.55, 0.3, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Mat_RedCross"]
+albedo_color = Color(0.92, 0.12, 0.12, 1)
+emission_enabled = true
+emission = Color(0.92, 0.12, 0.12, 1)
+emission_energy_multiplier = 3.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_PostRed"]
+albedo_color = Color(0.78, 0.16, 0.16, 1)
+roughness = 0.65
 
 [sub_resource type="StandardMaterial3D" id="Mat_GPSArrow"]
 albedo_color = Color(0.12, 0.92, 1.0, 0.9)
@@ -415,16 +450,70 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 0.12, -114)
 size = Vector3(0.15, 0.24, 292.0)
 material = SubResource("Mat_Curb")
 
-[node name="SidewalkRight" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.1, -114)
+[node name="SidewalkRight1" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.1, -22.5)
 use_collision = true
-size = Vector3(2.4, 0.2, 292.0)
+size = Vector3(2.4, 0.2, 109.0)
 material = SubResource("Mat_Sidewalk")
 
-[node name="CurbRight" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.12, -114)
-size = Vector3(0.15, 0.24, 292.0)
+[node name="CurbRight1" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.12, -22.5)
+size = Vector3(0.15, 0.24, 109.0)
 material = SubResource("Mat_Curb")
+
+[node name="KripalDriveway" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0.02, -85.0)
+use_collision = true
+size = Vector3(5.0, 0.05, 16.0)
+material = SubResource("Mat_Sidewalk")
+
+[node name="SidewalkRight2" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.1, -155.0)
+use_collision = true
+size = Vector3(2.4, 0.2, 124.0)
+material = SubResource("Mat_Sidewalk")
+
+[node name="CurbRight2" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.12, -155.0)
+size = Vector3(0.15, 0.24, 124.0)
+material = SubResource("Mat_Curb")
+
+[node name="PoliceCompoundPlaza" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0.02, -234.0)
+use_collision = true
+size = Vector3(10.0, 0.05, 34.0)
+material = SubResource("Mat_Sidewalk")
+
+[node name="SidewalkRight3" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.1, -255.5)
+use_collision = true
+size = Vector3(2.4, 0.2, 9.0)
+material = SubResource("Mat_Sidewalk")
+
+[node name="CurbRight3" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 0.12, -255.5)
+size = Vector3(0.15, 0.24, 9.0)
+material = SubResource("Mat_Curb")
+
+[node name="ZebraCrossing1" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, -12.0)
+size = Vector3(7.4, 0.02, 3.0)
+material = SubResource("Mat_ZebraStripe")
+
+[node name="ZebraCrossing2" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, -75.0)
+size = Vector3(7.4, 0.02, 3.0)
+material = SubResource("Mat_ZebraStripe")
+
+[node name="ZebraCrossing3" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, -150.0)
+size = Vector3(7.4, 0.02, 3.0)
+material = SubResource("Mat_ZebraStripe")
+
+[node name="ZebraCrossing4" type="CSGBox3D" parent="EnvironmentProps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, -216.0)
+size = Vector3(7.4, 0.02, 3.0)
+material = SubResource("Mat_ZebraStripe")
 
 [node name="StreetLamps" type="Node3D" parent="EnvironmentProps"]
 
@@ -755,62 +844,72 @@ rings = 6
 material = SubResource("Mat_TreeLeaves")
 
 [node name="GPSRoadArrows" type="Node3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 visible = false
 
 [node name="Arrow1" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -95)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -92)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
 [node name="Arrow2" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -110)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -106)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
 [node name="Arrow3" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -125)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -120)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
 [node name="Arrow4" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -140)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -134)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
 [node name="Arrow5" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -155)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -148)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
 [node name="Arrow6" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -170)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -162)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
 [node name="Arrow7" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -185)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -176)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
 [node name="Arrow8" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -200)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -190)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
 [node name="Arrow9" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -215)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -204)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
 [node name="Arrow10" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -228)
-size = Vector3(1.4, 0.04, 1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -216)
+size = Vector3(1.6, 0.12, 1.8)
 material = SubResource("Mat_GPSArrow")
 
-[node name="ArrowTurn" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
-transform = Transform3D(0.642788, 0, -0.766044, 0, 1, 0, 0.766044, 0, 0.642788, 1.8, 0.02, -234)
-size = Vector3(1.5, 0.04, 2.2)
+[node name="ArrowTurn1" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
+transform = Transform3D(0.819, 0, -0.573, 0, 1, 0, 0.573, 0, 0.819, 1.8, 0.22, -225)
+size = Vector3(1.6, 0.12, 2.0)
+material = SubResource("Mat_GPSArrow")
+
+[node name="ArrowTurn2" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
+transform = Transform3D(0.422, 0, -0.906, 0, 1, 0, 0.906, 0, 0.422, 4.2, 0.22, -231)
+size = Vector3(1.6, 0.12, 2.0)
+material = SubResource("Mat_GPSArrow")
+
+[node name="ArrowTurn3" type="CSGBox3D" parent="EnvironmentProps/GPSRoadArrows"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 6.8, 0.22, -234)
+size = Vector3(1.6, 0.12, 2.2)
 material = SubResource("Mat_GPSArrow")
 
 [node name="PansemalTownHouses" type="Node3D" parent="EnvironmentProps"]
@@ -960,8 +1059,31 @@ light_color = Color(1, 0.85, 0.5, 1)
 light_energy = 2.5
 omni_range = 10.0
 
+[node name="CityWelcomeArch" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="ArchPillarL" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/CityWelcomeArch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 2.8, 0)
+use_collision = true
+size = Vector3(0.9, 5.6, 0.9)
+material = SubResource("Mat_HouseWall2")
+[node name="ArchPillarR" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/CityWelcomeArch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 2.8, 0)
+use_collision = true
+size = Vector3(0.9, 5.6, 0.9)
+material = SubResource("Mat_HouseWall2")
+[node name="Crossbeam" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/CityWelcomeArch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.4, 0)
+size = Vector3(10.2, 0.8, 0.9)
+material = SubResource("Mat_HouseWall1")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/CityWelcomeArch"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 5.4, -0.48)
+text = "🌟 WELCOME TO PANSEMAL CITY 🌟
+★ आपका हार्दिक स्वागत है ★"
+font_size = 20
+outline_size = 6
+
 [node name="SahilHouse" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -22)
 [node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SahilHouse"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
 use_collision = true
@@ -978,8 +1100,26 @@ text = "🏠 साहिल निवास
 font_size = 18
 outline_size = 4
 
+[node name="CityLibrary" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -22)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/CityLibrary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+use_collision = true
+size = Vector3(8.0, 6.4, 14.0)
+material = SubResource("Mat_HouseWall3")
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/CityLibrary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 2.8, 0)
+size = Vector3(0.15, 1.4, 2.4)
+material = SubResource("Mat_WindowWarm")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/CityLibrary"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.15, 2.5, 2.0)
+text = "📚 जिला सार्वजनिक वाचनालय
+(PANSEMAL PUBLIC LIBRARY)"
+font_size = 18
+outline_size = 4
+
 [node name="PlayerHouse" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -40)
 [node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PlayerHouse"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
 use_collision = true
@@ -996,8 +1136,51 @@ text = "🏠 मेरा घर (YOU / PLAYER)
 font_size = 18
 outline_size = 4
 
+[node name="SangamCinema" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 0, -48)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SangamCinema"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.25, 0)
+use_collision = true
+size = Vector3(9.5, 8.5, 18.0)
+material = SubResource("Mat_HouseWall1")
+[node name="MarqueeRoof" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SangamCinema"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.0, 4.2, 0)
+size = Vector3(1.8, 0.4, 12.0)
+material = SubResource("Mat_CinemaNeon")
+[node name="CinemaSign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SangamCinema"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.85, 5.5, 0)
+text = "🎬 संगम सिनेमा टॉकीज 🎬
+(SANGAM TALKIES & CINEMA)"
+font_size = 22
+outline_size = 6
+modulate = Color(1, 0.85, 0.2, 1)
+[node name="MovieBillboard" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SangamCinema"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.85, 3.0, 0)
+text = "★ NOW SHOWING: शोले / DDLJ ★
+NIGHT SHOW: 09:30 PM"
+font_size = 16
+outline_size = 4
+
+[node name="SweetsNamkeenShop" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -60)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SweetsNamkeenShop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
+use_collision = true
+size = Vector3(8.0, 6.0, 14.0)
+material = SubResource("Mat_HouseWall2")
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SweetsNamkeenShop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 2.8, 0)
+size = Vector3(0.15, 1.2, 1.8)
+material = SubResource("Mat_WindowWarm")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SweetsNamkeenShop"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.15, 2.2, 2.0)
+text = "🍬 पानसेमल स्वीट्स एवं नमकीन
+(SWEETS & SNACKS)"
+font_size = 18
+outline_size = 4
+
 [node name="AashutoshHouse" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -52)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -72)
 [node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/AashutoshHouse"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
 use_collision = true
@@ -1014,77 +1197,203 @@ text = "🏠 आशुतोष का घर
 font_size = 18
 outline_size = 4
 
-[node name="TownShop1" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -125)
-[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownShop1"]
+[node name="CityClinic" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 0, -96)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/CityClinic"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+use_collision = true
+size = Vector3(8.5, 7.0, 16.0)
+material = SubResource("Mat_HouseWall1")
+[node name="Stripe" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/CityClinic"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.6, 0)
+size = Vector3(8.7, 0.5, 16.2)
+material = SubResource("Mat_ClinicGreen")
+[node name="RedCrossH" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/CityClinic"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3, 5.0, 0)
+size = Vector3(0.2, 0.45, 1.5)
+material = SubResource("Mat_RedCross")
+[node name="RedCrossV" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/CityClinic"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3, 5.0, 0)
+size = Vector3(0.2, 1.5, 0.45)
+material = SubResource("Mat_RedCross")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/CityClinic"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 4.4, 3.2, 0)
+text = "🏥 प्राथमिक स्वास्थ्य केंद्र पानसेमल
+(PANSEMAL CITY CLINIC & HEALTH CENTER)"
+font_size = 18
+outline_size = 5
+
+[node name="SuperBazar" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -112)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SuperBazar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+use_collision = true
+size = Vector3(8.0, 6.4, 15.0)
+material = SubResource("Mat_HouseWall2")
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SuperBazar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 2.8, 0)
+size = Vector3(0.15, 1.4, 2.6)
+material = SubResource("Mat_WindowWarm")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SuperBazar"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.15, 2.2, 2.0)
+text = "🏬 पानसेमल सुपर बाज़ार
+(PANSEMAL SUPER BAZAR)"
+font_size = 18
+outline_size = 4
+
+[node name="PatidarBakery" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -126)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PatidarBakery"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
 use_collision = true
 size = Vector3(8.0, 6.0, 14.0)
 material = SubResource("Mat_HouseWall1")
-[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownShop1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 2.8, 0)
-size = Vector3(0.15, 1.2, 1.8)
-material = SubResource("Mat_WindowWarm")
-[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/TownShop1"]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.15, 2.2, 2.0)
-text = "🏪 किराना एवं जनरल स्टोर्स
-(PANSEMAL GENERAL STORES)"
-font_size = 18
-outline_size = 4
-
-[node name="TownShop2" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -155)
-[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownShop2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
-use_collision = true
-size = Vector3(8.0, 6.0, 14.0)
-material = SubResource("Mat_HouseWall2")
-[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownShop2"]
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PatidarBakery"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 2.8, 0)
 size = Vector3(0.15, 1.2, 1.8)
 material = SubResource("Mat_WindowWarm")
-[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/TownShop2"]
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/PatidarBakery"]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 4.15, 2.2, 2.0)
-text = "☕ पाटीदार टी स्टॉल एवं नाश्ता
-(PATIDAR TEA STALL)"
+text = "☕ पाटीदार बेकरी एवं टी स्टॉल
+(PATIDAR BAKERY & CAFE)"
 font_size = 18
 outline_size = 4
 
-[node name="TownShop3" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -185)
-[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownShop3"]
+[node name="SanjeevaniMedical" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -140)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SanjeevaniMedical"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
 use_collision = true
 size = Vector3(8.0, 6.0, 14.0)
 material = SubResource("Mat_HouseWall3")
-[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownShop3"]
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SanjeevaniMedical"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 2.8, 0)
 size = Vector3(0.15, 1.2, 1.8)
 material = SubResource("Mat_WindowWarm")
-[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/TownShop3"]
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SanjeevaniMedical"]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.15, 2.2, 2.0)
-text = "💊 पानसेमल मेडिकल स्टोर्स
-(PANSEMAL MEDICAL)"
+text = "💊 संजीवनी मेडिकल स्टोर्स
+(SANJEEVANI MEDICAL)"
 font_size = 18
 outline_size = 4
 
-[node name="TownHouse4" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -210)
-[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownHouse4"]
+[node name="SBI_Bank" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.5, 0, -160)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SBI_Bank"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+use_collision = true
+size = Vector3(8.5, 7.0, 16.0)
+material = SubResource("Mat_SBI_Blue")
+[node name="ATMBox" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SBI_Bank"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3, 1.8, 3.5)
+size = Vector3(0.3, 2.6, 2.2)
+material = SubResource("Mat_CinemaNeon")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SBI_Bank"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 4.35, 4.5, 0)
+text = "🏦 भारतीय स्टेट बैंक - पानसेमल शाखा
+(STATE BANK OF INDIA - 24HR ATM)"
+font_size = 20
+outline_size = 5
+
+[node name="OverheadPoliceSign" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -172)
+[node name="PillarL" type="CSGCylinder3D" parent="EnvironmentProps/PansemalTownHouses/OverheadPoliceSign"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 2.8, 0)
+radius = 0.14
+height = 5.6
+material = SubResource("Mat_LampPole")
+[node name="PillarR" type="CSGCylinder3D" parent="EnvironmentProps/PansemalTownHouses/OverheadPoliceSign"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 2.8, 0)
+radius = 0.14
+height = 5.6
+material = SubResource("Mat_LampPole")
+[node name="GantryBar" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/OverheadPoliceSign"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.2, 0)
+size = Vector3(9.8, 0.4, 0.4)
+material = SubResource("Mat_LampPole")
+[node name="SignBoard" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/OverheadPoliceSign"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+size = Vector3(7.5, 1.2, 0.12)
+material = SubResource("Mat_PoliceBlue")
+[node name="SignText" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/OverheadPoliceSign"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 4.5, -0.08)
+text = "🚨 PANSEMAL POLICE STATION 60M AHEAD ➔
+★ जिला पुलिस थाना आगे (राइट टर्न लें) ★"
+font_size = 18
+outline_size = 5
+modulate = Color(1, 0.9, 0.3, 1)
+
+[node name="SharmaGarage" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -172)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SharmaGarage"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
 use_collision = true
 size = Vector3(8.0, 6.0, 14.0)
-material = SubResource("Mat_HouseWall1")
-[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownHouse4"]
+material = SubResource("Mat_HouseWall2")
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/SharmaGarage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 2.8, 0)
+size = Vector3(0.15, 1.2, 1.8)
+material = SubResource("Mat_WindowWarm")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/SharmaGarage"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.15, 2.2, 2.0)
+text = "🔧 शर्मा ऑटो सर्विस एवं गैराज
+(SHARMA AUTO SERVICE)"
+font_size = 18
+outline_size = 4
+
+[node name="ElectronicsShop" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.0, 0, -192)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/ElectronicsShop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
+use_collision = true
+size = Vector3(8.0, 6.0, 14.0)
+material = SubResource("Mat_HouseWall3")
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/ElectronicsShop"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05, 2.8, 0)
 size = Vector3(0.15, 1.2, 1.8)
 material = SubResource("Mat_WindowWarm")
-[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/TownHouse4"]
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/ElectronicsShop"]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 4.15, 2.2, 2.0)
-text = "🏠 गुप्ता निवास
-(GUPTA RESIDENCE)"
+text = "📱 श्री राम इलेक्ट्रॉनिक्स एवं मोबाइल
+(SHREE RAM ELECTRONICS)"
 font_size = 18
 outline_size = 4
+
+[node name="HeadPostOffice" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0, 0, -196)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/HeadPostOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+use_collision = true
+size = Vector3(8.0, 6.4, 14.0)
+material = SubResource("Mat_PostRed")
+[node name="Win" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/HeadPostOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.05, 2.8, 0)
+size = Vector3(0.15, 1.2, 1.8)
+material = SubResource("Mat_WindowWarm")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/HeadPostOffice"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -4.15, 2.4, 2.0)
+text = "📮 मुख्य डाकघर पानसेमल
+(PANSEMAL HEAD POST OFFICE)"
+font_size = 18
+outline_size = 4
+
+[node name="TownHall" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 0, -225)
+[node name="Building" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+use_collision = true
+size = Vector3(9.5, 9.0, 18.0)
+material = SubResource("Mat_HouseWall1")
+[node name="Portico" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/TownHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.0, 4.5, 0)
+size = Vector3(1.5, 0.4, 10.0)
+material = SubResource("Mat_HouseWall2")
+[node name="Sign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/TownHall"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5.85, 5.2, 0)
+text = "🏛️ नगर परिषद पानसेमल (मध्य प्रदेश)
+(NAGAR PARISHAD / PANSEMAL TOWN HALL)"
+font_size = 20
+outline_size = 5
 
 [node name="PansemalPoliceStation" type="Node3D" parent="EnvironmentProps/PansemalTownHouses"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, 0, -235)
@@ -1098,21 +1407,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.75, 0)
 size = Vector3(8.7, 0.5, 16.2)
 material = SubResource("Mat_PoliceBlue")
 [node name="PorticoStairs" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0.35, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0.08, 0)
 use_collision = true
-size = Vector3(1.6, 0.7, 4.5)
+size = Vector3(2.2, 0.15, 6.0)
 material = SubResource("Mat_Sidewalk")
 
 [node name="PorticoPillarL" type="CSGCylinder3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 2.5, -1.8)
-use_collision = true
+use_collision = false
 radius = 0.22
 height = 5.0
 material = SubResource("Mat_PoliceStation")
 
 [node name="PorticoPillarR" type="CSGCylinder3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 2.5, 1.8)
-use_collision = true
+use_collision = false
 radius = 0.22
 height = 5.0
 material = SubResource("Mat_PoliceStation")
@@ -1153,12 +1462,31 @@ light_color = Color(0.1, 0.4, 1, 1)
 light_energy = 3.5
 omni_range = 8.0
 
+[node name="PoliceSkyBeacon" type="CSGCylinder3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0, 18.0, 0)
+radius = 0.45
+height = 36.0
+material = SubResource("Mat_SkyBeacon")
+
+[node name="PoliceSkyLight" type="OmniLight3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0, 12.0, 0)
+light_color = Color(0.2, 0.75, 1.0, 1)
+light_energy = 6.0
+omni_range = 30.0
+
+[node name="SkyWaypointSign" type="Label3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -3.2, 8.5, 0)
+text = "🚨 WAYPOINT: PANSEMAL POLICE STATION 🚨
+★ जिला पुलिस थाना पानसेमल ★"
+font_size = 28
+outline_size = 8
+modulate = Color(0.2, 0.9, 1.0, 1)
 
 [node name="PoliceDoorTrigger" type="Area3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0, 1.5, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation/PoliceDoorTrigger"]
-shape = SubResource("Box_DoorTrigger")
+shape = SubResource("Box_PoliceDoorTrigger")
 
 [node name="Pedestrians" type="Node3D" parent="EnvironmentProps"]
 
@@ -1193,7 +1521,7 @@ size = Vector3(0.35, 0.7, 0.22)
 material = SubResource("Mat_Jeans")
 
 [node name="KripalCar" type="CharacterBody3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.8, 0.35, -84.0)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 5.2, 0.35, -85.0)
 
 [node name="CarBody" type="CSGBox3D" parent="KripalCar"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
@@ -1311,34 +1639,34 @@ transform = Transform3D(-1, 0, 0, 0, 0.978148, 0.207912, 0, 0.207912, -0.978148,
 fov = 74.0
 
 [node name="KripalHouse" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -95)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 12.0, 0, -85.0)
 
 [node name="GatePillarL" type="CSGBox3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 1.25, 6.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 1.25, 5.8)
 use_collision = true
 size = Vector3(0.5, 2.5, 0.5)
 material = SubResource("Mat_HouseWall2")
 
 [node name="GatePillarR" type="CSGBox3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 1.25, 6.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 1.25, 5.8)
 use_collision = true
 size = Vector3(0.5, 2.5, 0.5)
 material = SubResource("Mat_HouseWall2")
 
 [node name="BoundaryWallL" type="CSGBox3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 1.0, 6.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8, 1.0, 5.8)
 use_collision = true
-size = Vector3(7.8, 2.0, 0.3)
+size = Vector3(7.5, 2.0, 0.3)
 material = SubResource("Mat_HouseWall1")
 
 [node name="BoundaryWallR" type="CSGBox3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 1.0, 6.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8, 1.0, 5.8)
 use_collision = true
-size = Vector3(7.8, 2.0, 0.3)
+size = Vector3(7.5, 2.0, 0.3)
 material = SubResource("Mat_HouseWall1")
 
 [node name="NamePlate" type="Label3D" parent="KripalHouse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.1, 6.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 2.1, 6.1)
 text = "🏠 कृपाल निवास
 KRIPAL'S RESIDENCE"
 font_size = 22

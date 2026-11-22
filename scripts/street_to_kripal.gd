@@ -149,7 +149,7 @@ var landmarks = {
 	"sahil_home": {"name": "साहिल निवास", "pos": Vector3(-11.0, 0, -22), "color": Color(1.0, 0.75, 0.2)},
 	"player_home": {"name": "मेरा घर", "pos": Vector3(11.0, 0, -42), "color": Color(0.3, 0.9, 0.4)},
 	"aashu_home": {"name": "आशुतोष निवास", "pos": Vector3(-11.0, 0, -62), "color": Color(0.85, 0.45, 1.0)},
-	"kripal": {"name": "कृपाल निवास", "pos": Vector3(0, 0, -95), "color": Color(1.0, 0.25, 0.25)},
+	"kripal": {"name": "कृपाल निवास", "pos": Vector3(8.5, 0, -85), "color": Color(1.0, 0.25, 0.25)},
 	"police": {"name": "पानसेमल पुलिस थाना", "pos": Vector3(11.5, 0, -235), "color": Color(0.2, 0.5, 1.0)}
 }
 
@@ -317,7 +317,8 @@ func handle_interaction() -> void:
 		if abs(car_speed) < 2.0:
 			exit_car()
 	elif current_mode == PlayerMode.FOOT_POLICE:
-		if is_near_police_door:
+		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
+		if is_near_police_door or dist_to_police < 10.0:
 			_on_start_police_pressed()
 
 func dismount_bicycle() -> void:
@@ -444,12 +445,17 @@ func _physics_process(delta: float) -> void:
 		_handle_foot_movement(delta)
 		_update_walking_companions(delta)
 		
-		if is_near_police_door:
+		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
+		if is_near_police_door or dist_to_police < 10.0:
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
+			if dist_to_police < 3.2:
+				_on_start_police_pressed()
 		else:
-			if action_prompt: action_prompt.visible = false
+			if action_prompt:
+				action_prompt.visible = true
+				action_prompt.text = "🚶 पुलिस थाने के मुख्य द्वार की तरफ बढ़ें (WALK TOWARDS POLICE ENTRANCE)"
 
 func _handle_cycling_movement(delta: float) -> void:
 	var input_dir: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
@@ -538,10 +544,10 @@ func _handle_car_driving(delta: float) -> void:
 	else:
 		car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 0.8 * delta)
 		
-	# Steer car: Negating steer_input ensures A turns Left and D turns Right with car local +Z as front!
+	# Steer car: steer_input > 0 (A pressed) turns Left, steer_input < 0 (D pressed) turns Right!
 	if abs(car_speed) > 0.1 and steer_input != 0.0:
 		var dir_factor = 1.0 if car_speed >= 0 else -1.0
-		kripal_car.rotate_y(-steer_input * CAR_STEER_SPEED * delta * dir_factor)
+		kripal_car.rotate_y(steer_input * CAR_STEER_SPEED * delta * dir_factor)
 		
 	# Move car along its forward basis (car front points along Z in our model)
 	var car_fwd = kripal_car.transform.basis.z.normalized()
@@ -555,13 +561,23 @@ func _handle_car_driving(delta: float) -> void:
 	if car_engine_audio:
 		car_engine_audio.pitch_scale = lerp(0.85, 1.6, abs(car_speed) / CAR_MAX_SPEED)
 		
-	# HUD update
+	# Dynamic GPS HUD Route & Distance indicator
+	var dist_to_police: int = int(abs(kripal_car.global_position.z - (-235.0)))
+	if objective_banner:
+		if kripal_car.global_position.z > -205.0:
+			objective_banner.text = "🧭 GPS ROUTE: ⬆️ GO STRAIGHT DOWN MAIN ROAD [POLICE STATION: %d M]" % dist_to_police
+		elif kripal_car.global_position.z > -228.0:
+			objective_banner.text = "🧭 GPS ROUTE: ➡️ SLOW DOWN & TURN RIGHT INTO POLICE COMPOUND [DISTANCE: %d M]" % dist_to_police
+		else:
+			objective_banner.text = "🎯 ARRIVED AT POLICE STATION! PRESS [BACKSPACE] OR [E] TO EXIT CAR"
+		
+	# Action prompt update
 	if action_prompt:
 		action_prompt.visible = true
-		if kripal_car.global_position.z <= -218.0:
-			action_prompt.text = "🚗 [BACKSPACE] दबाकर कार से उतरें (PRESS [BACKSPACE] TO EXIT CAR AT POLICE STATION)"
+		if kripal_car.global_position.z <= -215.0:
+			action_prompt.text = "🚗 [BACKSPACE] या [E] दबाकर कार से उतरें (PRESS [BACKSPACE] OR [E] TO EXIT CAR)"
 		else:
-			action_prompt.text = "🚗 [W] FORWARD | [S] REVERSE | [A/D] STEER | [BACKSPACE] EXIT CAR"
+			action_prompt.text = "🚗 [W] FORWARD | [S] REVERSE | [A] LEFT | [D] RIGHT | [BACKSPACE] EXIT"
 
 func enter_car() -> void:
 	current_mode = PlayerMode.DRIVING_CAR
@@ -603,8 +619,8 @@ func exit_car() -> void:
 	if camera: camera.make_current()
 	if visual_model: visual_model.visible = true
 	
-	# Place player on road next to driver door
-	player.global_position = kripal_car.global_position + Vector3(-2.2, 0, 0)
+	# Place player safely beside car
+	player.global_position = kripal_car.global_position + Vector3(-2.2, 0.2, 0)
 	
 	# Position companions outside car
 	if kripal_mummy:
@@ -847,11 +863,11 @@ func end_dialogue_sequence() -> void:
 	# Aunty, Sahil, Aashutosh walk towards the car
 	var walk_tw = create_tween()
 	if kripal_mummy:
-		walk_tw.parallel().tween_property(kripal_mummy, "global_position", Vector3(3.4, 0.1, -84.0), 1.6)
+		walk_tw.parallel().tween_property(kripal_mummy, "global_position", Vector3(4.2, 0.1, -84.2), 1.6)
 	if sahil:
-		walk_tw.parallel().tween_property(sahil, "global_position", Vector3(3.6, 0.1, -85.5), 1.6)
+		walk_tw.parallel().tween_property(sahil, "global_position", Vector3(4.4, 0.1, -85.8), 1.6)
 	if aashutosh:
-		walk_tw.parallel().tween_property(aashutosh, "global_position", Vector3(5.8, 0.1, -85.5), 1.6)
+		walk_tw.parallel().tween_property(aashutosh, "global_position", Vector3(6.0, 0.1, -85.8), 1.6)
 		
 	objective_banner.text = "✦ कृपाल की कार में बैठें [E] और पानसेमल पुलिस स्टेशन ड्राइव करें"
 	show_subtitle("👩 कृपाल की माँ: 'कृपाल की गाड़ी बाहर खड़ी है... चलो सब इसमें बैठो, हम अभी पुलिस स्टेशन चलते हैं!'", 4.5)
