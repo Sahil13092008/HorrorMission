@@ -147,15 +147,15 @@ var dialogue_lines = [
 		"color": Color(1.0, 0.85, 0.2),
 		"portrait": "sahil",
 		"pitch": 1.0,
-		"text": "\"कृपाल हमारा भाई है... उसे वहाँ उस भूत के साथ अकेले नहीं छोड़ेंगे! गाड़ी की चाबी निकालो, सारा सामान गाड़ी में डालो... आज रात ही भानगढ़ किले चलेंगे!\""
+		"text": "\"चलो भाइयों कृपाल के घर... उसके घर पे ये बात बताते हैं! हमें तुरंत कृपाल के घर निकलना होगा!\""
 	},
 	{
 		"speaker_id": "mission",
-		"speaker": "★ मिशन शुरू (MISSION BEGINS) ★ 🗣️",
+		"speaker": "★ नया मिशन (MISSION) ★ 🗣️",
 		"color": Color(1.0, 0.2, 0.2),
 		"portrait": "mission",
 		"pitch": 1.0,
-		"text": "\"मिशन शुरू: भानगढ़ किले का खूनी श्राप... अपनी टीम के साथ गाड़ी में बैठो और भानगढ़ के लिए निकलो!\""
+		"text": "\"मिशन: क्लासरूम से बाहर निकलो और साहिल और आशुतोष के साथ तुरंत कृपाल के घर की ओर प्रस्थान करो!\""
 	}
 ]
 
@@ -495,7 +495,7 @@ func start_door_sequence():
 		voice_audio.stream = voice_door
 		voice_audio.play()
 
-	subtitle.text = "🎯 मिशन: साहिल और आशुतोष के साथ क्लासरूम का मुख्य गेट खोलो [E दबाएं]"
+	subtitle.text = "🎯 मिशन: साहिल और आशुतोष के साथ कृपाल के घर की ओर निकलो [E दबाएं]"
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 
 	# Sahil and Aashutosh run/walk over to the door!
@@ -600,7 +600,7 @@ func on_enter_bhangarh_clicked():
 	
 	if enter_bhangarh_btn:
 		enter_bhangarh_btn.disabled = true
-		enter_bhangarh_btn.text = "🚨 भानगढ़ की ओर प्रस्थान..."
+		enter_bhangarh_btn.text = "🚨 कृपाल के घर की ओर प्रस्थान..."
 	if beacon_btn:
 		beacon_btn.disabled = true
 
