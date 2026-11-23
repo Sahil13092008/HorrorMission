@@ -52,6 +52,7 @@ extends Node3D
 @onready var camera_pivot: Node3D = $Player/CameraPivot
 @onready var camera: Camera3D = $Player/CameraPivot/Camera3D
 @onready var flashlight: SpotLight3D = $Player/CameraPivot/Flashlight
+@onready var player_collision: CollisionShape3D = $Player/CollisionShape3D
 @onready var visual_model: Node3D = $Player/VisualModel
 @onready var player_cycle: Node3D = $Player/VisualModel/CycleModel
 @onready var sahil_cycle: Node3D = $Companions/SahilCompanion/CycleModel
@@ -425,9 +426,11 @@ func _physics_process(delta: float) -> void:
 	if player and player.global_position.y < -0.10:
 		player.global_position.y = 0.05
 		player.velocity.y = 0.0
-	if kripal_car and kripal_car.global_position.y < -0.10:
-		kripal_car.global_position.y = 0.25
+	if kripal_car and (current_mode == PlayerMode.DRIVING_CAR or kripal_car.global_position.y < -0.10 or kripal_car.global_position.y > 0.8):
+		kripal_car.global_position.y = 0.35
 		kripal_car.velocity.y = 0.0
+		kripal_car.rotation.x = 0.0
+		kripal_car.rotation.z = 0.0
 
 	_process_pedestrians(delta)
 	_update_radar_hud()
@@ -605,6 +608,10 @@ func _handle_car_driving(delta: float) -> void:
 		var turn_rate: float = CAR_STEER_SPEED if abs(car_speed) > 0.5 else (CAR_STEER_SPEED * 0.85)
 		kripal_car.rotate_y(steer_input * turn_rate * delta * dir_factor)
 		
+	# Lock pitch and roll so car never tilts up or rolls over
+	kripal_car.rotation.x = 0.0
+	kripal_car.rotation.z = 0.0
+	
 	# Basis vectors
 	var car_fwd: Vector3 = kripal_car.transform.basis.z.normalized()
 	var car_left: Vector3 = kripal_car.transform.basis.x.normalized()
@@ -617,14 +624,16 @@ func _handle_car_driving(delta: float) -> void:
 		var dir_mult: float = 1.0 if car_speed >= 0 else -1.0
 		target_velocity += car_left * (steer_input * 2.2 * dir_mult)
 		
-	# Floor adherence / gravity
-	if not kripal_car.is_on_floor():
-		target_velocity.y = kripal_car.velocity.y - (gravity * delta)
-	else:
-		target_velocity.y = -0.5
-		
+	# Strictly lock vertical velocity to 0.0 on flat street
+	target_velocity.y = 0.0
 	kripal_car.velocity = target_velocity
 	kripal_car.move_and_slide()
+	
+	# Keep car firmly grounded on the road surface
+	kripal_car.global_position.y = 0.35
+	kripal_car.velocity.y = 0.0
+	kripal_car.rotation.x = 0.0
+	kripal_car.rotation.z = 0.0
 	
 	# Sync player position with car
 	player.global_position = kripal_car.global_position
@@ -654,6 +663,30 @@ func _handle_car_driving(delta: float) -> void:
 func enter_car() -> void:
 	current_mode = PlayerMode.DRIVING_CAR
 	if action_prompt: action_prompt.text = "🚗 [W] FORWARD | [S] REVERSE | [A/D] STEER | [BACKSPACE] EXIT CAR"
+	
+	# Disable player and companion collisions to eliminate physics repulsion
+	if player_collision:
+		player_collision.set_deferred("disabled", true)
+	if player:
+		player.collision_layer = 0
+		player.collision_mask = 0
+		player.velocity = Vector3.ZERO
+	if sahil:
+		sahil.collision_layer = 0
+		sahil.collision_mask = 0
+		sahil.velocity = Vector3.ZERO
+	if aashutosh:
+		aashutosh.collision_layer = 0
+		aashutosh.collision_mask = 0
+		aashutosh.velocity = Vector3.ZERO
+		
+	# Reset and ground the car firmly on the road
+	if kripal_car:
+		kripal_car.global_position.y = 0.35
+		kripal_car.velocity = Vector3.ZERO
+		kripal_car.rotation.x = 0.0
+		kripal_car.rotation.z = 0.0
+	car_speed = 0.0
 	
 	if car_door_open_audio: car_door_open_audio.play()
 	await get_tree().create_timer(0.3).timeout
@@ -691,8 +724,22 @@ func exit_car() -> void:
 	if camera: camera.make_current()
 	if visual_model: visual_model.visible = true
 	
-	# Place player safely beside car
-	player.global_position = kripal_car.global_position + Vector3(-2.2, 0.2, 0)
+	# Place player safely beside car on the ground
+	player.global_position = kripal_car.global_position + Vector3(-2.2, 0.05, 0)
+	player.velocity = Vector3.ZERO
+	
+	# Re-enable player and companion collisions
+	if player:
+		player.collision_layer = 1
+		player.collision_mask = 1
+	if player_collision:
+		player_collision.set_deferred("disabled", false)
+	if sahil:
+		sahil.collision_layer = 2
+		sahil.collision_mask = 1
+	if aashutosh:
+		aashutosh.collision_layer = 2
+		aashutosh.collision_mask = 1
 	
 	# Position companions outside car
 	if kripal_mummy:

@@ -674,7 +674,7 @@ font_size = 16
 outline_size = 4
 
 [node name="Player" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.0, 2.2)
 
 [node name="VisualModel" type="Node3D" parent="Player"]
 
@@ -694,7 +694,7 @@ radius = 0.15
 material = SubResource("Mat_Skin")
 
 [node name="CameraPivot" type="Node3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Player/CameraPivot"]
 current = true

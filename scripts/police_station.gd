@@ -156,10 +156,44 @@ func _ready() -> void:
 	if radio_chatter_audio: radio_chatter_audio.play()
 	
 	# Auto sit down after 3.0s if player doesn't press E
-	get_tree().create_timer(3.5).timeout.connect(func():
+	get_tree().create_timer(8.0).timeout.connect(func():
 		if not is_seated:
 			sit_down_on_chair()
 	)
+
+
+func _physics_process(delta: float) -> void:
+	if is_seated or cutscene_active:
+		return
+		
+	var input_dir: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	if Input.is_key_pressed(KEY_A): input_dir.x -= 1.0
+	if Input.is_key_pressed(KEY_D): input_dir.x += 1.0
+	if Input.is_key_pressed(KEY_W): input_dir.y -= 1.0
+	if Input.is_key_pressed(KEY_S): input_dir.y += 1.0
+	input_dir = input_dir.normalized()
+	
+	if input_dir != Vector2.ZERO:
+		var move_dir = (player.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+		var walk_speed: float = 2.4
+		player.position.x += move_dir.x * walk_speed * delta
+		player.position.z += move_dir.z * walk_speed * delta
+		
+	# Keep player strictly on floor (Y = 0.0) and inside police office room bounds
+	player.position.y = 0.0
+	player.position.x = clamp(player.position.x, -4.5, 4.5)
+	player.position.z = clamp(player.position.z, -1.8, 4.8)
+	
+	# Check proximity to visitor chairs
+	var dist_to_chair: float = player.position.distance_to(Vector3(0.55, 0, 0.4))
+	if dist_to_chair < 1.8:
+		if sit_prompt:
+			sit_prompt.visible = true
+			sit_prompt.text = "🪑 [E] दबाकर कुर्सी पर बैठें (PRESS [E] TO SIT ON VISITOR CHAIR)"
+	else:
+		if sit_prompt:
+			sit_prompt.visible = true
+			sit_prompt.text = "🚶 थानेदार की मेज़ के सामने वाली कुर्सी की तरफ बढ़ें और [E] दबाएं"
 
 func _process(delta: float) -> void:
 	if ceiling_fan_blades and fan_speed > 0:
@@ -198,11 +232,13 @@ func toggle_camera_mode() -> void:
 func update_camera_mode() -> void:
 	if not camera: return
 	if is_first_person:
-		camera.position = Vector3(0, 1.45, 0.0)
+		camera.position = Vector3(0, 0, 0)
+		camera.rotation = Vector3.ZERO
 		if player_visual: player_visual.visible = false
 		if view_toggle_btn: view_toggle_btn.text = "👁️ [V] VIEW: 1ST PERSON"
 	else:
-		camera.position = Vector3(0, 1.65, 2.4)
+		camera.position = Vector3(0, 0.2, 1.6)
+		camera.rotation = Vector3(deg_to_rad(-6.0), 0, 0)
 		if player_visual: player_visual.visible = true
 		if view_toggle_btn: view_toggle_btn.text = "👁️ [V] VIEW: 3RD PERSON"
 
@@ -213,13 +249,16 @@ func sit_down_on_chair() -> void:
 	
 	# Smoothly seat player on right visitor chair and Aunty on left visitor chair
 	var tw = create_tween()
-	# Player sits on right chair at (0.55, 0.25, 0.4)
-	tw.parallel().tween_property(player, "position", Vector3(0.55, 0.1, 0.4), 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	# Aunty sits on left chair at (-0.55, 0.25, 0.4)
-	tw.parallel().tween_property(kripal_mummy, "position", Vector3(-0.55, 0.05, 0.4), 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Player sits on right chair at (0.55, 0.0, 0.4)
+	tw.parallel().tween_property(player, "position", Vector3(0.55, 0.0, 0.4), 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Lower camera pivot to seated eye height (Y = 1.05m)
+	if camera_pivot:
+		tw.parallel().tween_property(camera_pivot, "position:y", 1.05, 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Aunty sits on left chair at (-0.55, 0.0, 0.4)
+	tw.parallel().tween_property(kripal_mummy, "position", Vector3(-0.55, 0.0, 0.4), 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	# Sahil and Aashutosh stand behind chairs
-	tw.parallel().tween_property(sahil, "position", Vector3(-1.1, 0, 1.0), 1.0)
-	tw.parallel().tween_property(aashutosh, "position", Vector3(1.1, 0, 1.0), 1.0)
+	tw.parallel().tween_property(sahil, "position", Vector3(-1.1, 0.0, 1.0), 0.8)
+	tw.parallel().tween_property(aashutosh, "position", Vector3(1.1, 0.0, 1.0), 0.8)
 	
 	await tw.finished
 	start_dialogue_sequence()
