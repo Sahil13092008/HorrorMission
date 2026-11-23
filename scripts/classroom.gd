@@ -139,7 +139,7 @@ var dialogue_lines = [
 		"color": Color(1.0, 0.45, 0.2),
 		"portrait": "aashutosh",
 		"pitch": 1.0,
-		"text": "\"भाई, तो कृपाल अभी उस खंडहर में फंसा हुआ है। यार भाई, हम सुबह का इंतज़ार नहीं कर सकते। अभी हमारे पास ईएमएफ मीटर, थर्मल कैमरा और सारे ट्रैप्स हैं।\""
+		"text": "\"भाई, तो कृपाल अभी उस खंडहर में फंसा हुआ है। हमें तुरंत उसके घर जाकर उसकी माँ को बताना होगा!\""
 	},
 	{
 		"speaker_id": "sahil",
@@ -600,7 +600,7 @@ func show_bhangarh_map():
 		voice_audio.play()
 
 	if map_dialogue_feed:
-		map_dialogue_feed.text = "साहिल: \"चलो जल्दी गाड़ी में बैठो! पहले कृपाल के घर चलते हैं और उसके घरवालों को सब सच बताते हैं!\""
+		map_dialogue_feed.text = "साहिल: \"जल्दी चलो भाई, साइकिल उठाओ और कृपाल के घर चलो जल्दी! उसके घरवालों को सब सच बताना होगा!\""
 
 	# After Sahil finishes, Aashutosh chimes in
 	await get_tree().create_timer(5.2).timeout
@@ -610,7 +610,7 @@ func show_bhangarh_map():
 		voice_audio.stream = voice_map_aashu
 		voice_audio.play()
 		if map_dialogue_feed:
-			map_dialogue_feed.text = "आशुतोष: \"हाँ भाई, कृपाल की मम्मी-पापा बहुत परेशान होंगे! चलो तुरंत गाड़ी निकालते हैं!\""
+			map_dialogue_feed.text = "आशुतोष: \"हाँ भाई, कृपाल की मम्मी बहुत परेशान होंगी! चलो तुरंत साइकिल से निकलते हैं!\""
 
 func pulse_radar_beacon():
 	if not ping_ring: return

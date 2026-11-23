@@ -1767,17 +1767,17 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 13
 text = "STATUS: CASE #402/BHANGARH OFFICIALLY LOGGED
-POLICE DISPATCH: TEAM MOVING TOMORROW AT 06:00 AM (INTER-STATE DELAYS)
-CRITICAL DECISION:
-Kripal cannot wait until morning. The occult force at Bhangarh fort is active tonight!
-You and your friends must take matters into your own hands!"
+POLICE DISPATCH: INTER-STATE SEARCH OPERATION INITIATED
+PLAN OF ACTION:
+You and your friends return home to await updates from the police.
+If the police investigation yields no results, you will take action!"
 autowrap_mode = 2
 
 [node name="ProceedBtn" type="Button" parent="PoliceUI/MissionCompleteCard/Margin/VBox"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "➔ STEP OUTSIDE & PREPARE FOR DEPARTURE"
+text = "➔ STEP OUTSIDE & RETURN HOME"
 
 [node name="DepartureOverlay" type="ColorRect" parent="PoliceUI"]
 anchors_preset = 15
@@ -1913,8 +1913,8 @@ text = "✔ Classroom Mystery Investigated
 ✔ Kripal's Residence & Mother Informed
 ✔ Emergency FIR Filed at Pansemal Police Station
 
-Sahil, Aashutosh, and you are packing high-power flashlights, EMF meters, cameras, and first-aid kits.
-In 30 minutes, you rendezvous at Sahil's car to embark on the dark desert highway to Bhangarh Ruins!"
+Two full days have passed with zero progress from the police investigation.
+Sahil, Aashutosh, and you pack your paranormal equipment into Sahil's car to journey to Bhangarh Ruins!"
 autowrap_mode = 2
 
 [node name="BtnBox" type="HBoxContainer" parent="PoliceUI/ChapterEndCard/Margin/VBox"]
