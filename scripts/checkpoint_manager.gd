@@ -7,11 +7,11 @@ extends CanvasLayer
 # - Always-visible HUD Bar at Top-Center/Top-Right
 # - One-click "NEXT SCENE ⏩" quick jump
 # - Full Chapter Select with progress indicator & descriptions
+# - Forces MOUSE_MODE_VISIBLE so cursor is ALWAYS visible when open!
 # ==============================================================
 
 var is_menu_open: bool = false
 var prev_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
-var prev_paused: bool = false
 
 var hud_container: HBoxContainer
 var toggle_btn: Button
@@ -78,6 +78,12 @@ func _ready() -> void:
 	build_hud()
 	build_modal()
 
+func _process(_delta: float) -> void:
+	# Keep mouse cursor visible whenever menu is open
+	if is_menu_open:
+		if Input.mouse_mode != Input.MOUSE_MODE_VISIBLE:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
 func build_hud() -> void:
 	var hud_root = Control.new()
 	hud_root.name = "HUD_Root"
@@ -105,6 +111,7 @@ func build_hud() -> void:
 	quick_next_btn.tooltip_text = "सीधे अगले सीन पर स्किप करें (Fast Skip to Next Chapter)"
 	quick_next_btn.custom_minimum_size = Vector2(115, 36)
 	quick_next_btn.focus_mode = Control.FOCUS_NONE
+	quick_next_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	
 	var q_style = StyleBoxFlat.new()
 	q_style.bg_color = Color(0.12, 0.28, 0.22, 0.92)
@@ -134,6 +141,7 @@ func build_hud() -> void:
 	toggle_btn.tooltip_text = "सारे चैप्टर्स की लिस्ट खोलें (Open All Story Checkpoints)"
 	toggle_btn.custom_minimum_size = Vector2(190, 36)
 	toggle_btn.focus_mode = Control.FOCUS_NONE
+	toggle_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	
 	var t_style = StyleBoxFlat.new()
 	t_style.bg_color = Color(0.10, 0.14, 0.24, 0.92)
@@ -166,6 +174,7 @@ func build_modal() -> void:
 	modal_overlay.color = Color(0, 0, 0, 0.75)
 	modal_overlay.visible = false
 	modal_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	modal_overlay.mouse_default_cursor_shape = Control.CURSOR_ARROW
 	add_child(modal_overlay)
 	
 	# Modal Center Card
@@ -179,6 +188,7 @@ func build_modal() -> void:
 	modal_panel.offset_top = -280
 	modal_panel.offset_right = 340
 	modal_panel.offset_bottom = 280
+	modal_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	
 	var p_style = StyleBoxFlat.new()
 	p_style.bg_color = Color(0.07, 0.09, 0.14, 0.98)
@@ -249,6 +259,7 @@ func build_modal() -> void:
 	reload_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	reload_btn.custom_minimum_size = Vector2(0, 36)
 	reload_btn.focus_mode = Control.FOCUS_NONE
+	reload_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	var r_style = StyleBoxFlat.new()
 	r_style.bg_color = Color(0.18, 0.22, 0.32, 0.9)
 	r_style.corner_radius_top_left = 6
@@ -267,6 +278,7 @@ func build_modal() -> void:
 	close_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	close_btn.custom_minimum_size = Vector2(0, 36)
 	close_btn.focus_mode = Control.FOCUS_NONE
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	var c_style = StyleBoxFlat.new()
 	c_style.bg_color = Color(0.45, 0.14, 0.14, 0.9)
 	c_style.corner_radius_top_left = 6
@@ -344,6 +356,7 @@ func populate_cards() -> void:
 		jump_btn.text = "PLAY ➔" if not is_current else "RELOAD 🔄"
 		jump_btn.custom_minimum_size = Vector2(100, 32)
 		jump_btn.focus_mode = Control.FOCUS_NONE
+		jump_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		
 		var j_style = StyleBoxFlat.new()
 		j_style.bg_color = Color(0.18, 0.45, 0.3, 0.9) if is_current else Color(0.15, 0.35, 0.6, 0.9)
@@ -376,6 +389,8 @@ func open_menu() -> void:
 	is_menu_open = true
 	prev_mouse_mode = Input.mouse_mode
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	get_tree().paused = true
 	
 	populate_cards()
 	
@@ -387,11 +402,17 @@ func open_menu() -> void:
 func close_menu() -> void:
 	is_menu_open = false
 	modal_overlay.visible = false
+	get_tree().paused = false
+	
 	if prev_mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func jump_to_scene(scene_path: String) -> void:
-	close_menu()
+	get_tree().paused = false
+	is_menu_open = false
+	modal_overlay.visible = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
 	if not ResourceLoader.exists(scene_path):
@@ -407,6 +428,7 @@ func jump_to_scene(scene_path: String) -> void:
 			get_tree().change_scene_to_packed(ps)
 
 func jump_to_next_scene() -> void:
+	get_tree().paused = false
 	var cur = get_tree().current_scene
 	var current_path = cur.scene_file_path if cur else ""
 	

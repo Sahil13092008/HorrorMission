@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://phone_convo_2days_later_01"]
+[gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/phone_call_convo.gd" id="1_script"]
 [ext_resource type="AudioStream" path="res://audio/ambience.wav" id="2_ambience"]
@@ -336,6 +336,7 @@ glow_intensity = 0.4
 
 [node name="PhoneCallConvo" type="Node3D"]
 script = ExtResource("1_script")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env_PhoneConvo")
 
