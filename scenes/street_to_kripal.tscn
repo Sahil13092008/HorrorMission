@@ -52,7 +52,10 @@ height = 1.75
 size = Vector3(8.0, 4.0, 12.0)
 
 [sub_resource type="BoxShape3D" id="Box_PoliceDoorTrigger"]
-size = Vector3(14.0, 5.0, 24.0)
+size = Vector3(22.0, 6.0, 36.0)
+
+[sub_resource type="BoxShape3D" id="Box_CarCollision"]
+size = Vector3(1.9, 1.2, 4.2)
 
 [sub_resource type="BoxShape3D" id="Box_CarTrigger"]
 size = Vector3(5.5, 2.8, 5.8)
@@ -481,8 +484,8 @@ size = Vector3(0.22, 0.01, 290.0)
 material = SubResource("Mat_RoadStripe")
 
 [node name="SidewalkLeft" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, -0.2, -114)
-use_collision = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, -0.4, -114)
+use_collision = false
 size = Vector3(2.4, 0.8, 292.0)
 material = SubResource("Mat_Sidewalk")
 
@@ -492,8 +495,8 @@ size = Vector3(0.15, 0.24, 292.0)
 material = SubResource("Mat_Curb")
 
 [node name="SidewalkRight1" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, -0.2, -22.5)
-use_collision = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, -0.4, -22.5)
+use_collision = false
 size = Vector3(2.4, 0.8, 109.0)
 material = SubResource("Mat_Sidewalk")
 
@@ -514,8 +517,8 @@ size = Vector3(3.6, 0.1, 6.5)
 material = SubResource("Mat_Asphalt")
 
 [node name="SidewalkRight2" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, -0.2, -155.0)
-use_collision = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, -0.4, -155.0)
+use_collision = false
 size = Vector3(2.4, 0.8, 124.0)
 material = SubResource("Mat_Sidewalk")
 
@@ -525,14 +528,14 @@ size = Vector3(0.15, 0.24, 124.0)
 material = SubResource("Mat_Curb")
 
 [node name="PoliceCompoundPlaza" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, -0.2, -234.0)
-use_collision = true
-size = Vector3(12.0, 0.8, 36.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, -0.4, -234.0)
+use_collision = false
+size = Vector3(14.0, 0.8, 40.0)
 material = SubResource("Mat_Sidewalk")
 
 [node name="SidewalkRight3" type="CSGBox3D" parent="EnvironmentProps"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, -0.2, -255.5)
-use_collision = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, -0.4, -255.5)
+use_collision = false
 size = Vector3(2.4, 0.8, 9.0)
 material = SubResource("Mat_Sidewalk")
 
@@ -991,7 +994,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 24)
 
 [node name="CampusGround" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/StAugustineSchool"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
-use_collision = true
+use_collision = false
 size = Vector3(44, 0.2, 26)
 material = SubResource("Mat_Sidewalk")
 
@@ -1896,7 +1899,7 @@ size = Vector3(8.7, 0.5, 16.2)
 material = SubResource("Mat_PoliceBlue")
 [node name="PorticoStairs" type="CSGBox3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0.08, 0)
-use_collision = true
+use_collision = false
 size = Vector3(2.2, 0.15, 6.0)
 material = SubResource("Mat_Sidewalk")
 
@@ -1971,7 +1974,7 @@ outline_size = 8
 modulate = Color(0.2, 0.9, 1.0, 1)
 
 [node name="PoliceDoorTrigger" type="Area3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0, 1.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 2.0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="EnvironmentProps/PansemalTownHouses/PansemalPoliceStation/PoliceDoorTrigger"]
 shape = SubResource("Box_PoliceDoorTrigger")
@@ -2008,18 +2011,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 size = Vector3(0.35, 0.7, 0.22)
 material = SubResource("Mat_Jeans")
 
-[node name="KripalCar" type="CharacterBody3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 5.6, 0.35, -76.0)
+[node name="KripalCar" type="CharacterBody3D" parent="." groups=["vehicle"]]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 3.6, 0.35, -78.0)
+collision_layer = 4
+collision_mask = 1
+
+[node name="CarCollisionShape" type="CollisionShape3D" parent="KripalCar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+shape = SubResource("Box_CarCollision")
 
 [node name="CarBody" type="CSGBox3D" parent="KripalCar"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
-use_collision = true
 size = Vector3(1.9, 0.65, 4.2)
 material = SubResource("Mat_CarPaint")
 
 [node name="Cabin" type="CSGBox3D" parent="KripalCar"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, -0.2)
-use_collision = true
 size = Vector3(1.68, 0.65, 2.3)
 material = SubResource("Mat_CarPaint")
 

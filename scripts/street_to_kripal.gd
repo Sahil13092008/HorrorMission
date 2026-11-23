@@ -100,7 +100,7 @@ var gravity: float = 9.8
 var car_speed: float = 0.0
 const CAR_MAX_SPEED: float = 12.5
 const CAR_ACCEL: float = 7.5
-const CAR_STEER_SPEED: float = 1.8
+const CAR_STEER_SPEED: float = 2.8
 
 # Camera & Input State
 var is_first_person: bool = false
@@ -244,6 +244,11 @@ func _ready() -> void:
 	if car_trigger:
 		car_trigger.body_entered.connect(_on_car_trigger_entered)
 		car_trigger.body_exited.connect(_on_car_trigger_exited)
+	if kripal_car:
+		kripal_car.floor_snap_length = 0.5
+		kripal_car.floor_max_angle = deg_to_rad(45.0)
+		kripal_car.floor_constant_speed = true
+		kripal_car.max_slides = 4
 		
 	if dialogue_box: dialogue_box.visible = false
 	if next_chapter_card: next_chapter_card.visible = false
@@ -463,14 +468,14 @@ func _physics_process(delta: float) -> void:
 		_update_walking_companions(delta)
 		
 		var dist_to_door: float = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
-		var dist_to_car: float = player.global_position.distance_to(Vector3(5.6, 0.35, -76.0))
+		var dist_to_car: float = player.global_position.distance_to(Vector3(3.6, 0.35, -78.0))
 		
 		if (is_near_door or dist_to_door < 6.5) and not door_opened:
 			is_near_door = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🔔 [E] दबाकर डोरबेल बजाएं (PRESS [E] TO RING DOORBELL)"
-		elif (is_near_car or dist_to_car < 4.0) and door_opened:
+		elif (is_near_car or dist_to_car < 5.5) and door_opened:
 			is_near_car = true
 			if action_prompt:
 				action_prompt.visible = true
@@ -494,11 +499,11 @@ func _physics_process(delta: float) -> void:
 		_update_walking_companions(delta)
 		
 		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
-		if is_near_police_door or dist_to_police < 10.0:
+		if is_near_police_door or dist_to_police < 14.0:
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
-			if dist_to_police < 3.2:
+			if dist_to_police < 4.0:
 				_on_start_police_pressed()
 		else:
 			if action_prompt:
@@ -590,18 +595,35 @@ func _handle_car_driving(delta: float) -> void:
 	if forward_input > 0:
 		car_speed = move_toward(car_speed, CAR_MAX_SPEED, CAR_ACCEL * delta)
 	elif forward_input < 0:
-		car_speed = move_toward(car_speed, -CAR_MAX_SPEED * 0.5, CAR_ACCEL * 1.4 * delta)
+		car_speed = move_toward(car_speed, -CAR_MAX_SPEED * 0.55, CAR_ACCEL * 1.5 * delta)
 	else:
-		car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 0.8 * delta)
+		car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 0.9 * delta)
 		
-	# Steer car: steer_input > 0 (A pressed) turns Left, steer_input < 0 (D pressed) turns Right!
-	if abs(car_speed) > 0.1 and steer_input != 0.0:
-		var dir_factor = 1.0 if car_speed >= 0 else -1.0
-		kripal_car.rotate_y(steer_input * CAR_STEER_SPEED * delta * dir_factor)
+	# Steer car: allow steering whenever A or D is pressed (both stationary & moving)
+	if steer_input != 0.0:
+		var dir_factor: float = -1.0 if (car_speed < -0.1 or (car_speed <= 0.1 and forward_input < 0)) else 1.0
+		var turn_rate: float = CAR_STEER_SPEED if abs(car_speed) > 0.5 else (CAR_STEER_SPEED * 0.85)
+		kripal_car.rotate_y(steer_input * turn_rate * delta * dir_factor)
 		
-	# Move car along its forward basis (car front points along Z in our model)
-	var car_fwd = kripal_car.transform.basis.z.normalized()
-	kripal_car.velocity = car_fwd * car_speed
+	# Basis vectors
+	var car_fwd: Vector3 = kripal_car.transform.basis.z.normalized()
+	var car_left: Vector3 = kripal_car.transform.basis.x.normalized()
+	
+	# Main forward/reverse velocity
+	var target_velocity: Vector3 = car_fwd * car_speed
+	
+	# Lateral steering assist: responsive arcade drift/slide when turning
+	if abs(car_speed) > 0.2 and steer_input != 0.0:
+		var dir_mult: float = 1.0 if car_speed >= 0 else -1.0
+		target_velocity += car_left * (steer_input * 2.2 * dir_mult)
+		
+	# Floor adherence / gravity
+	if not kripal_car.is_on_floor():
+		target_velocity.y = kripal_car.velocity.y - (gravity * delta)
+	else:
+		target_velocity.y = -0.5
+		
+	kripal_car.velocity = target_velocity
 	kripal_car.move_and_slide()
 	
 	# Sync player position with car
@@ -996,11 +1018,11 @@ func end_dialogue_sequence() -> void:
 	# Aunty, Sahil, Aashutosh walk towards the car
 	var walk_tw = create_tween()
 	if kripal_mummy:
-		walk_tw.parallel().tween_property(kripal_mummy, "global_position", Vector3(4.8, 0.1, -75.0), 1.6)
+		walk_tw.parallel().tween_property(kripal_mummy, "global_position", Vector3(4.8, 0.1, -77.0), 1.6)
 	if sahil:
-		walk_tw.parallel().tween_property(sahil, "global_position", Vector3(4.8, 0.1, -77.2), 1.6)
+		walk_tw.parallel().tween_property(sahil, "global_position", Vector3(4.8, 0.1, -79.0), 1.6)
 	if aashutosh:
-		walk_tw.parallel().tween_property(aashutosh, "global_position", Vector3(6.6, 0.1, -77.2), 1.6)
+		walk_tw.parallel().tween_property(aashutosh, "global_position", Vector3(2.4, 0.1, -79.0), 1.6)
 		
 	objective_banner.text = "✦ कृपाल की कार में बैठें [E] और पानसेमल पुलिस स्टेशन ड्राइव करें"
 	show_subtitle("👩 कृपाल की माँ: 'कृपाल की गाड़ी बाहर खड़ी है... चलो सब इसमें बैठो, हम अभी पुलिस स्टेशन चलते हैं!'", 4.5)
