@@ -426,8 +426,7 @@ omni_range = 6.0
 [node name="RoomTag" type="Label3D" parent="Room_Aashutosh"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -1.8)
 billboard = 1
-text = "👓 आशुतोष का कमरा (AASHUTOSH'S ROOM)
-[PANSEMAL — NIGHT 11:45 PM]"
+text = "👓 आशुतोष का कमरा (AASHUTOSH'S ROOM)\n(PANSEMAL — NIGHT 11:45 PM)"
 font_size = 20
 outline_size = 5
 modulate = Color(0.5, 0.8, 1.0, 1)
@@ -854,8 +853,7 @@ omni_range = 6.0
 [node name="RoomTag" type="Label3D" parent="Room_Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -1.8)
 billboard = 1
-text = "🎒 तेरा कमरा (YOUR ROOM — PROTAGONIST)
-[PANSEMAL — NIGHT 11:45 PM]"
+text = "🎒 तेरा कमरा (YOUR ROOM — PROTAGONIST)\n(PANSEMAL — NIGHT 11:45 PM)"
 font_size = 20
 outline_size = 5
 modulate = Color(0.4, 0.9, 1.0, 1)
@@ -1232,8 +1230,7 @@ omni_range = 6.0
 [node name="RoomTag" type="Label3D" parent="Room_Sahil"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -1.8)
 billboard = 1
-text = "🧢 साहिल का कमरा (SAHIL'S ROOM)
-[PANSEMAL — NIGHT 11:45 PM]"
+text = "🧢 साहिल का कमरा (SAHIL'S ROOM)\n(PANSEMAL — NIGHT 11:45 PM)"
 font_size = 20
 outline_size = 5
 modulate = Color(1.0, 0.85, 0.3, 1)
@@ -1717,11 +1714,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.95, 1.0, 1)
 theme_override_font_sizes/font_size = 14
-text = "• Two days have passed. The police searched outer Bhangarh but found zero trace of Kripal.
-• Kripal's mother and father are heartbroken, waiting anxiously at home.
-• The three friends have decided: they cannot leave Kripal behind!
-• Midnight rendezvous set at Sahil's car with high-power EMF meters and thermal gear.
-• Destination: Bhangarh Fort, Rajasthan — The Most Haunted Place in India."
+text = "• Two days have passed. The police searched outer Bhangarh but found zero trace of Kripal.\n• Kripal's mother and father are heartbroken, waiting anxiously at home.\n• The three friends have decided: they cannot leave Kripal behind!\n• Midnight rendezvous set at Sahil's car with high-power EMF meters and thermal gear.\n• Destination: Bhangarh Fort, Rajasthan — The Most Haunted Place in India."
 autowrap_mode = 2
 
 [node name="ProceedBtn" type="Button" parent="PhoneUI/ExpeditionCard/Margin/VBox"]

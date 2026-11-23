@@ -447,8 +447,10 @@ func _transition_to_phone_call() -> void:
 		if ps:
 			get_tree().change_scene_to_packed(ps)
 		else:
-			print("Critical: Could not load phone_call_convo.tscn, falling back to bhangarh_ruins.tscn")
-			get_tree().change_scene_to_file("res://scenes/bhangarh_ruins.tscn")
+			print("Critical: Could not load phone_call_convo.tscn: ", err)
+			if start_call_btn:
+				start_call_btn.disabled = false
+				start_call_btn.text = "⚠️ RETRY LOADING PHONE CALL ➔"
 
 func _on_start_chapter2_pressed() -> void:
 	if start_chapter2_btn:
