@@ -53,6 +53,7 @@ var mouse_captured: bool = true
 var cam_rot_x: float = 0.0
 var cam_rot_y: float = 0.0
 const MOUSE_SENSITIVITY: float = 0.0028
+var in_two_days_later_screen: bool = false
 
 # State
 var is_seated: bool = false
@@ -209,6 +210,12 @@ func _process(delta: float) -> void:
 		ceiling_fan_blades.rotate_y(fan_speed * delta)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if in_two_days_later_screen:
+		if (event is InputEventKey and event.pressed and not event.echo) or \
+		   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+			_transition_to_phone_call()
+			return
+
 	if event is InputEventMouseMotion and mouse_captured and not cutscene_active:
 		cam_rot_y -= event.relative.x * MOUSE_SENSITIVITY
 		cam_rot_x -= event.relative.y * MOUSE_SENSITIVITY
@@ -398,6 +405,9 @@ func start_departure_cutscene() -> void:
 	trigger_2_days_later_sequence()
 
 func trigger_2_days_later_sequence() -> void:
+	in_two_days_later_screen = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	
 	if departure_overlay:
 		departure_overlay.visible = false
 		
@@ -405,23 +415,29 @@ func trigger_2_days_later_sequence() -> void:
 		two_days_later_screen.visible = true
 		two_days_later_screen.modulate.a = 0.0
 		var tw = create_tween()
-		tw.tween_property(two_days_later_screen, "modulate:a", 1.0, 1.2)
+		tw.tween_property(two_days_later_screen, "modulate:a", 1.0, 1.0)
 		
 	# Play deep suspense atmosphere
 	if suspense_audio:
 		suspense_audio.play()
 		
-	# Wait 4.5 seconds for dramatic suspense
-	await get_tree().create_timer(4.5).timeout
-	
-	# Transition into the 3-Way Phone Call Conference between the friends in their bedrooms!
-	get_tree().change_scene_to_file("res://scenes/phone_call_convo.tscn")
+	# Wait 3.5 seconds, or transition earlier if player presses key/click
+	await get_tree().create_timer(3.5).timeout
+	if in_two_days_later_screen:
+		_transition_to_phone_call()
+
+func _transition_to_phone_call() -> void:
+	if not in_two_days_later_screen: return
+	in_two_days_later_screen = false
+	var err = get_tree().change_scene_to_file("res://scenes/phone_call_convo.tscn")
+	if err != OK:
+		print("ERROR: Failed to load res://scenes/phone_call_convo.tscn. Error code: ", err)
 
 func _on_start_chapter2_pressed() -> void:
 	if start_chapter2_btn:
 		start_chapter2_btn.disabled = true
 		start_chapter2_btn.text = "➔ LOADING 3-WAY CONFERENCE CALL..."
-	get_tree().change_scene_to_file("res://scenes/phone_call_convo.tscn")
+	_transition_to_phone_call()
 
 func _on_replay_station_pressed() -> void:
 	get_tree().reload_current_scene()

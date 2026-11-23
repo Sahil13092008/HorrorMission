@@ -198,6 +198,15 @@ func display_current_dialogue() -> void:
 		voice_audio.play()
 		animate_head_speaking(speaker_id)
 		
+		# Auto advance after voice finishes if player hasn't clicked
+		var current_idx = dialogue_index
+		voice_audio.finished.connect(func():
+			if dialogue_index == current_idx:
+				await get_tree().create_timer(0.6).timeout
+				if dialogue_index == current_idx:
+					advance_dialogue()
+		, CONNECT_ONE_SHOT)
+		
 	await get_tree().create_timer(0.8).timeout
 	can_advance = true
 

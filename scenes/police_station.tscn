@@ -1912,6 +1912,13 @@ text = "दो दिन बीत चुके हैं... पुलिस क
 कृपाल का अभी तक कोई सुराग नहीं मिला..."
 horizontal_alignment = 1
 
+[node name="SkipHint" type="Label" parent="PoliceUI/TwoDaysLaterScreen/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.85, 1.0, 0.9)
+theme_override_font_sizes/font_size = 14
+text = "[CLICK OR SPACE TO CONTINUE ➔]"
+horizontal_alignment = 1
+
 [node name="ChapterEndCard" type="PanelContainer" parent="PoliceUI"]
 layout_mode = 1
 anchors_preset = 8
