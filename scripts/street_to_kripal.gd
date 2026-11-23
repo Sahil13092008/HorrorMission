@@ -30,6 +30,7 @@ extends Node3D
 @onready var door_trigger: Area3D = $KripalHouse/DoorTrigger
 @onready var police_door_trigger: Area3D = $EnvironmentProps/PansemalTownHouses/PansemalPoliceStation/PoliceDoorTrigger
 @onready var kripal_mummy: Node3D = $KripalHouse/KripalMummy
+@onready var convo_camera: Camera3D = $KripalHouse/DoorConvoCamera
 @onready var sahil: CharacterBody3D = $Companions/SahilCompanion
 @onready var aashutosh: CharacterBody3D = $Companions/AashutoshCompanion
 @onready var pedestrian1: Node3D = $EnvironmentProps/Pedestrians/Pedestrian1
@@ -990,6 +991,7 @@ func start_door_interaction() -> void:
 	door_opened = true
 	is_near_door = false
 	if action_prompt: action_prompt.visible = false
+	if convo_camera: convo_camera.make_current()
 	
 	if doorbell_audio:
 		doorbell_audio.play()
@@ -1061,6 +1063,7 @@ func end_dialogue_sequence() -> void:
 	cutscene_active = false
 	if dialogue_box: dialogue_box.visible = false
 	if subtitle: subtitle.text = ""
+	if camera: camera.make_current()
 	
 	# Aunty, Sahil, Aashutosh walk towards the car
 	var walk_tw = create_tween()
