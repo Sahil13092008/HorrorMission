@@ -440,17 +440,21 @@ func _transition_to_phone_call() -> void:
 		start_call_btn.disabled = true
 		start_call_btn.text = "➔ LOADING 3-WAY PHONE CALL..."
 		
+	# Try loading freshly with CACHE_MODE_REPLACE to bypass any stale engine cache
+	var ps = ResourceLoader.load("res://scenes/phone_call_convo.tscn", "PackedScene", ResourceLoader.CACHE_MODE_REPLACE) as PackedScene
+	if ps:
+		var change_err = get_tree().change_scene_to_packed(ps)
+		if change_err == OK:
+			return
+
 	var err = get_tree().change_scene_to_file("res://scenes/phone_call_convo.tscn")
-	if err != OK:
-		print("change_scene_to_file failed with error %d, trying PackedScene..." % err)
-		var ps = ResourceLoader.load("res://scenes/phone_call_convo.tscn") as PackedScene
-		if ps:
-			get_tree().change_scene_to_packed(ps)
-		else:
-			print("Critical: Could not load phone_call_convo.tscn: ", err)
-			if start_call_btn:
-				start_call_btn.disabled = false
-				start_call_btn.text = "⚠️ RETRY LOADING PHONE CALL ➔"
+	if err == OK:
+		return
+		
+	print("Critical: Could not load phone_call_convo.tscn (err: %d)" % err)
+	if start_call_btn:
+		start_call_btn.disabled = false
+		start_call_btn.text = "⚠️ RETRY LOADING PHONE CALL [ERR %d] ➔" % err
 
 func _on_start_chapter2_pressed() -> void:
 	if start_chapter2_btn:

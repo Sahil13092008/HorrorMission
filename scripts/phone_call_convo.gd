@@ -49,7 +49,7 @@ var stream_sahil_2: AudioStream
 var stream_aashu_2: AudioStream
 
 func load_stream_safe(path: String) -> AudioStream:
-	if ResourceLoader.exists(path):
+	if FileAccess.file_exists(path + ".import") and ResourceLoader.exists(path):
 		var res = load(path)
 		if res is AudioStream:
 			return res
@@ -63,7 +63,10 @@ func load_stream_safe(path: String) -> AudioStream:
 				return mp3
 			elif path.ends_with(".wav"):
 				var wav = AudioStreamWAV.new()
-				wav.data = bytes
+				if bytes.size() > 44 and bytes.slice(0, 4).get_string_from_ascii() == "RIFF":
+					wav.data = bytes.slice(44)
+				else:
+					wav.data = bytes
 				return wav
 	return null
 

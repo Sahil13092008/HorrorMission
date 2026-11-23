@@ -84,6 +84,23 @@ func _process(_delta: float) -> void:
 		if Input.mouse_mode != Input.MOUSE_MODE_VISIBLE:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
+func _input(event: InputEvent) -> void:
+	if is_menu_open:
+		# Always ensure mouse cursor is visible while checkpoint modal is active
+		if Input.mouse_mode != Input.MOUSE_MODE_VISIBLE:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		if event is InputEventKey and event.pressed and not event.echo:
+			if event.keycode == KEY_TAB or event.keycode == KEY_C or event.keycode == KEY_ESCAPE:
+				close_menu()
+				get_viewport().set_input_as_handled()
+				return
+	else:
+		if event is InputEventKey and event.pressed and not event.echo:
+			if event.keycode == KEY_TAB or event.keycode == KEY_C or event.keycode == KEY_F1:
+				open_menu()
+				get_viewport().set_input_as_handled()
+				return
+
 func build_hud() -> void:
 	var hud_root = Control.new()
 	hud_root.name = "HUD_Root"
@@ -395,16 +412,19 @@ func open_menu() -> void:
 	populate_cards()
 	
 	modal_overlay.visible = true
-	modal_panel.modulate.a = 0.0
-	var tw = create_tween()
-	tw.tween_property(modal_panel, "modulate:a", 1.0, 0.18)
+	modal_panel.modulate.a = 1.0
 
 func close_menu() -> void:
 	is_menu_open = false
 	modal_overlay.visible = false
 	get_tree().paused = false
 	
-	if prev_mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	# Only restore captured if not going into a UI cutscene
+	var cur = get_tree().current_scene
+	var current_path = cur.scene_file_path if cur else ""
+	if current_path == "res://scenes/phone_call_convo.tscn":
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	elif prev_mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -420,12 +440,17 @@ func jump_to_scene(scene_path: String) -> void:
 		return
 		
 	print("Checkpoint jump to: ", scene_path)
+	
+	# Try loading freshly bypassing cache
+	var ps = ResourceLoader.load(scene_path, "PackedScene", ResourceLoader.CACHE_MODE_REPLACE) as PackedScene
+	if ps:
+		var packed_err = get_tree().change_scene_to_packed(ps)
+		if packed_err == OK:
+			return
+			
 	var err = get_tree().change_scene_to_file(scene_path)
 	if err != OK:
-		print("change_scene_to_file returned error %d, attempting PackedScene..." % err)
-		var ps = ResourceLoader.load(scene_path) as PackedScene
-		if ps:
-			get_tree().change_scene_to_packed(ps)
+		print("change_scene_to_file returned error %d" % err)
 
 func jump_to_next_scene() -> void:
 	get_tree().paused = false

@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene load_steps=62 format=3 uid="uid://d8m1p4k9x7v2c"]
 
 [ext_resource type="Script" path="res://scripts/phone_call_convo.gd" id="1_script"]
 [ext_resource type="AudioStream" path="res://audio/ambience.wav" id="2_ambience"]
@@ -359,9 +359,9 @@ stream = ExtResource("2_ambience")
 volume_db = -12.0
 autoplay = true
 
-# ==============================================================
-# ROOM 1: AASHUTOSH'S BEDROOM (LEFT ROOM: X = -20)
-# ==============================================================
+; ==============================================================
+; ROOM 1: AASHUTOSH'S BEDROOM (LEFT ROOM: X = -20)
+; ==============================================================
 [node name="Room_Aashutosh" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 0)
 
@@ -782,9 +782,9 @@ font_size = 16
 outline_size = 4
 
 
-# ==============================================================
-# ROOM 2: PLAYER'S BEDROOM (CENTER ROOM: X = 0)
-# ==============================================================
+; ==============================================================
+; ROOM 2: PLAYER'S BEDROOM (CENTER ROOM: X = 0)
+; ==============================================================
 [node name="Room_Player" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
@@ -1164,9 +1164,9 @@ material = SubResource("Mat_Sneakers_Sole")
 
 
 
-# ==============================================================
-# ROOM 3: SAHIL'S BEDROOM (RIGHT ROOM: X = 20)
-# ==============================================================
+; ==============================================================
+; ROOM 3: SAHIL'S BEDROOM (RIGHT ROOM: X = 20)
+; ==============================================================
 [node name="Room_Sahil" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 0)
 
@@ -1562,9 +1562,9 @@ font_size = 16
 outline_size = 4
 
 
-# ==============================================================
-# UI CANVAS LAYER (PHONE CALL HUD & SUBTITLES)
-# ==============================================================
+; ==============================================================
+; UI CANVAS LAYER (PHONE CALL HUD & SUBTITLES)
+; ==============================================================
 [node name="PhoneUI" type="CanvasLayer" parent="."]
 
 [node name="TopCallBar" type="PanelContainer" parent="PhoneUI"]
@@ -1663,9 +1663,9 @@ theme_override_font_sizes/font_size = 13
 text = "[CLICK / SPACE TO ADVANCE ➔]"
 horizontal_alignment = 2
 
-# ==============================================================
-# CHAPTER 1 FINALE BRIEFING CARD (POST-CALL)
-# ==============================================================
+; ==============================================================
+; CHAPTER 1 FINALE BRIEFING CARD (POST-CALL)
+; ==============================================================
 [node name="ExpeditionCard" type="PanelContainer" parent="PhoneUI"]
 visible = false
 anchors_preset = 8
