@@ -1,15 +1,7 @@
 [gd_scene format=3 uid="uid://phone_convo_2days_later_01"]
 
 [ext_resource type="Script" path="res://scripts/phone_call_convo.gd" id="1_script"]
-[ext_resource type="AudioStream" path="res://audio/phone_ring.wav" id="2_ring"]
-[ext_resource type="AudioStream" path="res://audio/phone_pickup.wav" id="3_pickup"]
-[ext_resource type="AudioStream" path="res://audio/rain_night_ambient.wav" id="4_rain"]
-[ext_resource type="AudioStream" path="res://audio/call_aashu_1.mp3" id="5_aashu1"]
-[ext_resource type="AudioStream" path="res://audio/call_player_1.mp3" id="6_player1"]
-[ext_resource type="AudioStream" path="res://audio/call_sahil_1.mp3" id="7_sahil1"]
-[ext_resource type="AudioStream" path="res://audio/call_player_2.mp3" id="8_player2"]
-[ext_resource type="AudioStream" path="res://audio/call_sahil_2.mp3" id="9_sahil2"]
-[ext_resource type="AudioStream" path="res://audio/call_aashu_2.mp3" id="10_aashu2"]
+[ext_resource type="AudioStream" path="res://audio/ambience.wav" id="2_ambience"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_Floor"]
 albedo_color = Color(0.32, 0.34, 0.36, 1)
@@ -362,7 +354,7 @@ volume_db = 2.0
 volume_db = 1.0
 
 [node name="RainAudio" type="AudioStreamPlayer" parent="Audio"]
-stream = ExtResource("4_rain")
+stream = ExtResource("2_ambience")
 volume_db = -12.0
 autoplay = true
 
@@ -1622,6 +1614,12 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1.0, 0.85, 0.35, 1)
 theme_override_font_sizes/font_size = 15
 text = "🧢 SAHIL [ONLINE]"
+
+[node name="SkipCallBtn" type="Button" parent="PhoneUI/TopCallBar/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 13
+text = "⏭️ SKIP CALL [S]"
 
 [node name="SubtitlePanel" type="PanelContainer" parent="PhoneUI"]
 anchors_preset = 12

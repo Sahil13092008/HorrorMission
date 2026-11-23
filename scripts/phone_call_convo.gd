@@ -35,17 +35,38 @@ extends Node3D
 
 @onready var expedition_card: PanelContainer = $PhoneUI/ExpeditionCard
 @onready var proceed_btn: Button = $PhoneUI/ExpeditionCard/Margin/VBox/ProceedBtn
+@onready var skip_call_btn: Button = $PhoneUI/TopCallBar/Margin/HBox/SkipCallBtn
 
-# Preloaded Audio
-var sfx_ring = preload("res://audio/phone_ring.wav")
-var sfx_pickup = preload("res://audio/phone_pickup.wav")
+# Safe audio streams loaded at runtime without blocking parse
+var sfx_ring: AudioStream
+var sfx_pickup: AudioStream
 
-var stream_aashu_1 = preload("res://audio/call_aashu_1.mp3")
-var stream_player_1 = preload("res://audio/call_player_1.mp3")
-var stream_sahil_1 = preload("res://audio/call_sahil_1.mp3")
-var stream_player_2 = preload("res://audio/call_player_2.mp3")
-var stream_sahil_2 = preload("res://audio/call_sahil_2.mp3")
-var stream_aashu_2 = preload("res://audio/call_aashu_2.mp3")
+var stream_aashu_1: AudioStream
+var stream_player_1: AudioStream
+var stream_sahil_1: AudioStream
+var stream_player_2: AudioStream
+var stream_sahil_2: AudioStream
+var stream_aashu_2: AudioStream
+
+func load_stream_safe(path: String) -> AudioStream:
+	if ResourceLoader.exists(path):
+		var res = load(path)
+		if res is AudioStream:
+			return res
+	if FileAccess.file_exists(path):
+		var f = FileAccess.open(path, FileAccess.READ)
+		if f:
+			var bytes = f.get_buffer(f.get_length())
+			if path.ends_with(".mp3"):
+				var mp3 = AudioStreamMP3.new()
+				mp3.data = bytes
+				return mp3
+			elif path.ends_with(".wav"):
+				var wav = AudioStreamWAV.new()
+				wav.data = bytes
+				wav.format = AudioStreamWAV.FORMAT_16_BITS
+				return wav
+	return null
 
 # Dialogues Array matching user story exactly
 var dialogues = [
@@ -101,6 +122,16 @@ var call_duration: float = 0.0
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
+	sfx_ring = load_stream_safe("res://audio/phone_ring.wav")
+	sfx_pickup = load_stream_safe("res://audio/phone_pickup.wav")
+	
+	stream_aashu_1 = load_stream_safe("res://audio/call_aashu_1.mp3")
+	stream_player_1 = load_stream_safe("res://audio/call_player_1.mp3")
+	stream_sahil_1 = load_stream_safe("res://audio/call_sahil_1.mp3")
+	stream_player_2 = load_stream_safe("res://audio/call_player_2.mp3")
+	stream_sahil_2 = load_stream_safe("res://audio/call_sahil_2.mp3")
+	stream_aashu_2 = load_stream_safe("res://audio/call_aashu_2.mp3")
+	
 	dialogues[0]["audio"] = stream_aashu_1
 	dialogues[1]["audio"] = stream_player_1
 	dialogues[2]["audio"] = stream_sahil_1
@@ -110,6 +141,8 @@ func _ready() -> void:
 	
 	if proceed_btn:
 		proceed_btn.pressed.connect(_on_proceed_chapter2_pressed)
+	if skip_call_btn:
+		skip_call_btn.pressed.connect(end_phone_call)
 		
 	if subtitle_panel:
 		subtitle_panel.visible = false
@@ -128,6 +161,11 @@ func _process(delta: float) -> void:
 			call_status.text = "🟢 LIVE 3-WAY CONFERENCE CALL [%02d:%02d] — [2 DAYS LATER]" % [minutes, seconds]
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_S:
+			end_phone_call()
+			return
+			
 	if not can_advance: return
 	
 	if (event is InputEventKey and event.pressed and not event.echo and (event.keycode == KEY_SPACE or event.keycode == KEY_ENTER or event.keycode == KEY_E)) or \

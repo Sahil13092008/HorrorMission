@@ -46,6 +46,8 @@ extends Node3D
 @onready var start_chapter2_btn: Button = $PoliceUI/ChapterEndCard/Margin/VBox/BtnBox/StartCh2Btn
 @onready var replay_station_btn: Button = $PoliceUI/ChapterEndCard/Margin/VBox/BtnBox/ReplayBtn
 @onready var view_toggle_btn: Button = $PoliceUI/HUD/ViewToggleBtn
+@onready var skip_to_call_btn: Button = $PoliceUI/HUD/SkipToCallBtn
+@onready var start_call_btn: Button = $PoliceUI/TwoDaysLaterScreen/VBox/StartCallBtn
 
 # Camera & Settings
 var is_first_person: bool = false
@@ -139,6 +141,10 @@ func _ready() -> void:
 		replay_station_btn.pressed.connect(_on_replay_station_pressed)
 	if view_toggle_btn:
 		view_toggle_btn.pressed.connect(toggle_camera_mode)
+	if skip_to_call_btn:
+		skip_to_call_btn.pressed.connect(trigger_2_days_later_sequence)
+	if start_call_btn:
+		start_call_btn.pressed.connect(_transition_to_phone_call)
 		
 	# UI Initial states
 	if dialogue_box: dialogue_box.visible = false
@@ -427,11 +433,22 @@ func trigger_2_days_later_sequence() -> void:
 		_transition_to_phone_call()
 
 func _transition_to_phone_call() -> void:
-	if not in_two_days_later_screen: return
 	in_two_days_later_screen = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	
+	if start_call_btn:
+		start_call_btn.disabled = true
+		start_call_btn.text = "➔ LOADING 3-WAY PHONE CALL..."
+		
 	var err = get_tree().change_scene_to_file("res://scenes/phone_call_convo.tscn")
 	if err != OK:
-		print("ERROR: Failed to load res://scenes/phone_call_convo.tscn. Error code: ", err)
+		print("change_scene_to_file failed with error %d, trying PackedScene..." % err)
+		var ps = ResourceLoader.load("res://scenes/phone_call_convo.tscn") as PackedScene
+		if ps:
+			get_tree().change_scene_to_packed(ps)
+		else:
+			print("Critical: Could not load phone_call_convo.tscn, falling back to bhangarh_ruins.tscn")
+			get_tree().change_scene_to_file("res://scenes/bhangarh_ruins.tscn")
 
 func _on_start_chapter2_pressed() -> void:
 	if start_chapter2_btn:
