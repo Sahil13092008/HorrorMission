@@ -174,6 +174,7 @@ var intro_cam_tw: Tween = null
 var lightning_timer: float = 3.5
 var is_lightning_flashing: bool = false
 var pulse_time: float = 0.0
+var radar_update_timer: float = 0.0
 
 # Preloaded Audio
 var stream_cycle_riding: AudioStream = preload("res://audio/cycle_riding.wav")
@@ -474,9 +475,6 @@ func _input(event: InputEvent) -> void:
 			skip_school_exit_intro()
 		elif dialogue_in_progress and can_advance_dialogue:
 			advance_dialogue()
-		elif not cutscene_active and not dialogue_in_progress:
-			if current_mode != PlayerMode.DRIVING_CAR:
-				handle_interaction()
 
 func handle_interaction() -> void:
 	if cutscene_active:
@@ -486,38 +484,61 @@ func handle_interaction() -> void:
 	if dialogue_in_progress and can_advance_dialogue:
 		advance_dialogue()
 		return
-	
-	var dist_door_quick = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
-	if (is_near_door or dist_door_quick < 6.5) and not door_opened:
-		if current_mode == PlayerMode.CYCLING:
-			dismount_bicycle()
-		start_door_interaction()
-		return
 
+	# MODE 1: CYCLING
 	if current_mode == PlayerMode.CYCLING:
-		if can_dismount:
+		# Only dismount when player has reached Kripal's house
+		if can_dismount or player.global_position.z <= -75.0:
 			dismount_bicycle()
 		else:
 			ring_cycle_bell()
+		return
+
+	# MODE 2: FOOT AT KRIPAL'S HOUSE
 	elif current_mode == PlayerMode.FOOT_KRIPAL:
+		var dist_to_door: float = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
 		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
-		if (is_near_door or dist_door_quick < 6.5) and not door_opened:
-			start_door_interaction()
-		elif (is_near_car or dist_to_car < 6.0) and door_opened:
-			enter_car()
+		if not door_opened:
+			if is_near_door or dist_to_door < 4.5:
+				start_door_interaction()
+			else:
+				show_subtitle("🚶 कृपाल के घर के मुख्य दरवाजे के पास जाकर घंटी [E] बजाएं", 2.0)
+		else:
+			if is_near_car or dist_to_car < 5.0:
+				enter_car()
+			elif is_near_door or dist_to_door < 4.0:
+				show_subtitle("👩 कृपाल की माँ: 'बेटा, बाहर गाड़ी खड़ी है, जल्दी उसमें बैठो!'", 2.5)
+			else:
+				show_subtitle("🚗 सामने खड़ी कृपाल की गाड़ी के पास जाकर [E] दबाएं", 2.0)
+		return
+
+	# MODE 3: DRIVING CAR
 	elif current_mode == PlayerMode.DRIVING_CAR:
-		var dist_to_police = kripal_car.global_position.distance_to(Vector3(11.5, 0, -235.0))
-		if dist_to_police < 25.0 or kripal_car.global_position.z <= -215.0:
-			exit_car()
+		exit_car()
+		return
+
+	# MODE 4: FOOT AT POLICE STATION OR ROAD
 	elif current_mode == PlayerMode.FOOT_POLICE:
+		var dist_to_police: float = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
-		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
-		if (is_near_car or dist_to_car < 5.5) and dist_to_car < dist_to_police:
+		
+		# If closer to car and within 4.8m, re-enter car!
+		if (is_near_car or dist_to_car < 4.8) and dist_to_car < dist_to_police:
 			enter_car()
-		elif is_near_police_door or dist_to_police < 10.0:
+			return
+		# If closer to police door and within 5.5m, enter police station!
+		elif is_near_police_door or dist_to_police < 5.5:
 			_on_start_police_pressed()
-		elif is_near_car or dist_to_car < 5.5:
+			return
+		elif is_near_car or dist_to_car < 4.8:
 			enter_car()
+			return
+		else:
+			if dist_to_police < 15.0:
+				show_subtitle("🚪 पुलिस थाने के मुख्य द्वार के पास जाकर [E] दबाएं", 2.0)
+			else:
+				show_subtitle("🚗 वापस गाड़ी में बैठने के लिए गाड़ी के पास जाएं, या थाने के द्वार पर जाएं", 2.0)
+			return
 
 func dismount_bicycle() -> void:
 	current_mode = PlayerMode.FOOT_KRIPAL
@@ -609,7 +630,11 @@ func _physics_process(delta: float) -> void:
 		kripal_car.rotation.z = 0.0
 
 	_process_pedestrians(delta)
-	_update_radar_hud()
+	
+	radar_update_timer += delta
+	if radar_update_timer >= 0.1:
+		radar_update_timer = 0.0
+		_update_radar_hud()
 	
 	# Police beacon flashing lights
 	if police_light_red and police_light_blue:
@@ -649,17 +674,19 @@ func _physics_process(delta: float) -> void:
 		var dist_to_door: float = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
 		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		
-		if (is_near_door or dist_to_door < 6.5) and not door_opened:
+		if (is_near_door or dist_to_door < 4.5) and not door_opened:
 			is_near_door = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🔔 [E] दबाकर डोरबेल बजाएं (PRESS [E] TO RING DOORBELL)"
-		elif (is_near_car or dist_to_car < 5.5) and door_opened:
+		elif (is_near_car or dist_to_car < 4.5) and door_opened:
 			is_near_car = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚗 [E] दबाकर कार में बैठें और चलाएं (PRESS [E] TO DRIVE CAR)"
 		else:
+			if dist_to_door >= 4.5: is_near_door = false
+			if dist_to_car >= 4.5: is_near_car = false
 			if action_prompt and not can_advance_dialogue:
 				if not door_opened:
 					action_prompt.visible = true
@@ -680,21 +707,24 @@ func _physics_process(delta: float) -> void:
 		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		
-		if (is_near_car or dist_to_car < 5.0) and dist_to_car < dist_to_police:
+		if (is_near_car or dist_to_car < 4.5) and dist_to_car < dist_to_police:
+			is_near_car = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚗 [E] / ACTION दबाकर वापस कार में बैठें (ENTER CAR)"
-		elif is_near_police_door or dist_to_police < 14.0:
+		elif is_near_police_door or dist_to_police < 5.5:
+			is_near_police_door = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
-			if dist_to_police < 4.0:
-				_on_start_police_pressed()
-		elif is_near_car or dist_to_car < 5.0:
+		elif is_near_car or dist_to_car < 4.5:
+			is_near_car = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚗 [E] / ACTION दबाकर वापस कार में बैठें (ENTER CAR)"
 		else:
+			if dist_to_car >= 4.5: is_near_car = false
+			if dist_to_police >= 5.5: is_near_police_door = false
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚶 पुलिस थाने के मुख्य द्वार की तरफ बढ़ें (WALK TOWARDS POLICE ENTRANCE)"

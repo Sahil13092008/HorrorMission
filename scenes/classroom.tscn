@@ -294,7 +294,7 @@ environment = SubResource("Environment_1")
 transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, -10, 8, 0)
 light_color = Color(1, 0.96, 0.88, 1)
 light_energy = 1.2
-shadow_enabled = true
+shadow_enabled = false
 
 [node name="Audio" type="Node" parent="." unique_id=1622359934]
 
