@@ -30,7 +30,7 @@ extends Node3D
 @onready var door_trigger: Area3D = $KripalHouse/DoorTrigger
 @onready var police_door_trigger: Area3D = $EnvironmentProps/PansemalTownHouses/PansemalPoliceStation/PoliceDoorTrigger
 @onready var kripal_mummy: Node3D = $KripalHouse/KripalMummy
-@onready var convo_camera: Camera3D = $KripalHouse/DoorConvoCamera
+@onready var convo_camera: Camera3D = $DoorConvoCamera
 @onready var sahil: CharacterBody3D = $Companions/SahilCompanion
 @onready var aashutosh: CharacterBody3D = $Companions/AashutoshCompanion
 @onready var pedestrian1: Node3D = $EnvironmentProps/Pedestrians/Pedestrian1
@@ -55,7 +55,7 @@ extends Node3D
 @onready var flashlight: SpotLight3D = $Player/CameraPivot/Flashlight
 @onready var player_collision: CollisionShape3D = $Player/CollisionShape3D
 @onready var visual_model: Node3D = $Player/VisualModel
-@onready var player_cycle: Node3D = $Player/VisualModel/CycleModel
+@onready var player_cycle: Node3D = $Player/CycleModel
 @onready var sahil_cycle: Node3D = $Companions/SahilCompanion/CycleModel
 @onready var aashu_cycle: Node3D = $Companions/AashutoshCompanion/CycleModel
 
@@ -357,17 +357,22 @@ func dismount_bicycle() -> void:
 	is_cycling = false
 	can_dismount = false
 	if action_prompt: action_prompt.visible = false
-	
+
 	# Hide riding cycle meshes on player and companions
 	if player_cycle: player_cycle.visible = false
 	if sahil_cycle: sahil_cycle.visible = false
 	if aashu_cycle: aashu_cycle.visible = false
-	
+
+	# Reset visual models to ground standing position
+	if visual_model: visual_model.position = Vector3.ZERO
+	if sahil and sahil.has_node("VisualModel"): sahil.get_node("VisualModel").position = Vector3.ZERO
+	if aashutosh and aashutosh.has_node("VisualModel"): aashutosh.get_node("VisualModel").position = Vector3.ZERO
+
 	# Spawn parked bicycles beside the road
 	if parked_bicycles:
 		parked_bicycles.visible = true
 		parked_bicycles.global_position = player.global_position + Vector3(1.2, 0, 0)
-		
+
 	objective_banner.text = "✦ कृपाल के घर के सामने पहुँच गए! सामने वाले दरवाजे की घंटी [E] बजाएं"
 	show_subtitle("🚲 [साइकिल पार्क की]... सामने कृपाल का घर है, दरवाजे पर जाएँ और डोरबेल बजाएं!", 3.5)
 
@@ -991,35 +996,56 @@ func start_door_interaction() -> void:
 	door_opened = true
 	is_near_door = false
 	if action_prompt: action_prompt.visible = false
-	if convo_camera: convo_camera.make_current()
-	
+
+	# Ensure characters are visible and cycle meshes are hidden
+	if visual_model:
+		visual_model.visible = true
+		visual_model.position = Vector3.ZERO
+	if sahil:
+		sahil.visible = true
+		if sahil.has_node("VisualModel"): sahil.get_node("VisualModel").position = Vector3.ZERO
+	if aashutosh:
+		aashutosh.visible = true
+		if aashutosh.has_node("VisualModel"): aashutosh.get_node("VisualModel").position = Vector3.ZERO
+	if player_cycle: player_cycle.visible = false
+	if sahil_cycle: sahil_cycle.visible = false
+	if aashu_cycle: aashu_cycle.visible = false
+
+	# Position conversation camera in front yard angled directly at the doorway conversation
+	if convo_camera:
+		convo_camera.global_position = Vector3(6.2, 1.65, -82.6)
+		convo_camera.look_at(Vector3(8.3, 1.35, -85.0), Vector3.UP)
+		convo_camera.make_current()
+
 	if doorbell_audio:
 		doorbell_audio.play()
-		
+
 	show_subtitle("🔔 [डोरबेल बजी: डिंग-डोंग]... अंदर से किसी के आने की आहट सुनाई दे रही है...", 2.5)
-	
+
+	# Walk boys to porch and turn them to face the door (+X direction towards X = 9.0)
 	var tw = create_tween()
 	tw.tween_property(player, "global_position", Vector3(8.0, 0.1, -85.0), 1.2)
 	tw.parallel().tween_property(sahil, "global_position", Vector3(7.6, 0.1, -86.2), 1.2)
 	tw.parallel().tween_property(aashutosh, "global_position", Vector3(7.6, 0.1, -83.8), 1.2)
-	tw.parallel().tween_property(player, "rotation:y", deg_to_rad(90), 1.2)
-	if sahil: tw.parallel().tween_property(sahil, "rotation:y", deg_to_rad(90), 1.2)
-	if aashutosh: tw.parallel().tween_property(aashutosh, "rotation:y", deg_to_rad(90), 1.2)
-	
+	tw.parallel().tween_property(player, "rotation:y", deg_to_rad(-90), 1.2)
+	if sahil: tw.parallel().tween_property(sahil, "rotation:y", deg_to_rad(-90), 1.2)
+	if aashutosh: tw.parallel().tween_property(aashutosh, "rotation:y", deg_to_rad(-90), 1.2)
+
 	await tw.finished
-	
+
 	if home_door_audio:
 		home_door_audio.play()
-		
+
 	var door_tw = create_tween()
 	door_tw.tween_property(door_hinge, "rotation_degrees:y", -85.0, 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	
+
 	if kripal_mummy:
 		kripal_mummy.visible = true
 		kripal_mummy.position.x = -2.6
+		kripal_mummy.rotation = Vector3(0, deg_to_rad(90), 0)
 		var mummy_tw = create_tween()
 		mummy_tw.tween_property(kripal_mummy, "position:x", -2.9, 1.2)
-		
+
 	await door_tw.finished
 	start_dialogue_sequence()
 

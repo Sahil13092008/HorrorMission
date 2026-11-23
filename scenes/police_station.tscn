@@ -664,7 +664,7 @@ font_size = 18
 outline_size = 5
 
 [node name="Sahil" type="Node3D" parent="Characters"]
-transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, -1.2, 0, 1.4)
+transform = Transform3D(-0.966, 0, -0.259, 0, 1, 0, 0.259, 0, -0.966, -1.2, 0, 1.4)
 
 [node name="HeadNode" type="Node3D" parent="Characters/Sahil"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
@@ -919,7 +919,7 @@ font_size = 16
 outline_size = 4
 
 [node name="Aashutosh" type="Node3D" parent="Characters"]
-transform = Transform3D(0.966, 0, -0.259, 0, 1, 0, 0.259, 0, 0.966, 1.2, 0, 1.4)
+transform = Transform3D(-0.966, 0, 0.259, 0, 1, 0, -0.259, 0, -0.966, 1.2, 0, 1.4)
 
 [node name="HeadNode" type="Node3D" parent="Characters/Aashutosh"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
@@ -1194,7 +1194,7 @@ font_size = 16
 outline_size = 4
 
 [node name="KripalMummy" type="Node3D" parent="Characters"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, 1.7)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.4, 0, 1.7)
 
 [node name="SareeSkirt" type="CSGCylinder3D" parent="Characters/KripalMummy"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48, 0)
@@ -1233,6 +1233,7 @@ outline_size = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.0, 2.2)
 
 [node name="VisualModel" type="Node3D" parent="Player"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 
 [node name="HeadNode" type="Node3D" parent="Player/VisualModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)

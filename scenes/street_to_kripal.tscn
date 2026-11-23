@@ -2579,10 +2579,6 @@ fov = 74.0
 
 [node name="KripalHouse" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.0, 0, -85.0)
-[node name="DoorConvoCamera" type="Camera3D" parent="KripalHouse"]
-transform = Transform3D(-0.591364, 0, 0.806405, 0.075534, 0.995604, 0.055391, -0.80286, 0.093667, -0.588764, -6.2, 1.65, -2.4)
-fov = 65.0
-
 
 [node name="KripalSkyBeacon" type="CSGCylinder3D" parent="KripalHouse"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18.0, 0)
@@ -2757,7 +2753,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0, 1.2, 0)
 shape = SubResource("Box_DoorTrigger")
 
 [node name="KripalMummy" type="Node3D" parent="KripalHouse"]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -2.6, 0.1, 0)
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -2.9, 0.1, 0)
 visible = false
 
 [node name="SareeSkirt" type="CSGCylinder3D" parent="KripalHouse/KripalMummy"]
@@ -2810,6 +2806,10 @@ font_size = 18
 outline_size = 5
 modulate = Color(1.0, 0.7, 0.8, 1)
 
+[node name="DoorConvoCamera" type="Camera3D" parent="."]
+transform = Transform3D(0.752577, 0.061675, -0.655610, -0.000000, 0.995604, 0.093659, 0.658505, -0.070485, 0.749269, 6.2, 1.65, -82.6)
+fov = 68.0
+
 [node name="Player" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 
@@ -2831,6 +2831,7 @@ spot_range = 22.0
 spot_angle = 42.0
 
 [node name="VisualModel" type="Node3D" parent="Player"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0.15)
 
 [node name="HeadNode" type="Node3D" parent="Player/VisualModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
@@ -3422,74 +3423,74 @@ theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_font_sizes/font_size = 16
 text = "🔄 REPLAY SCENE"
 
-[node name="CycleModel" type="Node3D" parent="Player/VisualModel"]
+[node name="CycleModel" type="Node3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="FrameTop" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+[node name="FrameTop" type="CSGBox3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, -0.05)
 size = Vector3(0.06, 0.06, 0.78)
 material = SubResource("Mat_CycleBlack")
 
-[node name="FrameDown" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+[node name="FrameDown" type="CSGBox3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, 0.819152, 0.573576, 0, -0.573576, 0.819152, 0, 0.48, -0.15)
 size = Vector3(0.06, 0.06, 0.85)
 material = SubResource("Mat_CycleBlack")
 
-[node name="SeatPost" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+[node name="SeatPost" type="CSGBox3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0.58, 0.22)
 size = Vector3(0.06, 0.65, 0.06)
 material = SubResource("Mat_CycleMetal")
 
-[node name="Saddle" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+[node name="Saddle" type="CSGBox3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 0.25)
 size = Vector3(0.22, 0.06, 0.32)
 material = SubResource("Mat_CycleTire")
 
-[node name="Handlebar" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+[node name="Handlebar" type="CSGBox3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94, -0.45)
 size = Vector3(0.68, 0.05, 0.05)
 material = SubResource("Mat_CycleMetal")
 
-[node name="HandleGripL" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+[node name="HandleGripL" type="CSGBox3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, 0.94, -0.45)
 size = Vector3(0.12, 0.07, 0.07)
 material = SubResource("Mat_CycleTire")
 
-[node name="HandleGripR" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+[node name="HandleGripR" type="CSGBox3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 0.94, -0.45)
 size = Vector3(0.12, 0.07, 0.07)
 material = SubResource("Mat_CycleTire")
 
-[node name="FrontFork" type="CSGBox3D" parent="Player/VisualModel/CycleModel"]
+[node name="FrontFork" type="CSGBox3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0.55, -0.48)
 size = Vector3(0.14, 0.72, 0.05)
 material = SubResource("Mat_CycleMetal")
 
-[node name="FrontWheel" type="CSGCylinder3D" parent="Player/VisualModel/CycleModel"]
+[node name="FrontWheel" type="CSGCylinder3D" parent="Player/CycleModel"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0.36, -0.55)
 radius = 0.36
 height = 0.06
 material = SubResource("Mat_CycleTire")
 
-[node name="RearWheel" type="CSGCylinder3D" parent="Player/VisualModel/CycleModel"]
+[node name="RearWheel" type="CSGCylinder3D" parent="Player/CycleModel"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0.36, 0.52)
 radius = 0.36
 height = 0.06
 material = SubResource("Mat_CycleTire")
 
-[node name="HeadlightHousing" type="CSGCylinder3D" parent="Player/VisualModel/CycleModel"]
+[node name="HeadlightHousing" type="CSGCylinder3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.88, -0.54)
 radius = 0.08
 height = 0.12
 material = SubResource("Mat_CycleMetal")
 
-[node name="HeadlightGlass" type="CSGCylinder3D" parent="Player/VisualModel/CycleModel"]
+[node name="HeadlightGlass" type="CSGCylinder3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.88, -0.61)
 radius = 0.075
 height = 0.02
 material = SubResource("Mat_CycleHeadlight")
 
-[node name="HeadlightBeam" type="SpotLight3D" parent="Player/VisualModel/CycleModel"]
+[node name="HeadlightBeam" type="SpotLight3D" parent="Player/CycleModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, -0.62)
 light_color = Color(1, 0.95, 0.82, 1)
 light_energy = 3.2
@@ -3509,6 +3510,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
 shape = SubResource("Capsule_Player")
 
 [node name="VisualModel" type="Node3D" parent="Companions/SahilCompanion"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0.15)
 
 [node name="HeadNode" type="Node3D" parent="Companions/SahilCompanion/VisualModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
@@ -3848,6 +3850,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
 shape = SubResource("Capsule_Player")
 
 [node name="VisualModel" type="Node3D" parent="Companions/AashutoshCompanion"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0.15)
 
 [node name="HeadNode" type="Node3D" parent="Companions/AashutoshCompanion/VisualModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
