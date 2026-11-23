@@ -222,7 +222,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_transition_to_phone_call()
 			return
 
-	if event is InputEventMouseMotion and mouse_captured and not cutscene_active:
+	if (event is InputEventMouseMotion or event is InputEventScreenDrag) and not cutscene_active:
 		cam_rot_y -= event.relative.x * MOUSE_SENSITIVITY
 		cam_rot_x -= event.relative.y * MOUSE_SENSITIVITY
 		cam_rot_x = clamp(cam_rot_x, -deg_to_rad(65), deg_to_rad(65))

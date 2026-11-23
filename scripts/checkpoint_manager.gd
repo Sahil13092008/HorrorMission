@@ -75,8 +75,14 @@ func _ready() -> void:
 	layer = 125 # Topmost UI layer
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
+	# Register standard gameplay actions
+	for action in ["move_forward", "move_backward", "move_left", "move_right", "interact", "flashlight", "sprint"]:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
+	
 	build_hud()
 	build_modal()
+	build_mobile_controls()
 
 func _process(_delta: float) -> void:
 	# Keep mouse cursor visible whenever menu is open
@@ -409,6 +415,9 @@ func open_menu() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	get_tree().paused = true
 	
+	if mobile_controls_root:
+		mobile_controls_root.visible = false
+	
 	populate_cards()
 	
 	modal_overlay.visible = true
@@ -419,12 +428,16 @@ func close_menu() -> void:
 	modal_overlay.visible = false
 	get_tree().paused = false
 	
+	var is_mobile = OS.has_feature("mobile") or OS.has_feature("android") or DisplayServer.is_touchscreen_available()
+	if mobile_controls_root:
+		mobile_controls_root.visible = is_mobile
+	
 	# Only restore captured if not going into a UI cutscene
 	var cur = get_tree().current_scene
 	var current_path = cur.scene_file_path if cur else ""
 	if current_path == "res://scenes/phone_call_convo.tscn":
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	elif prev_mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	elif prev_mouse_mode == Input.MOUSE_MODE_CAPTURED and not is_mobile:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -466,3 +479,138 @@ func jump_to_next_scene() -> void:
 	var target = CHAPTERS[next_index]["scene"]
 	print("Quick skipping to next scene: ", target)
 	jump_to_scene(target)
+
+var mobile_controls_root: Control
+
+func build_mobile_controls() -> void:
+	mobile_controls_root = Control.new()
+	mobile_controls_root.name = "MobileControls"
+	mobile_controls_root.anchors_preset = Control.PRESET_FULL_RECT
+	mobile_controls_root.anchor_right = 1.0
+	mobile_controls_root.anchor_bottom = 1.0
+	mobile_controls_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(mobile_controls_root)
+	
+	# Only display on mobile/touchscreen devices
+	var is_mobile = OS.has_feature("mobile") or OS.has_feature("android") or DisplayServer.is_touchscreen_available()
+	mobile_controls_root.visible = is_mobile
+	if not is_mobile:
+		return
+
+	# Helper to create styled touch button
+	var make_btn = func(text: String, size: Vector2, pos: Vector2, color_bg: Color, color_border: Color) -> Button:
+		var btn = Button.new()
+		btn.text = text
+		btn.custom_minimum_size = size
+		btn.size = size
+		btn.position = pos
+		btn.focus_mode = Control.FOCUS_NONE
+		var style = StyleBoxFlat.new()
+		style.bg_color = color_bg
+		style.border_width_left = 2
+		style.border_width_top = 2
+		style.border_width_right = 2
+		style.border_width_bottom = 2
+		style.border_color = color_border
+		style.corner_radius_top_left = 12
+		style.corner_radius_top_right = 12
+		style.corner_radius_bottom_right = 12
+		style.corner_radius_bottom_left = 12
+		btn.add_theme_stylebox_override("normal", style)
+		var pressed_style = style.duplicate()
+		pressed_style.bg_color = Color(color_bg.r * 1.5, color_bg.g * 1.5, color_bg.b * 1.5, 0.85)
+		btn.add_theme_stylebox_override("pressed", pressed_style)
+		btn.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
+		btn.add_theme_font_size_override("font_size", 16)
+		return btn
+
+	# --- Bottom-Left: Movement D-Pad ---
+	var dpad = Control.new()
+	dpad.name = "DPad"
+	dpad.anchors_preset = Control.PRESET_BOTTOM_LEFT
+	dpad.anchor_top = 1.0
+	dpad.anchor_bottom = 1.0
+	dpad.offset_left = 24
+	dpad.offset_top = -215
+	dpad.offset_right = 215
+	dpad.offset_bottom = -24
+	mobile_controls_root.add_child(dpad)
+
+	var bg_col = Color(0.12, 0.16, 0.24, 0.65)
+	var border_col = Color(0.4, 0.7, 1.0, 0.75)
+
+	var btn_up = make_btn.call("▲", Vector2(58, 58), Vector2(66, 0), bg_col, border_col)
+	btn_up.button_down.connect(func(): Input.action_press("move_forward"))
+	btn_up.button_up.connect(func(): Input.action_release("move_forward"))
+	dpad.add_child(btn_up)
+
+	var btn_down = make_btn.call("▼", Vector2(58, 58), Vector2(66, 132), bg_col, border_col)
+	btn_down.button_down.connect(func(): Input.action_press("move_backward"))
+	btn_down.button_up.connect(func(): Input.action_release("move_backward"))
+	dpad.add_child(btn_down)
+
+	var btn_left = make_btn.call("◀", Vector2(58, 58), Vector2(0, 66), bg_col, border_col)
+	btn_left.button_down.connect(func(): Input.action_press("move_left"))
+	btn_left.button_up.connect(func(): Input.action_release("move_left"))
+	dpad.add_child(btn_left)
+
+	var btn_right = make_btn.call("▶", Vector2(58, 58), Vector2(132, 66), bg_col, border_col)
+	btn_right.button_down.connect(func(): Input.action_press("move_right"))
+	btn_right.button_up.connect(func(): Input.action_release("move_right"))
+	dpad.add_child(btn_right)
+
+	# --- Bottom-Right: Action & Flashlight Buttons ---
+	var actions = Control.new()
+	actions.name = "Actions"
+	actions.anchors_preset = Control.PRESET_BOTTOM_RIGHT
+	actions.anchor_left = 1.0
+	actions.anchor_right = 1.0
+	actions.anchor_top = 1.0
+	actions.anchor_bottom = 1.0
+	actions.offset_left = -230
+	actions.offset_top = -180
+	actions.offset_right = -20
+	actions.offset_bottom = -20
+	mobile_controls_root.add_child(actions)
+
+	# [E] Interact Action Button
+	var btn_action = make_btn.call("⚡ [E]\nACTION", Vector2(95, 75), Vector2(110, 75), Color(0.12, 0.45, 0.25, 0.75), Color(0.3, 1.0, 0.6, 0.9))
+	btn_action.button_down.connect(func():
+		Input.action_press("interact")
+		var ev = InputEventKey.new()
+		ev.keycode = KEY_E
+		ev.pressed = true
+		Input.parse_input_event(ev)
+	)
+	btn_action.button_up.connect(func():
+		Input.action_release("interact")
+		var ev = InputEventKey.new()
+		ev.keycode = KEY_E
+		ev.pressed = false
+		Input.parse_input_event(ev)
+	)
+	actions.add_child(btn_action)
+
+	# [F] Flashlight Button
+	var btn_light = make_btn.call("🔦 [F]\nLIGHT", Vector2(85, 65), Vector2(15, 85), Color(0.45, 0.35, 0.1, 0.7), Color(1.0, 0.85, 0.3, 0.9))
+	btn_light.button_down.connect(func():
+		Input.action_press("flashlight")
+		var ev = InputEventKey.new()
+		ev.keycode = KEY_F
+		ev.pressed = true
+		Input.parse_input_event(ev)
+	)
+	btn_light.button_up.connect(func():
+		Input.action_release("flashlight")
+		var ev = InputEventKey.new()
+		ev.keycode = KEY_F
+		ev.pressed = false
+		Input.parse_input_event(ev)
+	)
+	actions.add_child(btn_light)
+
+	# [RUN] Sprint Button
+	var btn_sprint = make_btn.call("🏃 RUN", Vector2(85, 55), Vector2(115, 10), Color(0.12, 0.25, 0.45, 0.7), Color(0.3, 0.65, 1.0, 0.85))
+	btn_sprint.button_down.connect(func(): Input.action_press("sprint"))
+	btn_sprint.button_up.connect(func(): Input.action_release("sprint"))
+	actions.add_child(btn_sprint)

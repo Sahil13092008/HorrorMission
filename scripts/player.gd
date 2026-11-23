@@ -42,23 +42,23 @@ func _input(event):
 	if classroom and (classroom.get("is_in_group_discussion") == true or classroom.get("is_in_chapter_card") == true or classroom.get("is_in_bhangarh_map") == true):
 		return
 
-	# If clicked on the screen, lock mouse
+	# If clicked on the screen, lock mouse (on desktop only)
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if not is_in_dialogue and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		if not is_in_dialogue and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not OS.has_feature("mobile"):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
-	# Handle mouse camera rotation
-	if event is InputEventMouseMotion and not is_in_dialogue:
-		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+	# Handle mouse and mobile touch-drag camera rotation
+	if (event is InputEventMouseMotion or event is InputEventScreenDrag) and not is_in_dialogue:
+		if not OS.has_feature("mobile") and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			
 		rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
 		head.rotate_x(-event.relative.y * MOUSE_SENSITIVITY)
 		head.rotation.x = clamp(head.rotation.x, deg_to_rad(-85), deg_to_rad(85))
 
-	if event is InputEventKey and event.pressed:
+	if (event is InputEventKey and event.pressed) or event.is_action_pressed("interact") or event.is_action_pressed("flashlight"):
 		# Toggle mouse capture / close simple popups with ESC
-		if event.keycode == KEY_ESCAPE:
+		if event is InputEventKey and event.keycode == KEY_ESCAPE:
 			if is_in_dialogue:
 				close_popup()
 			else:
@@ -67,12 +67,12 @@ func _input(event):
 				else:
 					Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
-		# Toggle Flashlight (Key F)
-		if event.keycode == KEY_F and not is_in_dialogue:
+		# Toggle Flashlight (Key F or Mobile Button)
+		if ((event is InputEventKey and event.keycode == KEY_F) or event.is_action_pressed("flashlight")) and not is_in_dialogue:
 			flashlight.visible = !flashlight.visible
 
-		# Interact (Key E)
-		if event.keycode == KEY_E:
+		# Interact (Key E or Mobile Button)
+		if (event is InputEventKey and event.keycode == KEY_E) or event.is_action_pressed("interact"):
 			if is_in_dialogue:
 				close_popup()
 			elif raycast.is_colliding():
@@ -107,14 +107,14 @@ func _physics_process(delta):
 
 	# Handle movement
 	var current_speed = SPEED
-	if Input.is_key_pressed(KEY_SHIFT):
+	if Input.is_key_pressed(KEY_SHIFT) or Input.is_action_pressed("sprint"):
 		current_speed = SPRINT_SPEED
 
 	var input_dir = Vector2.ZERO
-	if Input.is_key_pressed(KEY_W): input_dir.y -= 1
-	if Input.is_key_pressed(KEY_S): input_dir.y += 1
-	if Input.is_key_pressed(KEY_A): input_dir.x -= 1
-	if Input.is_key_pressed(KEY_D): input_dir.x += 1
+	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("move_forward"): input_dir.y -= 1
+	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("move_backward"): input_dir.y += 1
+	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("move_left"): input_dir.x -= 1
+	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("move_right"): input_dir.x += 1
 	input_dir = input_dir.normalized()
 
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()

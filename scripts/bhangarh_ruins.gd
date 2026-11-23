@@ -110,9 +110,9 @@ func _ready():
 	start_awakening_cutscene()
 
 func _input(event):
-	# Mouse look rotation
-	if event is InputEventMouseMotion and is_control_active and not is_jumpscare_triggered:
-		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+	# Mouse or touch-drag look rotation
+	if (event is InputEventMouseMotion or event is InputEventScreenDrag) and is_control_active and not is_jumpscare_triggered:
+		if not OS.has_feature("mobile") and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			
 		kripal.rotate_y(-event.relative.x * MOUSE_SENSITIVITY)
