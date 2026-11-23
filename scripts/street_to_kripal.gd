@@ -59,6 +59,51 @@ extends Node3D
 @onready var sahil_cycle: Node3D = $Companions/SahilCompanion/CycleModel
 @onready var aashu_cycle: Node3D = $Companions/AashutoshCompanion/CycleModel
 
+# Procedural Bicycle Limbs & Wheels (Player)
+@onready var p_arms_node: Node3D = $Player/VisualModel/ArmsNode
+@onready var p_legs_node: Node3D = $Player/VisualModel/LegsNode
+@onready var p_leg_l_thigh: Node3D = $Player/VisualModel/LegsNode/LegL_Thigh
+@onready var p_leg_l_shin: Node3D = $Player/VisualModel/LegsNode/LegL_Shin
+@onready var p_boot_l_base: Node3D = $Player/VisualModel/LegsNode/BootL_Base
+@onready var p_boot_l_sole: Node3D = $Player/VisualModel/LegsNode/BootL_Sole
+@onready var p_leg_r_thigh: Node3D = $Player/VisualModel/LegsNode/LegR_Thigh
+@onready var p_leg_r_shin: Node3D = $Player/VisualModel/LegsNode/LegR_Shin
+@onready var p_boot_r_base: Node3D = $Player/VisualModel/LegsNode/BootR_Base
+@onready var p_boot_r_sole: Node3D = $Player/VisualModel/LegsNode/BootR_Sole
+@onready var p_front_wheel: Node3D = $Player/CycleModel/FrontWheel
+@onready var p_rear_wheel: Node3D = $Player/CycleModel/RearWheel
+
+# Procedural Bicycle Limbs & Wheels (Sahil)
+@onready var s_arms_node: Node3D = $Companions/SahilCompanion/VisualModel/ArmsNode
+@onready var s_legs_node: Node3D = $Companions/SahilCompanion/VisualModel/LegsNode
+@onready var s_leg_l_thigh: Node3D = $Companions/SahilCompanion/VisualModel/LegsNode/LegL_Thigh
+@onready var s_leg_l_shin: Node3D = $Companions/SahilCompanion/VisualModel/LegsNode/LegL_Shin
+@onready var s_boot_l_base: Node3D = $Companions/SahilCompanion/VisualModel/LegsNode/BootL_Base
+@onready var s_boot_l_sole: Node3D = $Companions/SahilCompanion/VisualModel/LegsNode/BootL_Sole
+@onready var s_leg_r_thigh: Node3D = $Companions/SahilCompanion/VisualModel/LegsNode/LegR_Thigh
+@onready var s_leg_r_shin: Node3D = $Companions/SahilCompanion/VisualModel/LegsNode/LegR_Shin
+@onready var s_boot_r_base: Node3D = $Companions/SahilCompanion/VisualModel/LegsNode/BootR_Base
+@onready var s_boot_r_sole: Node3D = $Companions/SahilCompanion/VisualModel/LegsNode/BootR_Sole
+@onready var s_front_wheel: Node3D = $Companions/SahilCompanion/CycleModel/FrontWheel
+@onready var s_rear_wheel: Node3D = $Companions/SahilCompanion/CycleModel/RearWheel
+
+# Procedural Bicycle Limbs & Wheels (Aashutosh)
+@onready var a_arms_node: Node3D = $Companions/AashutoshCompanion/VisualModel/ArmsNode
+@onready var a_legs_node: Node3D = $Companions/AashutoshCompanion/VisualModel/LegsNode
+@onready var a_leg_l_thigh: Node3D = $Companions/AashutoshCompanion/VisualModel/LegsNode/LegL_Thigh
+@onready var a_leg_l_shin: Node3D = $Companions/AashutoshCompanion/VisualModel/LegsNode/LegL_Shin
+@onready var a_boot_l_base: Node3D = $Companions/AashutoshCompanion/VisualModel/LegsNode/BootL_Base
+@onready var a_boot_l_sole: Node3D = $Companions/AashutoshCompanion/VisualModel/LegsNode/BootL_Sole
+@onready var a_leg_r_thigh: Node3D = $Companions/AashutoshCompanion/VisualModel/LegsNode/LegR_Thigh
+@onready var a_leg_r_shin: Node3D = $Companions/AashutoshCompanion/VisualModel/LegsNode/LegR_Shin
+@onready var a_boot_r_base: Node3D = $Companions/AashutoshCompanion/VisualModel/LegsNode/BootR_Base
+@onready var a_boot_r_sole: Node3D = $Companions/AashutoshCompanion/VisualModel/LegsNode/BootR_Sole
+@onready var a_front_wheel: Node3D = $Companions/AashutoshCompanion/CycleModel/FrontWheel
+@onready var a_rear_wheel: Node3D = $Companions/AashutoshCompanion/CycleModel/RearWheel
+
+var pedal_phase: float = 0.0
+var default_limb_transforms: Dictionary = {}
+
 # --- UI Nodes ---
 @onready var lightning_flash_ui: ColorRect = $StreetUI/LightningFlashUI
 @onready var view_toggle_btn: Button = $StreetUI/HUDContainer/HBox/ViewToggleBtn
@@ -260,7 +305,94 @@ func _ready() -> void:
 	if parked_bicycles: parked_bicycles.visible = false
 	if gps_arrows: gps_arrows.visible = false
 	
+	CheckpointManager.set_control_mode("adventure")
+	_save_default_limb_transforms()
+	
 	start_school_exit_intro()
+
+func _save_default_limb_transforms() -> void:
+	var nodes_to_save = [
+		p_arms_node, p_legs_node, p_leg_l_thigh, p_leg_l_shin, p_boot_l_base, p_boot_l_sole,
+		p_leg_r_thigh, p_leg_r_shin, p_boot_r_base, p_boot_r_sole,
+		s_arms_node, s_legs_node, s_leg_l_thigh, s_leg_l_shin, s_boot_l_base, s_boot_l_sole,
+		s_leg_r_thigh, s_leg_r_shin, s_boot_r_base, s_boot_r_sole,
+		a_arms_node, a_legs_node, a_leg_l_thigh, a_leg_l_shin, a_boot_l_base, a_boot_l_sole,
+		a_leg_r_thigh, a_leg_r_shin, a_boot_r_base, a_boot_r_sole
+	]
+	for node in nodes_to_save:
+		if node and is_instance_valid(node):
+			default_limb_transforms[node] = {
+				"pos": node.position,
+				"rot": node.rotation
+			}
+
+func _restore_default_limb_transforms() -> void:
+	for node in default_limb_transforms:
+		if is_instance_valid(node):
+			node.position = default_limb_transforms[node]["pos"]
+			node.rotation = default_limb_transforms[node]["rot"]
+
+func _animate_rider_limbs(
+	arms_node: Node3D,
+	leg_l_thigh: Node3D, leg_l_shin: Node3D, boot_l_base: Node3D, boot_l_sole: Node3D,
+	leg_r_thigh: Node3D, leg_r_shin: Node3D, boot_r_base: Node3D, boot_r_sole: Node3D,
+	front_wheel: Node3D, rear_wheel: Node3D,
+	phase: float, forward_speed: float, delta: float, steering: float
+) -> void:
+	# 1. Hands gripping handlebar forward realistically
+	if arms_node:
+		arms_node.rotation.x = deg_to_rad(-42.0)
+		arms_node.rotation.z = -steering * 0.08
+		arms_node.position.z = 0.06
+		arms_node.position.y = -0.02
+		
+	# 2. Left Leg (phase)
+	var left_pedal_y = cos(phase)
+	var left_pedal_z = sin(phase)
+	if leg_l_thigh:
+		leg_l_thigh.rotation.x = -0.52 + left_pedal_z * 0.38
+		leg_l_thigh.position.y = 0.52 + left_pedal_y * 0.04
+		leg_l_thigh.position.z = left_pedal_z * 0.04
+	if leg_l_shin:
+		leg_l_shin.rotation.x = 0.42 + left_pedal_y * 0.28
+		leg_l_shin.position.y = 0.22 + left_pedal_y * 0.08
+		leg_l_shin.position.z = 0.06 + left_pedal_z * 0.10
+	if boot_l_base:
+		boot_l_base.position.y = 0.08 + left_pedal_y * 0.11
+		boot_l_base.position.z = 0.04 + left_pedal_z * 0.13
+		boot_l_base.rotation.x = -left_pedal_z * 0.15
+	if boot_l_sole:
+		boot_l_sole.position.y = 0.025 + left_pedal_y * 0.11
+		boot_l_sole.position.z = 0.04 + left_pedal_z * 0.13
+		boot_l_sole.rotation.x = -left_pedal_z * 0.15
+
+	# 3. Right Leg (phase + PI)
+	var right_phase = phase + PI
+	var right_pedal_y = cos(right_phase)
+	var right_pedal_z = sin(right_phase)
+	if leg_r_thigh:
+		leg_r_thigh.rotation.x = -0.52 + right_pedal_z * 0.38
+		leg_r_thigh.position.y = 0.52 + right_pedal_y * 0.04
+		leg_r_thigh.position.z = right_pedal_z * 0.04
+	if leg_r_shin:
+		leg_r_shin.rotation.x = 0.42 + right_pedal_y * 0.28
+		leg_r_shin.position.y = 0.22 + right_pedal_y * 0.08
+		leg_r_shin.position.z = 0.06 + right_pedal_z * 0.10
+	if boot_r_base:
+		boot_r_base.position.y = 0.08 + right_pedal_y * 0.11
+		boot_r_base.position.z = 0.04 + right_pedal_z * 0.13
+		boot_r_base.rotation.x = -right_pedal_z * 0.15
+	if boot_r_sole:
+		boot_r_sole.position.y = 0.025 + right_pedal_y * 0.11
+		boot_r_sole.position.z = 0.04 + right_pedal_z * 0.13
+		boot_r_sole.rotation.x = -right_pedal_z * 0.15
+
+	# 4. Wheel spinning with road movement
+	var roll_speed = (forward_speed / 0.36) * delta
+	if front_wheel and roll_speed != 0.0:
+		front_wheel.rotate_y(roll_speed)
+	if rear_wheel and roll_speed != 0.0:
+		rear_wheel.rotate_y(roll_speed)
 
 func start_school_exit_intro() -> void:
 	cutscene_active = true
@@ -331,7 +463,8 @@ func _input(event: InputEvent) -> void:
 		elif dialogue_in_progress and can_advance_dialogue:
 			advance_dialogue()
 		elif not cutscene_active and not dialogue_in_progress:
-			handle_interaction()
+			if current_mode != PlayerMode.DRIVING_CAR:
+				handle_interaction()
 
 func handle_interaction() -> void:
 	if cutscene_active:
@@ -360,7 +493,9 @@ func handle_interaction() -> void:
 		elif is_near_car and door_opened:
 			enter_car()
 	elif current_mode == PlayerMode.DRIVING_CAR:
-		exit_car()
+		var dist_to_police = kripal_car.global_position.distance_to(Vector3(11.5, 0, -235.0))
+		if dist_to_police < 25.0 or kripal_car.global_position.z <= -215.0:
+			exit_car()
 	elif current_mode == PlayerMode.FOOT_POLICE:
 		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		if is_near_police_door or dist_to_police < 10.0:
@@ -370,6 +505,7 @@ func dismount_bicycle() -> void:
 	current_mode = PlayerMode.FOOT_KRIPAL
 	is_cycling = false
 	can_dismount = false
+	_restore_default_limb_transforms()
 	if action_prompt: action_prompt.visible = false
 
 	# Hide riding cycle meshes on player and companions
@@ -570,6 +706,44 @@ func _handle_cycling_movement(delta: float) -> void:
 		if cycle_audio and cycle_audio.playing: cycle_audio.stop()
 		
 	player.move_and_slide()
+	
+	# Procedural Realistic Rider & Limb Animations (Hands gripping handlebar, legs pedaling rhythmically, wheels spinning)
+	var forward_speed = player.velocity.length()
+	if forward_speed > 0.15:
+		pedal_phase += delta * forward_speed * 1.8
+		
+	# Animate Player (Arms holding grips, legs pedaling)
+	_animate_rider_limbs(
+		p_arms_node,
+		p_leg_l_thigh, p_leg_l_shin, p_boot_l_base, p_boot_l_sole,
+		p_leg_r_thigh, p_leg_r_shin, p_boot_r_base, p_boot_r_sole,
+		p_front_wheel, p_rear_wheel,
+		pedal_phase, forward_speed, delta, input_dir.x
+	)
+	
+	# Natural rider body tilt into turns
+	if visual_model:
+		visual_model.rotation.z = cycle_tilt * 0.8
+		visual_model.rotation.y = -input_dir.x * 0.08
+	
+	# Animate Sahil companion limbs & wheels
+	_animate_rider_limbs(
+		s_arms_node,
+		s_leg_l_thigh, s_leg_l_shin, s_boot_l_base, s_boot_l_sole,
+		s_leg_r_thigh, s_leg_r_shin, s_boot_r_base, s_boot_r_sole,
+		s_front_wheel, s_rear_wheel,
+		pedal_phase + 0.45, forward_speed, delta, 0.0
+	)
+	
+	# Animate Aashutosh companion limbs & wheels
+	_animate_rider_limbs(
+		a_arms_node,
+		a_leg_l_thigh, a_leg_l_shin, a_boot_l_base, a_boot_l_sole,
+		a_leg_r_thigh, a_leg_r_shin, a_boot_r_base, a_boot_r_sole,
+		a_front_wheel, a_rear_wheel,
+		pedal_phase + 0.90, forward_speed, delta, 0.0
+	)
+	
 	_update_companions(delta, direction)
 
 func _handle_foot_movement(delta: float) -> void:
@@ -620,35 +794,33 @@ func _handle_car_driving(delta: float) -> void:
 		
 	# Accelerate forward or reverse/brake
 	if forward_input > 0:
-		car_speed = move_toward(car_speed, CAR_MAX_SPEED, CAR_ACCEL * delta)
+		if car_speed < -0.1:
+			car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 2.5 * delta)
+		else:
+			car_speed = move_toward(car_speed, CAR_MAX_SPEED, CAR_ACCEL * delta)
 	elif forward_input < 0:
-		car_speed = move_toward(car_speed, -CAR_MAX_SPEED * 0.55, CAR_ACCEL * 1.5 * delta)
+		if car_speed > 0.5:
+			car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 2.8 * delta)
+		else:
+			car_speed = move_toward(car_speed, -CAR_MAX_SPEED * 0.45, CAR_ACCEL * 1.2 * delta)
 	else:
-		car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 0.9 * delta)
+		car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 0.8 * delta)
 		
 	# Steer car: allow steering whenever A or D is pressed (both stationary & moving)
 	if steer_input != 0.0:
-		var dir_factor: float = -1.0 if (car_speed < -0.1 or (car_speed <= 0.1 and forward_input < 0)) else 1.0
-		var turn_rate: float = CAR_STEER_SPEED if abs(car_speed) > 0.5 else (CAR_STEER_SPEED * 0.85)
+		var dir_factor: float = -1.0 if car_speed < -0.1 else 1.0
+		var turn_rate: float = CAR_STEER_SPEED
+		if abs(car_speed) < 0.5 and forward_input == 0:
+			turn_rate *= 0.65
 		kripal_car.rotate_y(steer_input * turn_rate * delta * dir_factor)
 		
 	# Lock pitch and roll so car never tilts up or rolls over
 	kripal_car.rotation.x = 0.0
 	kripal_car.rotation.z = 0.0
 	
-	# Basis vectors
+	# Forward velocity along car facing direction
 	var car_fwd: Vector3 = kripal_car.transform.basis.z.normalized()
-	var car_left: Vector3 = kripal_car.transform.basis.x.normalized()
-	
-	# Main forward/reverse velocity
 	var target_velocity: Vector3 = car_fwd * car_speed
-	
-	# Lateral steering assist: responsive arcade drift/slide when turning
-	if abs(car_speed) > 0.2 and steer_input != 0.0:
-		var dir_mult: float = 1.0 if car_speed >= 0 else -1.0
-		target_velocity += car_left * (steer_input * 2.2 * dir_mult)
-		
-	# Strictly lock vertical velocity to 0.0 on flat street
 	target_velocity.y = 0.0
 	kripal_car.velocity = target_velocity
 	kripal_car.move_and_slide()
@@ -674,19 +846,20 @@ func _handle_car_driving(delta: float) -> void:
 		elif kripal_car.global_position.z > -228.0:
 			objective_banner.text = "🧭 GPS ROUTE: ➡️ SLOW DOWN & TURN RIGHT INTO POLICE COMPOUND [DISTANCE: %d M]" % dist_to_police
 		else:
-			objective_banner.text = "🎯 ARRIVED AT POLICE STATION! PRESS [BACKSPACE] OR [E] TO EXIT CAR"
+			objective_banner.text = "🎯 ARRIVED AT POLICE STATION! PRESS [EXIT CAR] OR [E] TO EXIT"
 		
 	# Action prompt update
 	if action_prompt:
 		action_prompt.visible = true
 		if kripal_car.global_position.z <= -215.0:
-			action_prompt.text = "🚗 [BACKSPACE] या [E] दबाकर कार से उतरें (PRESS [BACKSPACE] OR [E] TO EXIT CAR)"
+			action_prompt.text = "🚗 [EXIT CAR] या [E] दबाकर कार से उतरें (PRESS [EXIT CAR] OR [E] TO EXIT)"
 		else:
-			action_prompt.text = "🚗 [W] FORWARD | [S] REVERSE | [A] LEFT | [D] RIGHT | [BACKSPACE] EXIT"
+			action_prompt.text = "🚗 [GAS] ACCEL | [BRAKE] REV | [STEER L/R] TURN | [EXIT CAR] LEAVE"
 
 func enter_car() -> void:
 	current_mode = PlayerMode.DRIVING_CAR
-	if action_prompt: action_prompt.text = "🚗 [W] FORWARD | [S] REVERSE | [A/D] STEER | [BACKSPACE] EXIT CAR"
+	CheckpointManager.set_control_mode("vehicle")
+	if action_prompt: action_prompt.text = "🚗 [GAS] ACCEL | [BRAKE] REV | [STEER L/R] TURN | [EXIT CAR] LEAVE"
 	
 	# Disable player and companion collisions to eliminate physics repulsion
 	if player_collision:
@@ -738,6 +911,7 @@ func enter_car() -> void:
 
 func exit_car() -> void:
 	current_mode = PlayerMode.FOOT_POLICE
+	CheckpointManager.set_control_mode("adventure")
 	car_speed = 0.0
 	if car_engine_audio: car_engine_audio.stop()
 	
@@ -778,9 +952,6 @@ func exit_car() -> void:
 		
 	objective_banner.text = "✦ पानसेमल पुलिस थाने की सीढ़ियां चढ़ें और अंदर प्रवेश करें [E]"
 	show_subtitle("🚓 [गाड़ी से बाहर निकले]... सामने पानसेमल पुलिस थाना है, अंदर चलें!", 3.5)
-	if action_prompt:
-		action_prompt.visible = true
-		action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
 	if action_prompt:
 		action_prompt.visible = true
 		action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"

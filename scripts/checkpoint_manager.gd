@@ -13,6 +13,7 @@ extends CanvasLayer
 var is_menu_open: bool = false
 var prev_mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 var force_show_controls: bool = false
+var control_mode: String = "adventure" # "adventure" or "vehicle"
 
 var hud_container: HBoxContainer
 var toggle_btn: Button
@@ -21,6 +22,11 @@ var controls_toggle_btn: Button
 var modal_overlay: ColorRect
 var modal_panel: PanelContainer
 var cards_vbox: VBoxContainer
+
+var mobile_controls_root: Control
+var dpad_node: Control
+var actions_node: Control
+var vehicle_controls_node: Control
 
 const CHAPTERS = [
 	{
@@ -103,6 +109,10 @@ func _process(_delta: float) -> void:
 	else:
 		_ensure_controls_visibility()
 
+func set_control_mode(mode: String) -> void:
+	control_mode = mode
+	_ensure_controls_visibility()
+
 func _ensure_controls_visibility() -> void:
 	if not mobile_controls_root:
 		return
@@ -113,12 +123,19 @@ func _ensure_controls_visibility() -> void:
 	var cur = get_tree().current_scene
 	var cur_path = cur.scene_file_path if cur else ""
 	
-	# Hide D-Pad during phone call conference or pure cutscenes
+	# Hide controls during phone call conference or pure cutscenes
 	if cur_path == "res://scenes/phone_call_convo.tscn" or cur_path == "res://scenes/cycle_ride.tscn":
 		mobile_controls_root.visible = false
 	else:
 		var is_mobile = OS.has_feature("mobile") or OS.has_feature("android") or DisplayServer.is_touchscreen_available()
 		mobile_controls_root.visible = is_mobile or force_show_controls
+		
+	if dpad_node:
+		dpad_node.visible = (control_mode == "adventure")
+	if actions_node:
+		actions_node.visible = (control_mode == "adventure")
+	if vehicle_controls_node:
+		vehicle_controls_node.visible = (control_mode == "vehicle")
 
 func _input(event: InputEvent) -> void:
 	if is_menu_open:
@@ -541,8 +558,6 @@ func jump_to_next_scene() -> void:
 	print("Quick skipping to next scene: ", target)
 	jump_to_scene(target)
 
-var mobile_controls_root: Control
-
 func build_mobile_controls() -> void:
 	mobile_controls_root = Control.new()
 	mobile_controls_root.name = "MobileControls"
@@ -634,6 +649,7 @@ func build_mobile_controls() -> void:
 	dpad.offset_bottom = -28
 	dpad.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mobile_controls_root.add_child(dpad)
+	dpad_node = dpad
 
 	var bg_col = Color(0.10, 0.14, 0.22, 0.75)
 	var border_col = Color(0.35, 0.75, 1.0, 0.85)
@@ -728,6 +744,7 @@ func build_mobile_controls() -> void:
 	actions.offset_bottom = -20
 	actions.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mobile_controls_root.add_child(actions)
+	actions_node = actions
 
 	# [E] Interact Action Button (Medium 110x92)
 	var btn_action = make_touch_btn.call(
@@ -737,14 +754,12 @@ func build_mobile_controls() -> void:
 			Input.action_press("interact")
 			send_key.call(KEY_E, true)
 			send_key.call(KEY_SPACE, true)
-			send_key.call(KEY_ENTER, true)
-			send_key.call(KEY_BACKSPACE, true),
+			send_key.call(KEY_ENTER, true),
 		func():
 			Input.action_release("interact")
 			send_key.call(KEY_E, false)
 			send_key.call(KEY_SPACE, false)
 			send_key.call(KEY_ENTER, false)
-			send_key.call(KEY_BACKSPACE, false)
 	)
 	actions.add_child(btn_action)
 
@@ -784,3 +799,146 @@ func build_mobile_controls() -> void:
 			send_key.call(KEY_V, false)
 	)
 	actions.add_child(btn_cam)
+
+	# ==============================================================
+	# --- Vehicle Controls (for Car Driving: Left Steer, Right Gas/Brake/Exit) ---
+	# ==============================================================
+	vehicle_controls_node = Control.new()
+	vehicle_controls_node.name = "VehicleControls"
+	vehicle_controls_node.anchors_preset = Control.PRESET_FULL_RECT
+	vehicle_controls_node.anchor_right = 1.0
+	vehicle_controls_node.anchor_bottom = 1.0
+	vehicle_controls_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vehicle_controls_node.visible = (control_mode == "vehicle")
+	mobile_controls_root.add_child(vehicle_controls_node)
+
+	# Left Cluster: Steering (PRESET_BOTTOM_LEFT)
+	var veh_steer = Control.new()
+	veh_steer.name = "VehSteer"
+	veh_steer.anchors_preset = Control.PRESET_BOTTOM_LEFT
+	veh_steer.anchor_top = 1.0
+	veh_steer.anchor_bottom = 1.0
+	veh_steer.offset_left = 30
+	veh_steer.offset_top = -240
+	veh_steer.offset_right = 320
+	veh_steer.offset_bottom = -25
+	veh_steer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vehicle_controls_node.add_child(veh_steer)
+
+	var steer_bg = Color(0.12, 0.18, 0.30, 0.88)
+	var steer_border = Color(0.35, 0.75, 1.0, 0.95)
+
+	# Steer Left
+	var btn_steer_l = make_touch_btn.call(
+		"◀◀\nSTEER L", Vector2(115, 96), Vector2(0, 70), steer_bg, steer_border, 16,
+		func():
+			Input.action_press("move_left")
+			Input.action_press("ui_left")
+			send_key.call(KEY_A, true)
+			send_key.call(KEY_LEFT, true),
+		func():
+			Input.action_release("move_left")
+			Input.action_release("ui_left")
+			send_key.call(KEY_A, false)
+			send_key.call(KEY_LEFT, false)
+	)
+	veh_steer.add_child(btn_steer_l)
+
+	# Steer Right
+	var btn_steer_r = make_touch_btn.call(
+		"▶▶\nSTEER R", Vector2(115, 96), Vector2(130, 70), steer_bg, steer_border, 16,
+		func():
+			Input.action_press("move_right")
+			Input.action_press("ui_right")
+			send_key.call(KEY_D, true)
+			send_key.call(KEY_RIGHT, true),
+		func():
+			Input.action_release("move_right")
+			Input.action_release("ui_right")
+			send_key.call(KEY_D, false)
+			send_key.call(KEY_RIGHT, false)
+	)
+	veh_steer.add_child(btn_steer_r)
+
+	var steer_tip = Label.new()
+	steer_tip.text = "🏎️ CAR STEERING (मोड़ें)"
+	steer_tip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	steer_tip.position = Vector2(0, 24)
+	steer_tip.size = Vector2(245, 30)
+	steer_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	steer_tip.add_theme_font_size_override("font_size", 13)
+	steer_tip.add_theme_color_override("font_color", Color(0.6, 0.85, 1.0, 0.9))
+	veh_steer.add_child(steer_tip)
+
+	# Right Cluster: Gas, Brake, Exit Car (PRESET_BOTTOM_RIGHT)
+	var veh_drive = Control.new()
+	veh_drive.name = "VehDrive"
+	veh_drive.anchors_preset = Control.PRESET_BOTTOM_RIGHT
+	veh_drive.anchor_left = 1.0
+	veh_drive.anchor_right = 1.0
+	veh_drive.anchor_top = 1.0
+	veh_drive.anchor_bottom = 1.0
+	veh_drive.offset_left = -380
+	veh_drive.offset_top = -250
+	veh_drive.offset_right = -20
+	veh_drive.offset_bottom = -20
+	veh_drive.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vehicle_controls_node.add_child(veh_drive)
+
+	# Gas / Accel (Forward)
+	var btn_gas = make_touch_btn.call(
+		"🏎️ GAS\n[ACCEL]", Vector2(130, 96), Vector2(210, 110),
+		Color(0.12, 0.45, 0.22, 0.90), Color(0.35, 1.0, 0.6, 0.95), 16,
+		func():
+			Input.action_press("move_forward")
+			Input.action_press("ui_up")
+			send_key.call(KEY_W, true)
+			send_key.call(KEY_UP, true),
+		func():
+			Input.action_release("move_forward")
+			Input.action_release("ui_up")
+			send_key.call(KEY_W, false)
+			send_key.call(KEY_UP, false)
+	)
+	veh_drive.add_child(btn_gas)
+
+	# Brake / Reverse
+	var btn_brake = make_touch_btn.call(
+		"🛑 BRAKE\n[REV]", Vector2(115, 84), Vector2(75, 122),
+		Color(0.50, 0.16, 0.16, 0.90), Color(1.0, 0.45, 0.45, 0.95), 14,
+		func():
+			Input.action_press("move_backward")
+			Input.action_press("ui_down")
+			send_key.call(KEY_S, true)
+			send_key.call(KEY_DOWN, true),
+		func():
+			Input.action_release("move_backward")
+			Input.action_release("ui_down")
+			send_key.call(KEY_S, false)
+			send_key.call(KEY_DOWN, false)
+	)
+	veh_drive.add_child(btn_brake)
+
+	# Exit Car button
+	var btn_exit_car = make_touch_btn.call(
+		"🚪 EXIT CAR\n[उतरें]", Vector2(130, 56), Vector2(210, 36),
+		Color(0.28, 0.24, 0.10, 0.92), Color(1.0, 0.85, 0.3, 0.95), 13,
+		func():
+			send_key.call(KEY_BACKSPACE, true)
+			send_key.call(KEY_E, true),
+		func():
+			send_key.call(KEY_BACKSPACE, false)
+			send_key.call(KEY_E, false)
+	)
+	veh_drive.add_child(btn_exit_car)
+
+	# Camera View Toggle in Car
+	var btn_veh_view = make_touch_btn.call(
+		"👁️ [V]\nCAM", Vector2(95, 56), Vector2(95, 50),
+		Color(0.24, 0.16, 0.42, 0.88), Color(0.7, 0.5, 1.0, 0.95), 13,
+		func():
+			send_key.call(KEY_V, true),
+		func():
+			send_key.call(KEY_V, false)
+	)
+	veh_drive.add_child(btn_veh_view)
