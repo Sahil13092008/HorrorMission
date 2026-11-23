@@ -75,6 +75,11 @@ func _ready() -> void:
 	layer = 125 # Topmost UI layer
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
+	# Force landscape orientation and fullscreen on mobile devices
+	if OS.has_feature("mobile") or OS.has_feature("android") or DisplayServer.is_touchscreen_available():
+		DisplayServer.screen_set_orientation(DisplayServer.SCREEN_LANDSCAPE)
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	
 	# Register standard gameplay actions
 	for action in ["move_forward", "move_backward", "move_left", "move_right", "interact", "flashlight", "sprint"]:
 		if not InputMap.has_action(action):
@@ -121,18 +126,18 @@ func build_hud() -> void:
 	hud_container.anchors_preset = Control.PRESET_TOP_RIGHT
 	hud_container.anchor_left = 1.0
 	hud_container.anchor_right = 1.0
-	hud_container.offset_left = -340
+	hud_container.offset_left = -380
 	hud_container.offset_top = 10
 	hud_container.offset_right = -10
-	hud_container.offset_bottom = 46
-	hud_container.add_theme_constant_override("separation", 8)
+	hud_container.offset_bottom = 54
+	hud_container.add_theme_constant_override("separation", 10)
 	hud_root.add_child(hud_container)
 	
 	# 1. Quick Next Scene button
 	quick_next_btn = Button.new()
 	quick_next_btn.text = "⏩ NEXT SCENE"
 	quick_next_btn.tooltip_text = "सीधे अगले सीन पर स्किप करें (Fast Skip to Next Chapter)"
-	quick_next_btn.custom_minimum_size = Vector2(115, 36)
+	quick_next_btn.custom_minimum_size = Vector2(130, 42)
 	quick_next_btn.focus_mode = Control.FOCUS_NONE
 	quick_next_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	
@@ -143,10 +148,10 @@ func build_hud() -> void:
 	q_style.border_width_right = 2
 	q_style.border_width_bottom = 2
 	q_style.border_color = Color(0.3, 0.9, 0.5, 0.9)
-	q_style.corner_radius_top_left = 8
-	q_style.corner_radius_top_right = 8
-	q_style.corner_radius_bottom_right = 8
-	q_style.corner_radius_bottom_left = 8
+	q_style.corner_radius_top_left = 10
+	q_style.corner_radius_top_right = 10
+	q_style.corner_radius_bottom_right = 10
+	q_style.corner_radius_bottom_left = 10
 	quick_next_btn.add_theme_stylebox_override("normal", q_style)
 	
 	var q_hover = q_style.duplicate()
@@ -154,7 +159,7 @@ func build_hud() -> void:
 	q_hover.border_color = Color(0.5, 1.0, 0.7, 1.0)
 	quick_next_btn.add_theme_stylebox_override("hover", q_hover)
 	quick_next_btn.add_theme_color_override("font_color", Color(0.85, 1.0, 0.9))
-	quick_next_btn.add_theme_font_size_override("font_size", 12)
+	quick_next_btn.add_theme_font_size_override("font_size", 13)
 	quick_next_btn.pressed.connect(jump_to_next_scene)
 	hud_container.add_child(quick_next_btn)
 	
@@ -162,7 +167,7 @@ func build_hud() -> void:
 	toggle_btn = Button.new()
 	toggle_btn.text = "⚡ CHECKPOINTS [TAB]"
 	toggle_btn.tooltip_text = "सारे चैप्टर्स की लिस्ट खोलें (Open All Story Checkpoints)"
-	toggle_btn.custom_minimum_size = Vector2(190, 36)
+	toggle_btn.custom_minimum_size = Vector2(210, 42)
 	toggle_btn.focus_mode = Control.FOCUS_NONE
 	toggle_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	
@@ -173,10 +178,10 @@ func build_hud() -> void:
 	t_style.border_width_right = 2
 	t_style.border_width_bottom = 2
 	t_style.border_color = Color(1.0, 0.82, 0.3, 0.9)
-	t_style.corner_radius_top_left = 8
-	t_style.corner_radius_top_right = 8
-	t_style.corner_radius_bottom_right = 8
-	t_style.corner_radius_bottom_left = 8
+	t_style.corner_radius_top_left = 10
+	t_style.corner_radius_top_right = 10
+	t_style.corner_radius_bottom_right = 10
+	t_style.corner_radius_bottom_left = 10
 	toggle_btn.add_theme_stylebox_override("normal", t_style)
 	
 	var t_hover = t_style.duplicate()
@@ -497,69 +502,85 @@ func build_mobile_controls() -> void:
 	if not is_mobile:
 		return
 
-	# Helper to create styled touch button
-	var make_btn = func(text: String, size: Vector2, pos: Vector2, color_bg: Color, color_border: Color) -> Button:
+	# Helper to create styled touch button with medium comfortable size
+	var make_btn = func(text: String, size: Vector2, pos: Vector2, color_bg: Color, color_border: Color, font_size: int = 18) -> Button:
 		var btn = Button.new()
 		btn.text = text
 		btn.custom_minimum_size = size
 		btn.size = size
 		btn.position = pos
 		btn.focus_mode = Control.FOCUS_NONE
+		btn.mouse_filter = Control.MOUSE_FILTER_STOP
 		var style = StyleBoxFlat.new()
 		style.bg_color = color_bg
-		style.border_width_left = 2
-		style.border_width_top = 2
-		style.border_width_right = 2
-		style.border_width_bottom = 2
+		style.border_width_left = 3
+		style.border_width_top = 3
+		style.border_width_right = 3
+		style.border_width_bottom = 3
 		style.border_color = color_border
-		style.corner_radius_top_left = 12
-		style.corner_radius_top_right = 12
-		style.corner_radius_bottom_right = 12
-		style.corner_radius_bottom_left = 12
+		style.corner_radius_top_left = 16
+		style.corner_radius_top_right = 16
+		style.corner_radius_bottom_right = 16
+		style.corner_radius_bottom_left = 16
+		style.shadow_size = 6
+		style.shadow_color = Color(0, 0, 0, 0.6)
 		btn.add_theme_stylebox_override("normal", style)
 		var pressed_style = style.duplicate()
-		pressed_style.bg_color = Color(color_bg.r * 1.5, color_bg.g * 1.5, color_bg.b * 1.5, 0.85)
+		pressed_style.bg_color = Color(color_bg.r * 1.8 + 0.1, color_bg.g * 1.8 + 0.1, color_bg.b * 1.8 + 0.1, 0.92)
+		pressed_style.border_color = Color(1, 1, 1, 0.95)
 		btn.add_theme_stylebox_override("pressed", pressed_style)
-		btn.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
-		btn.add_theme_font_size_override("font_size", 16)
+		btn.add_theme_color_override("font_color", Color(1, 1, 1, 0.98))
+		btn.add_theme_font_size_override("font_size", font_size)
 		return btn
 
-	# --- Bottom-Left: Movement D-Pad ---
+	# --- Bottom-Left: Movement D-Pad (Medium 76x76 Buttons) ---
 	var dpad = Control.new()
 	dpad.name = "DPad"
 	dpad.anchors_preset = Control.PRESET_BOTTOM_LEFT
 	dpad.anchor_top = 1.0
 	dpad.anchor_bottom = 1.0
-	dpad.offset_left = 24
-	dpad.offset_top = -215
-	dpad.offset_right = 215
-	dpad.offset_bottom = -24
+	dpad.offset_left = 28
+	dpad.offset_top = -285
+	dpad.offset_right = 285
+	dpad.offset_bottom = -28
 	mobile_controls_root.add_child(dpad)
 
-	var bg_col = Color(0.12, 0.16, 0.24, 0.65)
-	var border_col = Color(0.4, 0.7, 1.0, 0.75)
+	var bg_col = Color(0.10, 0.14, 0.22, 0.72)
+	var border_col = Color(0.35, 0.75, 1.0, 0.85)
 
-	var btn_up = make_btn.call("▲", Vector2(58, 58), Vector2(66, 0), bg_col, border_col)
+	# Medium-sized 76x76 directional buttons with clear spacing
+	var btn_up = make_btn.call("▲\nFWD", Vector2(76, 76), Vector2(85, 0), bg_col, border_col, 16)
 	btn_up.button_down.connect(func(): Input.action_press("move_forward"))
 	btn_up.button_up.connect(func(): Input.action_release("move_forward"))
 	dpad.add_child(btn_up)
 
-	var btn_down = make_btn.call("▼", Vector2(58, 58), Vector2(66, 132), bg_col, border_col)
+	var btn_down = make_btn.call("▼\nBACK", Vector2(76, 76), Vector2(85, 170), bg_col, border_col, 16)
 	btn_down.button_down.connect(func(): Input.action_press("move_backward"))
 	btn_down.button_up.connect(func(): Input.action_release("move_backward"))
 	dpad.add_child(btn_down)
 
-	var btn_left = make_btn.call("◀", Vector2(58, 58), Vector2(0, 66), bg_col, border_col)
+	var btn_left = make_btn.call("◀\nLEFT", Vector2(76, 76), Vector2(0, 85), bg_col, border_col, 16)
 	btn_left.button_down.connect(func(): Input.action_press("move_left"))
 	btn_left.button_up.connect(func(): Input.action_release("move_left"))
 	dpad.add_child(btn_left)
 
-	var btn_right = make_btn.call("▶", Vector2(58, 58), Vector2(132, 66), bg_col, border_col)
+	var btn_right = make_btn.call("▶\nRIGHT", Vector2(76, 76), Vector2(170, 85), bg_col, border_col, 16)
 	btn_right.button_down.connect(func(): Input.action_press("move_right"))
 	btn_right.button_up.connect(func(): Input.action_release("move_right"))
 	dpad.add_child(btn_right)
 
-	# --- Bottom-Right: Action & Flashlight Buttons ---
+	# D-Pad Center Badge
+	var center_lbl = Label.new()
+	center_lbl.text = "🕹️\nMOVE"
+	center_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	center_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	center_lbl.position = Vector2(85, 85)
+	center_lbl.size = Vector2(76, 76)
+	center_lbl.add_theme_font_size_override("font_size", 12)
+	center_lbl.add_theme_color_override("font_color", Color(0.65, 0.8, 1.0, 0.7))
+	dpad.add_child(center_lbl)
+
+	# --- Bottom-Right: Action, Flashlight & Sprint Buttons ---
 	var actions = Control.new()
 	actions.name = "Actions"
 	actions.anchors_preset = Control.PRESET_BOTTOM_RIGHT
@@ -567,14 +588,14 @@ func build_mobile_controls() -> void:
 	actions.anchor_right = 1.0
 	actions.anchor_top = 1.0
 	actions.anchor_bottom = 1.0
-	actions.offset_left = -230
-	actions.offset_top = -180
-	actions.offset_right = -20
-	actions.offset_bottom = -20
+	actions.offset_left = -330
+	actions.offset_top = -260
+	actions.offset_right = -24
+	actions.offset_bottom = -24
 	mobile_controls_root.add_child(actions)
 
-	# [E] Interact Action Button
-	var btn_action = make_btn.call("⚡ [E]\nACTION", Vector2(95, 75), Vector2(110, 75), Color(0.12, 0.45, 0.25, 0.75), Color(0.3, 1.0, 0.6, 0.9))
+	# [E] Interact Action Button (Medium 108x92)
+	var btn_action = make_btn.call("⚡ [E]\nACTION", Vector2(108, 92), Vector2(170, 120), Color(0.12, 0.45, 0.25, 0.8), Color(0.3, 1.0, 0.6, 0.95), 17)
 	btn_action.button_down.connect(func():
 		Input.action_press("interact")
 		var ev = InputEventKey.new()
@@ -591,8 +612,8 @@ func build_mobile_controls() -> void:
 	)
 	actions.add_child(btn_action)
 
-	# [F] Flashlight Button
-	var btn_light = make_btn.call("🔦 [F]\nLIGHT", Vector2(85, 65), Vector2(15, 85), Color(0.45, 0.35, 0.1, 0.7), Color(1.0, 0.85, 0.3, 0.9))
+	# [F] Flashlight Button (Medium 92x80)
+	var btn_light = make_btn.call("🔦 [F]\nLIGHT", Vector2(92, 80), Vector2(62, 132), Color(0.48, 0.36, 0.1, 0.8), Color(1.0, 0.85, 0.3, 0.95), 15)
 	btn_light.button_down.connect(func():
 		Input.action_press("flashlight")
 		var ev = InputEventKey.new()
@@ -609,8 +630,8 @@ func build_mobile_controls() -> void:
 	)
 	actions.add_child(btn_light)
 
-	# [RUN] Sprint Button
-	var btn_sprint = make_btn.call("🏃 RUN", Vector2(85, 55), Vector2(115, 10), Color(0.12, 0.25, 0.45, 0.7), Color(0.3, 0.65, 1.0, 0.85))
+	# [RUN] Sprint Button (Medium 108x68)
+	var btn_sprint = make_btn.call("🏃 SPRINT\n[RUN]", Vector2(108, 68), Vector2(170, 38), Color(0.14, 0.28, 0.52, 0.8), Color(0.4, 0.75, 1.0, 0.95), 15)
 	btn_sprint.button_down.connect(func(): Input.action_press("sprint"))
 	btn_sprint.button_up.connect(func(): Input.action_release("sprint"))
 	actions.add_child(btn_sprint)
