@@ -474,6 +474,9 @@ albedo_color = Color(0.14, 0.45, 0.24, 1)
 metallic = 0.8
 roughness = 0.3
 
+[sub_resource type="BoxShape3D" id="Box_ParkedBicycles"]
+size = Vector3(2.4, 1.2, 2.0)
+
 [node name="StreetToKripal" type="Node3D"]
 script = ExtResource("1_street")
 
@@ -546,6 +549,12 @@ volume_db = 1.0
 [node name="ParkedBicycles" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0.1, -85.0)
 visible = false
+
+[node name="BicyclesCollision" type="StaticBody3D" parent="ParkedBicycles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.6, 0.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ParkedBicycles/BicyclesCollision"]
+shape = SubResource("Box_ParkedBicycles")
 
 [node name="ParkedCyclePlayer" type="Node3D" parent="ParkedBicycles"]
 transform = Transform3D(0.966, 0, 0.259, 0, 0.996, 0.087, -0.259, -0.084, 0.962, 0.0, 0.0, 0.0)
@@ -2411,8 +2420,15 @@ shape = SubResource("Box_PoliceDoorTrigger")
 
 [node name="Pedestrians" type="Node3D" parent="EnvironmentProps"]
 
-[node name="Pedestrian1" type="Node3D" parent="EnvironmentProps/Pedestrians"]
+[node name="Pedestrian1" type="CharacterBody3D" parent="EnvironmentProps/Pedestrians"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 0.2, -22)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EnvironmentProps/Pedestrians/Pedestrian1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_Player")
+
 [node name="Body" type="CSGBox3D" parent="EnvironmentProps/Pedestrians/Pedestrian1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 size = Vector3(0.4, 0.8, 0.25)
@@ -2426,8 +2442,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 size = Vector3(0.35, 0.7, 0.22)
 material = SubResource("Mat_Jeans")
 
-[node name="Pedestrian2" type="Node3D" parent="EnvironmentProps/Pedestrians"]
+[node name="Pedestrian2" type="CharacterBody3D" parent="EnvironmentProps/Pedestrians"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 4.6, 0.2, -45)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EnvironmentProps/Pedestrians/Pedestrian2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_Player")
+
 [node name="Body" type="CSGBox3D" parent="EnvironmentProps/Pedestrians/Pedestrian2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 size = Vector3(0.4, 0.8, 0.25)
@@ -2444,7 +2467,7 @@ material = SubResource("Mat_Jeans")
 [node name="KripalCar" type="CharacterBody3D" parent="." groups=["vehicle"]]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 3.6, 0.35, -78.0)
 collision_layer = 4
-collision_mask = 1
+collision_mask = 7
 
 [node name="CarCollisionShape" type="CollisionShape3D" parent="KripalCar"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
@@ -2752,9 +2775,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0, 1.2, 0)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="KripalHouse/DoorTrigger"]
 shape = SubResource("Box_DoorTrigger")
 
-[node name="KripalMummy" type="Node3D" parent="KripalHouse"]
+[node name="KripalMummy" type="CharacterBody3D" parent="KripalHouse"]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -2.9, 0.1, 0)
 visible = false
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KripalHouse/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+shape = SubResource("Capsule_Player")
 
 [node name="SareeSkirt" type="CSGCylinder3D" parent="KripalHouse/KripalMummy"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48, 0)
@@ -2812,6 +2841,8 @@ fov = 68.0
 
 [node name="Player" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+collision_layer = 1
+collision_mask = 7
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
@@ -3503,7 +3534,7 @@ spot_angle = 35.0
 [node name="SahilCompanion" type="CharacterBody3D" parent="Companions"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.1, 0.8)
 collision_layer = 2
-collision_mask = 1
+collision_mask = 7
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Companions/SahilCompanion"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
@@ -3843,7 +3874,7 @@ spot_angle = 35.0
 [node name="AashutoshCompanion" type="CharacterBody3D" parent="Companions"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.1, 0.8)
 collision_layer = 2
-collision_mask = 1
+collision_mask = 7
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Companions/AashutoshCompanion"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)

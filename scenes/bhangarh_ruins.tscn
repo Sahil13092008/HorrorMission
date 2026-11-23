@@ -327,21 +327,25 @@ size = Vector3(3.2, 4.2, 1.2)
 
 [node name="Pillar1" type="CSGBox3D" parent="RuinsGeometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 2.5, -4)
+use_collision = true
 size = Vector3(0.9, 5.0, 0.9)
 material = SubResource("Mat_Pillar")
 
 [node name="Pillar2" type="CSGBox3D" parent="RuinsGeometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 2.5, -4)
+use_collision = true
 size = Vector3(0.9, 5.0, 0.9)
 material = SubResource("Mat_Pillar")
 
 [node name="Pillar3" type="CSGBox3D" parent="RuinsGeometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 2.5, 3)
+use_collision = true
 size = Vector3(0.9, 5.0, 0.9)
 material = SubResource("Mat_Pillar")
 
 [node name="Pillar4" type="CSGBox3D" parent="RuinsGeometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 2.5, 3)
+use_collision = true
 size = Vector3(0.9, 5.0, 0.9)
 material = SubResource("Mat_Pillar")
 

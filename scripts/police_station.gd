@@ -173,14 +173,23 @@ func _physics_process(delta: float) -> void:
 	if Input.is_key_pressed(KEY_S): input_dir.y += 1.0
 	input_dir = input_dir.normalized()
 	
+	var walk_speed: float = 2.4
 	if input_dir != Vector2.ZERO:
 		var move_dir = (player.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-		var walk_speed: float = 2.4
-		player.position.x += move_dir.x * walk_speed * delta
-		player.position.z += move_dir.z * walk_speed * delta
+		player.velocity.x = move_dir.x * walk_speed
+		player.velocity.z = move_dir.z * walk_speed
+	else:
+		player.velocity.x = move_toward(player.velocity.x, 0.0, walk_speed * 6.0 * delta)
+		player.velocity.z = move_toward(player.velocity.z, 0.0, walk_speed * 6.0 * delta)
 		
-	# Keep player strictly on floor (Y = 0.0) and inside police office room bounds
-	player.position.y = 0.0
+	if not player.is_on_floor():
+		player.velocity.y -= 9.8 * delta
+	else:
+		player.velocity.y = 0.0
+		
+	player.move_and_slide()
+		
+	# Keep player strictly on floor bounds and inside police office room bounds
 	player.position.x = clamp(player.position.x, -4.5, 4.5)
 	player.position.z = clamp(player.position.z, -1.8, 4.8)
 	

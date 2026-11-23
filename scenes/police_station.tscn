@@ -244,6 +244,17 @@ roughness = 0.65
 albedo_color = Color(0.92, 0.92, 0.90, 1)
 roughness = 0.5
 
+[sub_resource type="CapsuleShape3D" id="Capsule_PlayerPolice"]
+radius = 0.38
+height = 1.75
+
+[sub_resource type="CapsuleShape3D" id="Capsule_NPCPolice"]
+radius = 0.42
+height = 1.75
+
+[sub_resource type="BoxShape3D" id="Box_CellBars"]
+size = Vector3(1.6, 3.0, 0.2)
+
 [node name="PoliceStation" type="Node3D"]
 script = ExtResource("1_script")
 
@@ -519,11 +530,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0, 0.4)
 
 [node name="Seat" type="CSGBox3D" parent="OfficeProps/VisitorChairLeft"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+use_collision = true
 size = Vector3(0.55, 0.08, 0.5)
 material = SubResource("Mat_DeskWood")
 
 [node name="Backrest" type="CSGBox3D" parent="OfficeProps/VisitorChairLeft"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0.22)
+use_collision = true
 size = Vector3(0.55, 0.48, 0.06)
 material = SubResource("Mat_DeskWood")
 
@@ -532,11 +545,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 0, 0.4)
 
 [node name="Seat" type="CSGBox3D" parent="OfficeProps/VisitorChairRight"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+use_collision = true
 size = Vector3(0.55, 0.08, 0.5)
 material = SubResource("Mat_DeskWood")
 
 [node name="Backrest" type="CSGBox3D" parent="OfficeProps/VisitorChairRight"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0.22)
+use_collision = true
 size = Vector3(0.55, 0.48, 0.06)
 material = SubResource("Mat_DeskWood")
 
@@ -545,11 +560,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.8)
 
 [node name="Seat" type="CSGBox3D" parent="OfficeProps/InspectorChair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+use_collision = true
 size = Vector3(0.6, 0.1, 0.55)
 material = SubResource("Mat_PoliceDarkBrown")
 
 [node name="Backrest" type="CSGBox3D" parent="OfficeProps/InspectorChair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, -0.24)
+use_collision = true
 size = Vector3(0.55, 0.75, 0.1)
 material = SubResource("Mat_PoliceDarkBrown")
 
@@ -582,6 +599,12 @@ outline_size = 4
 [node name="LockupCell" type="Node3D" parent="OfficeProps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0, -2.5)
 
+[node name="CellCollision" type="StaticBody3D" parent="OfficeProps/LockupCell"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OfficeProps/LockupCell/CellCollision"]
+shape = SubResource("Box_CellBars")
+
 [node name="Bar1" type="CSGCylinder3D" parent="OfficeProps/LockupCell"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 radius = 0.025
@@ -608,8 +631,14 @@ material = SubResource("Mat_IronBars")
 
 [node name="Characters" type="Node3D" parent="."]
 
-[node name="Thanedaar" type="Node3D" parent="Characters"]
+[node name="Thanedaar" type="CharacterBody3D" parent="Characters"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.65)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Characters/Thanedaar"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_NPCPolice")
 
 [node name="Torso" type="CSGBox3D" parent="Characters/Thanedaar"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
@@ -663,8 +692,14 @@ text = "👮 थानेदार आर. के. शर्मा
 font_size = 18
 outline_size = 5
 
-[node name="Sahil" type="Node3D" parent="Characters"]
+[node name="Sahil" type="CharacterBody3D" parent="Characters"]
 transform = Transform3D(-0.966, 0, -0.259, 0, 1, 0, 0.259, 0, -0.966, -1.2, 0, 1.4)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Characters/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_NPCPolice")
 
 [node name="HeadNode" type="Node3D" parent="Characters/Sahil"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
@@ -918,8 +953,14 @@ text = "🧢 साहिल (SAHIL)"
 font_size = 16
 outline_size = 4
 
-[node name="Aashutosh" type="Node3D" parent="Characters"]
+[node name="Aashutosh" type="CharacterBody3D" parent="Characters"]
 transform = Transform3D(-0.966, 0, 0.259, 0, 1, 0, -0.259, 0, -0.966, 1.2, 0, 1.4)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Characters/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_NPCPolice")
 
 [node name="HeadNode" type="Node3D" parent="Characters/Aashutosh"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
@@ -1193,8 +1234,14 @@ text = "👓 आशुतोष (AASHUTOSH)"
 font_size = 16
 outline_size = 4
 
-[node name="KripalMummy" type="Node3D" parent="Characters"]
+[node name="KripalMummy" type="CharacterBody3D" parent="Characters"]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.4, 0, 1.7)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Characters/KripalMummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+shape = SubResource("Capsule_NPCPolice")
 
 [node name="SareeSkirt" type="CSGCylinder3D" parent="Characters/KripalMummy"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48, 0)
@@ -1229,8 +1276,14 @@ text = "👩 कृपाल की माँ (KRIPAL'S MOTHER)"
 font_size = 16
 outline_size = 4
 
-[node name="Player" type="Node3D" parent="."]
+[node name="Player" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.0, 2.2)
+collision_layer = 1
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_PlayerPolice")
 
 [node name="VisualModel" type="Node3D" parent="Player"]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
