@@ -141,8 +141,7 @@ func _ready() -> void:
 		bicycle_audio.play()
 
 func _input(event: InputEvent) -> void:
-	if (event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_SPACE, KEY_ESCAPE, KEY_ENTER, KEY_E]) or \
-	   (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("interact"):
+	if (event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_SPACE, KEY_ESCAPE, KEY_ENTER, KEY_E]):
 		_on_skip_pressed()
 
 func _physics_process(delta: float) -> void:

@@ -145,9 +145,9 @@ var gravity: float = 9.8
 
 # Car Physics
 var car_speed: float = 0.0
-const CAR_MAX_SPEED: float = 12.5
-const CAR_ACCEL: float = 7.5
-const CAR_STEER_SPEED: float = 2.8
+const CAR_MAX_SPEED: float = 15.0
+const CAR_ACCEL: float = 10.0
+const CAR_STEER_SPEED: float = 2.6
 
 # Camera & Input State
 var is_first_person: bool = false
@@ -168,6 +168,7 @@ var is_town_map_open: bool = false
 var dialogue_in_progress: bool = false
 var dialogue_index: int = 0
 var can_advance_dialogue: bool = false
+var intro_cam_tw: Tween = null
 
 # Weather & Atmosphere Timers
 var lightning_timer: float = 3.5
@@ -412,27 +413,38 @@ func start_school_exit_intro() -> void:
 		if aashu_cycle: aashu_cycle.visible = true
 	if player_cycle:
 		player_cycle.visible = true
+	if visual_model:
+		visual_model.rotation.y = PI
+		visual_model.rotation.z = 0.0
 	
 	show_subtitle("⛈️ [तूफान, बारिश और बादलों की गर्जना]... सेंट ऑगस्टीन स्कूल से बाहर निकलते हुए...", 3.2)
 	trigger_lightning(true)
 	
 	await get_tree().create_timer(1.8).timeout
+	if not cutscene_active: return
 	show_subtitle("🧢 साहिल: 'मौसम बहुत खराब हो रहा है! तेज साइकिल चलाओ, कृपाल के घर पहुँचना है!'", 2.8)
 	
 	await get_tree().create_timer(2.4).timeout
-	var cam_tw = create_tween()
-	cam_tw.tween_property(camera, "position", Vector3(0, 0.75, 3.4), 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-	cam_tw.tween_property(camera, "rotation_degrees", Vector3.ZERO, 1.4).set_trans(Tween.TRANS_QUAD)
+	if not cutscene_active: return
+	intro_cam_tw = create_tween()
+	intro_cam_tw.tween_property(camera, "position", Vector3(0, 0.75, 3.4), 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	intro_cam_tw.tween_property(camera, "rotation_degrees", Vector3.ZERO, 1.4).set_trans(Tween.TRANS_QUAD)
 	
-	await cam_tw.finished
+	await intro_cam_tw.finished
+	if not cutscene_active: return
 	cutscene_active = false
 	objective_banner.text = "✦ MISSION: RIDE BICYCLE IN THUNDERSTORM TO KRIPAL'S HOUSE [WASD / TOUCH]"
 
 func skip_school_exit_intro() -> void:
 	if not cutscene_active: return
 	cutscene_active = false
+	if intro_cam_tw and intro_cam_tw.is_valid():
+		intro_cam_tw.kill()
 	camera.position = Vector3(0, 0.75, 3.4)
 	camera.rotation_degrees = Vector3.ZERO
+	if visual_model:
+		visual_model.rotation.y = PI
+		visual_model.rotation.z = 0.0
 	if objective_banner:
 		objective_banner.text = "✦ MISSION: RIDE BICYCLE IN THUNDERSTORM TO KRIPAL'S HOUSE [WASD / TOUCH]"
 	show_subtitle("🚲 तूफ़ानी शाम में कृपाल के घर की तरफ साइकिल चलाओ!", 2.5)
@@ -488,18 +500,24 @@ func handle_interaction() -> void:
 		else:
 			ring_cycle_bell()
 	elif current_mode == PlayerMode.FOOT_KRIPAL:
+		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		if (is_near_door or dist_door_quick < 6.5) and not door_opened:
 			start_door_interaction()
-		elif is_near_car and door_opened:
+		elif (is_near_car or dist_to_car < 6.0) and door_opened:
 			enter_car()
 	elif current_mode == PlayerMode.DRIVING_CAR:
 		var dist_to_police = kripal_car.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		if dist_to_police < 25.0 or kripal_car.global_position.z <= -215.0:
 			exit_car()
 	elif current_mode == PlayerMode.FOOT_POLICE:
+		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
-		if is_near_police_door or dist_to_police < 10.0:
+		if (is_near_car or dist_to_car < 5.5) and dist_to_car < dist_to_police:
+			enter_car()
+		elif is_near_police_door or dist_to_police < 10.0:
 			_on_start_police_pressed()
+		elif is_near_car or dist_to_car < 5.5:
+			enter_car()
 
 func dismount_bicycle() -> void:
 	current_mode = PlayerMode.FOOT_KRIPAL
@@ -514,7 +532,9 @@ func dismount_bicycle() -> void:
 	if aashu_cycle: aashu_cycle.visible = false
 
 	# Reset visual models to ground standing position
-	if visual_model: visual_model.position = Vector3.ZERO
+	if visual_model:
+		visual_model.position = Vector3.ZERO
+		visual_model.rotation = Vector3(0, PI, 0)
 	if sahil and sahil.has_node("VisualModel"): sahil.get_node("VisualModel").position = Vector3.ZERO
 	if aashutosh and aashutosh.has_node("VisualModel"): aashutosh.get_node("VisualModel").position = Vector3.ZERO
 
@@ -627,7 +647,7 @@ func _physics_process(delta: float) -> void:
 		_update_walking_companions(delta)
 		
 		var dist_to_door: float = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
-		var dist_to_car: float = player.global_position.distance_to(Vector3(3.6, 0.35, -78.0))
+		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		
 		if (is_near_door or dist_to_door < 6.5) and not door_opened:
 			is_near_door = true
@@ -658,12 +678,22 @@ func _physics_process(delta: float) -> void:
 		_update_walking_companions(delta)
 		
 		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
-		if is_near_police_door or dist_to_police < 14.0:
+		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
+		
+		if (is_near_car or dist_to_car < 5.0) and dist_to_car < dist_to_police:
+			if action_prompt:
+				action_prompt.visible = true
+				action_prompt.text = "🚗 [E] / ACTION दबाकर वापस कार में बैठें (ENTER CAR)"
+		elif is_near_police_door or dist_to_police < 14.0:
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
 			if dist_to_police < 4.0:
 				_on_start_police_pressed()
+		elif is_near_car or dist_to_car < 5.0:
+			if action_prompt:
+				action_prompt.visible = true
+				action_prompt.text = "🚗 [E] / ACTION दबाकर वापस कार में बैठें (ENTER CAR)"
 		else:
 			if action_prompt:
 				action_prompt.visible = true
@@ -721,10 +751,10 @@ func _handle_cycling_movement(delta: float) -> void:
 		pedal_phase, forward_speed, delta, input_dir.x
 	)
 	
-	# Natural rider body tilt into turns
+	# Natural rider body tilt into turns (preserve forward PI orientation)
 	if visual_model:
 		visual_model.rotation.z = cycle_tilt * 0.8
-		visual_model.rotation.y = -input_dir.x * 0.08
+		visual_model.rotation.y = PI - input_dir.x * 0.08
 	
 	# Animate Sahil companion limbs & wheels
 	_animate_rider_limbs(
@@ -1230,10 +1260,10 @@ func start_door_interaction() -> void:
 
 	if kripal_mummy:
 		kripal_mummy.visible = true
-		kripal_mummy.position.x = -2.6
-		kripal_mummy.rotation = Vector3(0, deg_to_rad(90), 0)
+		kripal_mummy.position = Vector3(-1.8, 0.1, 0.0)
+		kripal_mummy.rotation = Vector3(0, deg_to_rad(-90), 0)
 		var mummy_tw = create_tween()
-		mummy_tw.tween_property(kripal_mummy, "position:x", -2.9, 1.2)
+		mummy_tw.tween_property(kripal_mummy, "position", Vector3(-3.45, 0.1, 0.0), 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 	await door_tw.finished
 	start_dialogue_sequence()

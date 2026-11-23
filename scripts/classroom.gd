@@ -195,14 +195,13 @@ func _process(delta):
 	# Check distance to door when waiting for player to open door
 	if is_waiting_for_door_open and not is_door_opening and player:
 		var dist = player.global_position.distance_to(doorway.global_position)
-		if dist < 3.8:
-			if door_prompt: door_prompt.visible = true
+		if dist < 3.2:
+			if door_prompt:
+				door_prompt.visible = true
+				door_prompt.text = "📍 दरवाजा खोलने के लिए [E] / ACTION दबाएं"
 		else:
-			if door_prompt: door_prompt.visible = false
-			
-		# Auto-open if player walks right up to the door
-		if dist < 1.8:
-			trigger_door_open()
+			if door_prompt:
+				door_prompt.visible = false
 
 	# Bhangarh Map Radar Pulsing and Bodycam Static
 	if is_in_bhangarh_map:
@@ -234,12 +233,11 @@ func _input(event):
 			dismiss_chapter_card()
 			get_viewport().set_input_as_handled()
 			
-	# 3. Open Classroom Door (Key E / Touch / Click when near door)
+	# 3. Open Classroom Door (Explicit Key E / Action Press when near door)
 	elif is_waiting_for_door_open and not is_door_opening:
-		if (event is InputEventKey and event.pressed and event.keycode in [KEY_E, KEY_SPACE, KEY_ENTER]) or \
-		   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or \
-		   (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("interact"):
-			if player and player.global_position.distance_to(doorway.global_position) < 4.5:
+		if (event is InputEventKey and event.pressed and event.keycode == KEY_E) or \
+		   event.is_action_pressed("interact"):
+			if player and player.global_position.distance_to(doorway.global_position) < 3.2:
 				trigger_door_open()
 				get_viewport().set_input_as_handled()
 				
@@ -522,7 +520,6 @@ func start_door_sequence():
 		var tw_s = create_tween()
 		tw_s.tween_property(char_sahil, "position", Vector3(6.6, 0.0, 3.8), 2.0)
 		char_sahil.look_at(doorway.global_position, Vector3.UP)
-		char_sahil.rotation.y += PI
 		char_sahil.rotation.x = 0
 		char_sahil.rotation.z = 0
 		
@@ -530,7 +527,6 @@ func start_door_sequence():
 		var tw_a = create_tween()
 		tw_a.tween_property(char_aashutosh, "position", Vector3(6.6, 0.0, 5.2), 2.2)
 		char_aashutosh.look_at(doorway.global_position, Vector3.UP)
-		char_aashutosh.rotation.y += PI
 		char_aashutosh.rotation.x = 0
 		char_aashutosh.rotation.z = 0
 

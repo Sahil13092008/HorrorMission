@@ -567,8 +567,8 @@ func execute_jumpscare():
 func on_continue_clicked():
 	if continue_btn:
 		continue_btn.disabled = true
-		continue_btn.text = "➔ PROCEEDING TO KRIPAL'S HOUSE..."
-	get_tree().change_scene_to_file("res://scenes/street_to_kripal.tscn")
+		continue_btn.text = "🎬 TO BE CONTINUED (जारी रहेगा...)"
+	get_tree().change_scene_to_file("res://scenes/classroom.tscn")
 
 func on_replay_clicked():
 	get_tree().reload_current_scene()

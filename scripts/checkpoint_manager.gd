@@ -619,15 +619,20 @@ func build_mobile_controls() -> void:
 				else:
 					if ev.index == state["touch_id"] or state["touch_id"] == -1:
 						do_release.call()
+			elif ev is InputEventScreenDrag:
+				if ev.index == state["touch_id"]:
+					var rect = Rect2(Vector2(-70, -70), btn.size + Vector2(140, 140))
+					if not rect.has_point(ev.position) and state["is_down"]:
+						do_release.call()
+					elif rect.has_point(ev.position) and not state["is_down"]:
+						do_press.call()
 			elif ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
-				if ev.pressed:
-					do_press.call()
-				else:
-					do_release.call()
+				if state["touch_id"] == -1:
+					if ev.pressed:
+						do_press.call()
+					else:
+						do_release.call()
 		)
-		btn.button_down.connect(do_press)
-		btn.button_up.connect(do_release)
-		btn.mouse_exited.connect(do_release)
 		return btn
 
 	# Helper to dispatch key event
