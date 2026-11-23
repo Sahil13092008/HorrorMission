@@ -1,0 +1,1701 @@
+[gd_scene format=3 uid="uid://phone_convo_2days_later_01"]
+
+[ext_resource type="Script" path="res://scripts/phone_call_convo.gd" id="1_script"]
+[ext_resource type="AudioStream" path="res://audio/phone_ring.wav" id="2_ring"]
+[ext_resource type="AudioStream" path="res://audio/phone_pickup.wav" id="3_pickup"]
+[ext_resource type="AudioStream" path="res://audio/rain_night_ambient.wav" id="4_rain"]
+[ext_resource type="AudioStream" path="res://audio/call_aashu_1.mp3" id="5_aashu1"]
+[ext_resource type="AudioStream" path="res://audio/call_player_1.mp3" id="6_player1"]
+[ext_resource type="AudioStream" path="res://audio/call_sahil_1.mp3" id="7_sahil1"]
+[ext_resource type="AudioStream" path="res://audio/call_player_2.mp3" id="8_player2"]
+[ext_resource type="AudioStream" path="res://audio/call_sahil_2.mp3" id="9_sahil2"]
+[ext_resource type="AudioStream" path="res://audio/call_aashu_2.mp3" id="10_aashu2"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Floor"]
+albedo_color = Color(0.32, 0.34, 0.36, 1)
+roughness = 0.45
+metallic = 0.15
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_WallUpper"]
+albedo_color = Color(0.88, 0.86, 0.78, 1)
+roughness = 0.85
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_WallLower"]
+albedo_color = Color(0.15, 0.26, 0.2, 1)
+roughness = 0.75
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_WallTrim"]
+albedo_color = Color(0.95, 0.95, 0.95, 1)
+roughness = 0.5
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_DeskWood"]
+albedo_color = Color(0.24, 0.14, 0.09, 1)
+roughness = 0.4
+metallic = 0.1
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_GlassTop"]
+transparency = 1
+albedo_color = Color(0.7, 0.85, 0.9, 0.4)
+roughness = 0.1
+metallic = 0.2
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_IronBars"]
+albedo_color = Color(0.18, 0.18, 0.2, 1)
+metallic = 0.9
+roughness = 0.3
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceKhaki"]
+albedo_color = Color(0.68, 0.58, 0.42, 1)
+roughness = 0.7
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceDarkBrown"]
+albedo_color = Color(0.22, 0.14, 0.08, 1)
+roughness = 0.4
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_PoliceGold"]
+albedo_color = Color(0.9, 0.76, 0.26, 1)
+metallic = 0.85
+roughness = 0.25
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Skin"]
+albedo_color = Color(0.85, 0.64, 0.5, 1)
+roughness = 0.7
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Hair"]
+albedo_color = Color(0.08, 0.07, 0.06, 1)
+roughness = 0.9
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_SahilRed"]
+albedo_color = Color(0.85, 0.18, 0.15, 1)
+roughness = 0.65
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_AashuBlue"]
+albedo_color = Color(0.18, 0.35, 0.85, 1)
+roughness = 0.65
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_MummySaree"]
+albedo_color = Color(0.75, 0.22, 0.42, 1)
+roughness = 0.7
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Jeans"]
+albedo_color = Color(0.18, 0.25, 0.4, 1)
+roughness = 0.75
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_PaperWhite"]
+albedo_color = Color(0.92, 0.9, 0.84, 1)
+roughness = 0.85
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_RegisterRed"]
+albedo_color = Color(0.55, 0.12, 0.12, 1)
+roughness = 0.6
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_BeaconRedGlow"]
+albedo_color = Color(1, 0.1, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.1, 0.1, 1)
+emission_energy_multiplier = 4.0
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_BeaconBlueGlow"]
+albedo_color = Color(0.1, 0.4, 1, 1)
+emission_enabled = true
+emission = Color(0.1, 0.4, 1, 1)
+emission_energy_multiplier = 4.0
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_CeilingFanBody"]
+albedo_color = Color(0.24, 0.15, 0.1, 1)
+metallic = 0.35
+roughness = 0.35
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_CeilingFanBlade"]
+albedo_color = Color(0.26, 0.16, 0.11, 1)
+metallic = 0.25
+roughness = 0.4
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_CeilingFanGold"]
+albedo_color = Color(0.88, 0.72, 0.28, 1)
+metallic = 0.85
+roughness = 0.22
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Hair_Black"]
+albedo_color = Color(0.07, 0.06, 0.06, 1)
+roughness = 0.85
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Hair_Brown"]
+albedo_color = Color(0.24, 0.15, 0.10, 1)
+roughness = 0.85
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Eye_White"]
+albedo_color = Color(0.96, 0.96, 0.98, 1)
+roughness = 0.2
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Eye_Pupil"]
+albedo_color = Color(0.12, 0.08, 0.06, 1)
+roughness = 0.1
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Eye_Shine"]
+albedo_color = Color(1, 1, 1, 1)
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 2.0
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Lips"]
+albedo_color = Color(0.68, 0.44, 0.40, 1)
+roughness = 0.7
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil_Jacket"]
+albedo_color = Color(0.14, 0.16, 0.19, 1)
+roughness = 0.65
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil_Cargo"]
+albedo_color = Color(0.22, 0.24, 0.27, 1)
+roughness = 0.75
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil_Cap"]
+albedo_color = Color(0.75, 0.18, 0.18, 1)
+roughness = 0.6
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Aashu_Hoodie"]
+albedo_color = Color(0.58, 0.13, 0.16, 1)
+roughness = 0.75
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Aashu_Jeans"]
+albedo_color = Color(0.20, 0.30, 0.46, 1)
+roughness = 0.8
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Glasses_Frame"]
+albedo_color = Color(0.06, 0.06, 0.06, 1)
+roughness = 0.2
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Glasses_Lens"]
+transparency = 1
+albedo_color = Color(0.75, 0.88, 1.0, 0.35)
+roughness = 0.1
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Player_Jacket"]
+albedo_color = Color(0.16, 0.28, 0.38, 1)
+roughness = 0.65
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Player_Jeans"]
+albedo_color = Color(0.18, 0.24, 0.34, 1)
+roughness = 0.8
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Leather_Belt"]
+albedo_color = Color(0.20, 0.12, 0.07, 1)
+roughness = 0.55
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Metal_Buckle"]
+albedo_color = Color(0.85, 0.85, 0.88, 1)
+metallic = 0.9
+roughness = 0.25
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Boots_Black"]
+albedo_color = Color(0.08, 0.08, 0.08, 1)
+roughness = 0.6
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Boots_Brown"]
+albedo_color = Color(0.26, 0.16, 0.10, 1)
+roughness = 0.65
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sneakers_Sole"]
+albedo_color = Color(0.92, 0.92, 0.90, 1)
+roughness = 0.5
+
+
+
+[sub_resource type="StandardMaterial3D" id="Mat_RoomAashu_Wall"]
+albedo_color = Color(0.72, 0.68, 0.58, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_RoomPlayer_Wall"]
+albedo_color = Color(0.22, 0.28, 0.38, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_RoomSahil_Wall"]
+albedo_color = Color(0.35, 0.38, 0.44, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Mat_WoodFloor"]
+albedo_color = Color(0.38, 0.24, 0.16, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Mat_PhoneBody"]
+albedo_color = Color(0.12, 0.12, 0.14, 1)
+metallic = 0.8
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_PhoneScreen"]
+albedo_color = Color(0.2, 0.85, 0.5, 1)
+emission_enabled = true
+emission = Color(0.2, 0.85, 0.5, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_PCMonitor"]
+albedo_color = Color(0.3, 0.7, 1.0, 1)
+emission_enabled = true
+emission = Color(0.3, 0.7, 1.0, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_BedPlayer"]
+albedo_color = Color(0.18, 0.32, 0.48, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_BedAashu"]
+albedo_color = Color(0.48, 0.38, 0.22, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_BedSahil"]
+albedo_color = Color(0.55, 0.18, 0.18, 1)
+roughness = 0.8
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_GlassPanel"]
+bg_color = Color(0.06, 0.08, 0.14, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.65, 1.0, 0.7)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.8)
+shadow_size = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_Card"]
+bg_color = Color(0.08, 0.10, 0.16, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1.0, 0.85, 0.3, 0.9)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.85)
+shadow_size = 18
+
+
+[node name="PhoneCallConvo" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="VoiceAudio" type="AudioStreamPlayer" parent="Audio"]
+volume_db = 2.0
+
+[node name="SFXAudio" type="AudioStreamPlayer" parent="Audio"]
+volume_db = 1.0
+
+[node name="RainAudio" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("4_rain")
+volume_db = -12.0
+autoplay = true
+
+# ==============================================================
+# ROOM 1: AASHUTOSH'S BEDROOM (LEFT ROOM: X = -20)
+# ==============================================================
+[node name="Room_Aashutosh" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 0)
+
+[node name="Floor" type="CSGBox3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+use_collision = true
+size = Vector3(7.2, 0.1, 6.4)
+material = SubResource("Mat_WoodFloor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+use_collision = true
+size = Vector3(7.2, 0.1, 6.4)
+material = SubResource("Mat_WallUpper")
+
+[node name="BackWall" type="CSGBox3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -3.2)
+use_collision = true
+size = Vector3(7.2, 3.2, 0.15)
+material = SubResource("Mat_RoomAashu_Wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6, 1.6, 0)
+use_collision = true
+size = Vector3(0.15, 3.2, 6.4)
+material = SubResource("Mat_RoomAashu_Wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 1.6, 0)
+use_collision = true
+size = Vector3(0.15, 3.2, 6.4)
+material = SubResource("Mat_RoomAashu_Wall")
+
+[node name="Window" type="CSGBox3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 1.8, -3.15)
+size = Vector3(1.8, 1.4, 0.05)
+material = SubResource("Mat_GlassTop")
+
+[node name="Desk" type="CSGBox3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -1.6)
+use_collision = true
+size = Vector3(2.0, 0.9, 1.0)
+material = SubResource("Mat_DeskWood")
+
+[node name="Bookshelf" type="CSGBox3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 1.4, -2.4)
+use_collision = true
+size = Vector3(1.2, 2.6, 0.6)
+material = SubResource("Mat_DeskWood")
+
+[node name="Bed" type="CSGBox3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0.35, 1.2)
+use_collision = true
+size = Vector3(1.6, 0.7, 2.8)
+material = SubResource("Mat_BedAashu")
+
+[node name="DeskLampLight" type="OmniLight3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 1.4, -1.5)
+light_color = Color(1.0, 0.88, 0.65, 1)
+light_energy = 2.4
+omni_range = 6.0
+
+[node name="RoomTag" type="Label3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -1.8)
+billboard = 1
+text = "👓 आशुतोष का कमरा (AASHUTOSH'S ROOM)
+[PANSEMAL — NIGHT 11:45 PM]"
+font_size = 20
+outline_size = 5
+modulate = Color(0.5, 0.8, 1.0, 1)
+
+[node name="Camera_Aashutosh" type="Camera3D" parent="Room_Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 0.994522, 0.104528, 0, -0.104528, 0.994522, 0, 1.45, 1.6)
+fov = 55.0
+
+[node name="Aashutosh" type="CharacterBody3D" parent="Room_Aashutosh"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, -0.8)
+
+[node name="PhoneModel" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh"]
+transform = Transform3D(0.966, 0.259, 0, -0.259, 0.966, 0, 0, 0, 1, -0.18, 1.48, -0.05)
+size = Vector3(0.04, 0.16, 0.08)
+material = SubResource("Mat_PhoneBody")
+
+[node name="PhoneScreen" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/PhoneModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.021, 0, 0)
+size = Vector3(0.005, 0.14, 0.07)
+material = SubResource("Mat_PhoneScreen")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Aashutosh/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_NPCPolice")
+
+
+[node name="HeadNode" type="Node3D" parent="Room_Aashutosh/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
+
+
+[node name="HeadBase" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_Skin")
+
+
+[node name="Jaw" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
+size = Vector3(0.22, 0.11, 0.22)
+material = SubResource("Mat_Skin")
+
+
+[node name="EarL" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+
+[node name="EarR" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+
+[node name="EyeL_White" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+
+[node name="EyeL_Pupil" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+
+[node name="EyeL_Shine" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.056, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+
+[node name="EyeR_White" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+
+[node name="EyeR_Pupil" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+
+[node name="EyeR_Shine" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.068, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+
+[node name="BrowL" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(0.996, 0.087, 0, -0.087, 0.996, 0, 0, 0, 1, -0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Brown")
+
+
+[node name="BrowR" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(0.996, -0.087, 0, 0.087, 0.996, 0, 0, 0, 1, 0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Brown")
+
+
+[node name="NoseBridge" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, 0.142)
+size = Vector3(0.026, 0.06, 0.03)
+material = SubResource("Mat_Skin")
+
+
+[node name="NoseTip" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, 0.152)
+size = Vector3(0.034, 0.024, 0.03)
+material = SubResource("Mat_Skin")
+
+
+[node name="Mouth" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.078, 0.133)
+size = Vector3(0.07, 0.02, 0.012)
+material = SubResource("Mat_Lips")
+
+
+[node name="HairTop" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155, -0.015)
+size = Vector3(0.29, 0.075, 0.29)
+material = SubResource("Mat_Hair_Brown")
+
+
+[node name="HairBack" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -0.135)
+size = Vector3(0.28, 0.22, 0.055)
+material = SubResource("Mat_Hair_Brown")
+
+
+[node name="HairSideL" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Brown")
+
+
+[node name="HairSideR" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Brown")
+
+
+[node name="HairFringe" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0.12)
+size = Vector3(0.24, 0.045, 0.055)
+material = SubResource("Mat_Hair_Brown")
+
+
+[node name="GlassesBridge" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0.15)
+size = Vector3(0.035, 0.01, 0.01)
+material = SubResource("Mat_Glasses_Frame")
+
+
+[node name="GlassesL_Rim" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.15)
+size = Vector3(0.07, 0.05, 0.01)
+material = SubResource("Mat_Glasses_Frame")
+
+
+[node name="GlassesL_Lens" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.152)
+size = Vector3(0.056, 0.038, 0.008)
+material = SubResource("Mat_Glasses_Lens")
+
+
+[node name="GlassesR_Rim" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.15)
+size = Vector3(0.07, 0.05, 0.01)
+material = SubResource("Mat_Glasses_Frame")
+
+
+[node name="GlassesR_Lens" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.152)
+size = Vector3(0.056, 0.038, 0.008)
+material = SubResource("Mat_Glasses_Lens")
+
+
+[node name="HeadphonesBand" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 0)
+size = Vector3(0.32, 0.028, 0.10)
+material = SubResource("Mat_Boots_Black")
+
+
+[node name="HeadphoneCupL" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.155, 0, 0)
+size = Vector3(0.045, 0.10, 0.10)
+material = SubResource("Mat_Boots_Black")
+
+
+[node name="HeadphoneCupR" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.155, 0, 0)
+size = Vector3(0.045, 0.10, 0.10)
+material = SubResource("Mat_Boots_Black")
+
+
+[node name="Neck" type="CSGCylinder3D" parent="Room_Aashutosh/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30, 0)
+radius = 0.068
+height = 0.11
+material = SubResource("Mat_Skin")
+
+
+[node name="TorsoNode" type="Node3D" parent="Room_Aashutosh/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)
+
+
+[node name="Chest" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0)
+size = Vector3(0.44, 0.38, 0.25)
+material = SubResource("Mat_Aashu_Hoodie")
+
+
+[node name="Collar" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33, 0.015)
+size = Vector3(0.24, 0.065, 0.22)
+material = SubResource("Mat_Aashu_Hoodie")
+
+
+[node name="ZipperLine" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0.127)
+size = Vector3(0.02, 0.36, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+
+[node name="PocketL" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Aashu_Hoodie")
+
+
+[node name="PocketR" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Aashu_Hoodie")
+
+
+[node name="Abdomen" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+size = Vector3(0.40, 0.18, 0.23)
+material = SubResource("Mat_Aashu_Hoodie")
+
+
+[node name="Belt" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0)
+size = Vector3(0.41, 0.06, 0.24)
+material = SubResource("Mat_Leather_Belt")
+
+
+[node name="BeltBuckle" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0.123)
+size = Vector3(0.075, 0.05, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+
+[node name="ArmsNode" type="Node3D" parent="Room_Aashutosh/Aashutosh"]
+
+
+[node name="ArmL_Upper" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Aashu_Hoodie")
+
+
+[node name="ArmL_Forearm" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Aashu_Hoodie")
+
+
+[node name="HandL" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+
+[node name="ArmR_Upper" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Aashu_Hoodie")
+
+
+[node name="ArmR_Forearm" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Aashu_Hoodie")
+
+
+[node name="HandR" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+
+[node name="LegsNode" type="Node3D" parent="Room_Aashutosh/Aashutosh"]
+
+
+[node name="LegL_Thigh" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Aashu_Jeans")
+
+
+[node name="LegL_Shin" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Aashu_Jeans")
+
+
+[node name="BootL_Base" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Brown")
+
+
+[node name="BootL_Sole" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
+
+
+[node name="LegR_Thigh" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Aashu_Jeans")
+
+
+[node name="LegR_Shin" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Aashu_Jeans")
+
+
+[node name="BootR_Base" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Brown")
+
+
+[node name="BootR_Sole" type="CSGBox3D" parent="Room_Aashutosh/Aashutosh/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
+
+
+
+[node name="NameTag" type="Label3D" parent="Room_Aashutosh/Aashutosh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.88, 0)
+text = "👓 आशुतोष (AASHUTOSH)"
+font_size = 16
+outline_size = 4
+
+
+# ==============================================================
+# ROOM 2: PLAYER'S BEDROOM (CENTER ROOM: X = 0)
+# ==============================================================
+[node name="Room_Player" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Floor" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+use_collision = true
+size = Vector3(7.2, 0.1, 6.4)
+material = SubResource("Mat_WoodFloor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+use_collision = true
+size = Vector3(7.2, 0.1, 6.4)
+material = SubResource("Mat_WallUpper")
+
+[node name="BackWall" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -3.2)
+use_collision = true
+size = Vector3(7.2, 3.2, 0.15)
+material = SubResource("Mat_RoomPlayer_Wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6, 1.6, 0)
+use_collision = true
+size = Vector3(0.15, 3.2, 6.4)
+material = SubResource("Mat_RoomPlayer_Wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 1.6, 0)
+use_collision = true
+size = Vector3(0.15, 3.2, 6.4)
+material = SubResource("Mat_RoomPlayer_Wall")
+
+[node name="Desk" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -1.6)
+use_collision = true
+size = Vector3(2.2, 0.9, 1.1)
+material = SubResource("Mat_DeskWood")
+
+[node name="PCMonitor" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, -1.8)
+size = Vector3(1.1, 0.65, 0.08)
+material = SubResource("Mat_PCMonitor")
+
+[node name="KripalNoteProp" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, -0.55, 0.92, -1.5)
+size = Vector3(0.28, 0.02, 0.35)
+material = SubResource("Mat_PaperWhite")
+
+[node name="Bed" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.35, 1.0)
+use_collision = true
+size = Vector3(1.6, 0.7, 2.8)
+material = SubResource("Mat_BedPlayer")
+
+[node name="PackedBackpack" type="CSGBox3D" parent="Room_Player"]
+transform = Transform3D(0.966, 0, -0.259, 0, 1, 0, 0.259, 0, 0.966, -2.4, 0.5, 0.5)
+size = Vector3(0.55, 0.65, 0.4)
+material = SubResource("Mat_SahilRed")
+
+[node name="MonitorLight" type="OmniLight3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, -1.5)
+light_color = Color(0.35, 0.75, 1.0, 1)
+light_energy = 2.8
+omni_range = 6.0
+
+[node name="RoomTag" type="Label3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -1.8)
+billboard = 1
+text = "🎒 तेरा कमरा (YOUR ROOM — PROTAGONIST)
+[PANSEMAL — NIGHT 11:45 PM]"
+font_size = 20
+outline_size = 5
+modulate = Color(0.4, 0.9, 1.0, 1)
+
+[node name="Camera_Player" type="Camera3D" parent="Room_Player"]
+transform = Transform3D(1, 0, 0, 0, 0.994522, 0.104528, 0, -0.104528, 0.994522, 0, 1.45, 1.6)
+current = true
+fov = 55.0
+
+[node name="PlayerCharacter" type="CharacterBody3D" parent="Room_Player"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, -0.8)
+
+[node name="PhoneModel" type="CSGBox3D" parent="Room_Player/PlayerCharacter"]
+transform = Transform3D(0.966, 0.259, 0, -0.259, 0.966, 0, 0, 0, 1, -0.18, 1.48, -0.05)
+size = Vector3(0.04, 0.16, 0.08)
+material = SubResource("Mat_PhoneBody")
+
+[node name="PhoneScreen" type="CSGBox3D" parent="Room_Player/PlayerCharacter/PhoneModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.021, 0, 0)
+size = Vector3(0.005, 0.14, 0.07)
+material = SubResource("Mat_PhoneScreen")
+
+[node name="VisualModel" type="Node3D" parent="Room_Player/PlayerCharacter"]
+
+[node name="HeadNode" type="Node3D" parent="Room_Player/PlayerCharacter/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
+
+
+[node name="HeadBase" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_Skin")
+
+
+[node name="Jaw" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
+size = Vector3(0.22, 0.11, 0.22)
+material = SubResource("Mat_Skin")
+
+
+[node name="EarL" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+
+[node name="EarR" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+
+[node name="EyeL_White" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+
+[node name="EyeL_Pupil" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+
+[node name="EyeL_Shine" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.056, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+
+[node name="EyeR_White" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+
+[node name="EyeR_Pupil" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+
+[node name="EyeR_Shine" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.068, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+
+[node name="BrowL" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(0.996, 0.087, 0, -0.087, 0.996, 0, 0, 0, 1, -0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="BrowR" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(0.996, -0.087, 0, 0.087, 0.996, 0, 0, 0, 1, 0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="NoseBridge" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, 0.142)
+size = Vector3(0.026, 0.06, 0.03)
+material = SubResource("Mat_Skin")
+
+
+[node name="NoseTip" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, 0.152)
+size = Vector3(0.034, 0.024, 0.03)
+material = SubResource("Mat_Skin")
+
+
+[node name="Mouth" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.078, 0.133)
+size = Vector3(0.07, 0.02, 0.012)
+material = SubResource("Mat_Lips")
+
+
+[node name="HairTop" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155, -0.015)
+size = Vector3(0.29, 0.075, 0.29)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="HairBack" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -0.135)
+size = Vector3(0.28, 0.22, 0.055)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="HairSideL" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="HairSideR" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="HairFringe" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0.12)
+size = Vector3(0.24, 0.045, 0.055)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="Neck" type="CSGCylinder3D" parent="Room_Player/PlayerCharacter/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30, 0)
+radius = 0.068
+height = 0.11
+material = SubResource("Mat_Skin")
+
+
+[node name="TorsoNode" type="Node3D" parent="Room_Player/PlayerCharacter/VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)
+
+
+[node name="Chest" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0)
+size = Vector3(0.44, 0.38, 0.25)
+material = SubResource("Mat_Player_Jacket")
+
+
+[node name="Collar" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33, 0.015)
+size = Vector3(0.24, 0.065, 0.22)
+material = SubResource("Mat_Player_Jacket")
+
+
+[node name="ZipperLine" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0.127)
+size = Vector3(0.02, 0.36, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+
+[node name="PocketL" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Player_Jacket")
+
+
+[node name="PocketR" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Player_Jacket")
+
+
+[node name="Abdomen" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+size = Vector3(0.40, 0.18, 0.23)
+material = SubResource("Mat_Player_Jacket")
+
+
+[node name="Belt" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0)
+size = Vector3(0.41, 0.06, 0.24)
+material = SubResource("Mat_Leather_Belt")
+
+
+[node name="BeltBuckle" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0.123)
+size = Vector3(0.075, 0.05, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+
+[node name="Backpack" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.18)
+size = Vector3(0.32, 0.36, 0.16)
+material = SubResource("Mat_Leather_Belt")
+
+
+[node name="BackpackPocket" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.03, -0.27)
+size = Vector3(0.24, 0.18, 0.06)
+material = SubResource("Mat_Boots_Black")
+
+
+[node name="ArmsNode" type="Node3D" parent="Room_Player/PlayerCharacter/VisualModel"]
+
+
+[node name="ArmL_Upper" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Player_Jacket")
+
+
+[node name="ArmL_Forearm" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Player_Jacket")
+
+
+[node name="HandL" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+
+[node name="ArmR_Upper" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Player_Jacket")
+
+
+[node name="ArmR_Forearm" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Player_Jacket")
+
+
+[node name="HandR" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+
+[node name="LegsNode" type="Node3D" parent="Room_Player/PlayerCharacter/VisualModel"]
+
+
+[node name="LegL_Thigh" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Player_Jeans")
+
+
+[node name="LegL_Shin" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Player_Jeans")
+
+
+[node name="BootL_Base" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Black")
+
+
+[node name="BootL_Sole" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
+
+
+[node name="LegR_Thigh" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Player_Jeans")
+
+
+[node name="LegR_Shin" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Player_Jeans")
+
+
+[node name="BootR_Base" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Black")
+
+
+[node name="BootR_Sole" type="CSGBox3D" parent="Room_Player/PlayerCharacter/VisualModel/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
+
+
+
+# ==============================================================
+# ROOM 3: SAHIL'S BEDROOM (RIGHT ROOM: X = 20)
+# ==============================================================
+[node name="Room_Sahil" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 0)
+
+[node name="Floor" type="CSGBox3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+use_collision = true
+size = Vector3(7.2, 0.1, 6.4)
+material = SubResource("Mat_WoodFloor")
+
+[node name="Ceiling" type="CSGBox3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+use_collision = true
+size = Vector3(7.2, 0.1, 6.4)
+material = SubResource("Mat_WallUpper")
+
+[node name="BackWall" type="CSGBox3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -3.2)
+use_collision = true
+size = Vector3(7.2, 3.2, 0.15)
+material = SubResource("Mat_RoomSahil_Wall")
+
+[node name="LeftWall" type="CSGBox3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6, 1.6, 0)
+use_collision = true
+size = Vector3(0.15, 3.2, 6.4)
+material = SubResource("Mat_RoomSahil_Wall")
+
+[node name="RightWall" type="CSGBox3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 1.6, 0)
+use_collision = true
+size = Vector3(0.15, 3.2, 6.4)
+material = SubResource("Mat_RoomSahil_Wall")
+
+[node name="Desk" type="CSGBox3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -1.6)
+use_collision = true
+size = Vector3(2.2, 0.9, 1.0)
+material = SubResource("Mat_DeskWood")
+
+[node name="PoliceFileFolder" type="CSGBox3D" parent="Room_Sahil"]
+transform = Transform3D(0.966, 0, -0.259, 0, 1, 0, 0.259, 0, 0.966, -0.4, 0.92, -1.5)
+size = Vector3(0.35, 0.04, 0.45)
+material = SubResource("Mat_RegisterRed")
+
+[node name="CarKeysProp" type="CSGBox3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.92, -1.5)
+size = Vector3(0.12, 0.02, 0.08)
+material = SubResource("Mat_PhoneBody")
+
+[node name="Bed" type="CSGBox3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.35, 1.0)
+use_collision = true
+size = Vector3(1.6, 0.7, 2.8)
+material = SubResource("Mat_BedSahil")
+
+[node name="DeskLampLight" type="OmniLight3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.4, -1.5)
+light_color = Color(1.0, 0.92, 0.8, 1)
+light_energy = 2.4
+omni_range = 6.0
+
+[node name="RoomTag" type="Label3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -1.8)
+billboard = 1
+text = "🧢 साहिल का कमरा (SAHIL'S ROOM)
+[PANSEMAL — NIGHT 11:45 PM]"
+font_size = 20
+outline_size = 5
+modulate = Color(1.0, 0.85, 0.3, 1)
+
+[node name="Camera_Sahil" type="Camera3D" parent="Room_Sahil"]
+transform = Transform3D(1, 0, 0, 0, 0.994522, 0.104528, 0, -0.104528, 0.994522, 0, 1.45, 1.6)
+fov = 55.0
+
+[node name="Sahil" type="CharacterBody3D" parent="Room_Sahil"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, -0.8)
+
+[node name="PhoneModel" type="CSGBox3D" parent="Room_Sahil/Sahil"]
+transform = Transform3D(0.966, 0.259, 0, -0.259, 0.966, 0, 0, 0, 1, -0.18, 1.48, -0.05)
+size = Vector3(0.04, 0.16, 0.08)
+material = SubResource("Mat_PhoneBody")
+
+[node name="PhoneScreen" type="CSGBox3D" parent="Room_Sahil/Sahil/PhoneModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.021, 0, 0)
+size = Vector3(0.005, 0.14, 0.07)
+material = SubResource("Mat_PhoneScreen")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room_Sahil/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+shape = SubResource("Capsule_NPCPolice")
+
+
+[node name="HeadNode" type="Node3D" parent="Room_Sahil/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
+
+
+[node name="HeadBase" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+size = Vector3(0.26, 0.28, 0.26)
+material = SubResource("Mat_Skin")
+
+
+[node name="Jaw" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
+size = Vector3(0.22, 0.11, 0.22)
+material = SubResource("Mat_Skin")
+
+
+[node name="EarL" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+
+[node name="EarR" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.145, 0, 0)
+size = Vector3(0.035, 0.08, 0.055)
+material = SubResource("Mat_Skin")
+
+
+[node name="EyeL_White" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+
+[node name="EyeL_Pupil" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+
+[node name="EyeL_Shine" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.056, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+
+[node name="EyeR_White" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.132)
+size = Vector3(0.052, 0.032, 0.012)
+material = SubResource("Mat_Eye_White")
+
+
+[node name="EyeR_Pupil" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.025, 0.138)
+size = Vector3(0.026, 0.026, 0.01)
+material = SubResource("Mat_Eye_Pupil")
+
+
+[node name="EyeR_Shine" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.068, 0.032, 0.143)
+size = Vector3(0.01, 0.01, 0.006)
+material = SubResource("Mat_Eye_Shine")
+
+
+[node name="BrowL" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(0.996, 0.087, 0, -0.087, 0.996, 0, 0, 0, 1, -0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="BrowR" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(0.996, -0.087, 0, 0.087, 0.996, 0, 0, 0, 1, 0.062, 0.058, 0.136)
+size = Vector3(0.06, 0.018, 0.016)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="NoseBridge" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, 0.142)
+size = Vector3(0.026, 0.06, 0.03)
+material = SubResource("Mat_Skin")
+
+
+[node name="NoseTip" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.026, 0.152)
+size = Vector3(0.034, 0.024, 0.03)
+material = SubResource("Mat_Skin")
+
+
+[node name="Mouth" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.078, 0.133)
+size = Vector3(0.07, 0.02, 0.012)
+material = SubResource("Mat_Lips")
+
+
+[node name="HairTop" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.155, -0.015)
+size = Vector3(0.29, 0.075, 0.29)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="HairBack" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -0.135)
+size = Vector3(0.28, 0.22, 0.055)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="HairSideL" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="HairSideR" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.135, 0.045, -0.015)
+size = Vector3(0.045, 0.20, 0.24)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="HairFringe" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0.12)
+size = Vector3(0.24, 0.045, 0.055)
+material = SubResource("Mat_Hair_Black")
+
+
+[node name="CapBase" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, -0.02)
+size = Vector3(0.30, 0.06, 0.30)
+material = SubResource("Mat_Sahil_Cap")
+
+
+[node name="CapVisor" type="CSGBox3D" parent="Room_Sahil/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 0.985, 0.174, 0, -0.174, 0.985, 0, 0.14, 0.19)
+size = Vector3(0.22, 0.02, 0.12)
+material = SubResource("Mat_Sahil_Cap")
+
+
+[node name="Neck" type="CSGCylinder3D" parent="Room_Sahil/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30, 0)
+radius = 0.068
+height = 0.11
+material = SubResource("Mat_Skin")
+
+
+[node name="TorsoNode" type="Node3D" parent="Room_Sahil/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)
+
+
+[node name="Chest" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0)
+size = Vector3(0.44, 0.38, 0.25)
+material = SubResource("Mat_Sahil_Jacket")
+
+
+[node name="Collar" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33, 0.015)
+size = Vector3(0.24, 0.065, 0.22)
+material = SubResource("Mat_Sahil_Jacket")
+
+
+[node name="ZipperLine" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0.127)
+size = Vector3(0.02, 0.36, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+
+[node name="PocketL" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Sahil_Jacket")
+
+
+[node name="PocketR" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13, 0.07, 0.128)
+size = Vector3(0.09, 0.10, 0.016)
+material = SubResource("Mat_Sahil_Jacket")
+
+
+[node name="Abdomen" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+size = Vector3(0.40, 0.18, 0.23)
+material = SubResource("Mat_Sahil_Jacket")
+
+
+[node name="Belt" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0)
+size = Vector3(0.41, 0.06, 0.24)
+material = SubResource("Mat_Leather_Belt")
+
+
+[node name="BeltBuckle" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0.123)
+size = Vector3(0.075, 0.05, 0.012)
+material = SubResource("Mat_Metal_Buckle")
+
+
+[node name="EMFMeter" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, -0.14, 0.14)
+size = Vector3(0.11, 0.18, 0.055)
+material = SubResource("Mat_Boots_Black")
+
+
+[node name="EMFLedGreen" type="CSGBox3D" parent="Room_Sahil/Sahil/TorsoNode/EMFMeter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.025, 0.045, 0.03)
+size = Vector3(0.018, 0.018, 0.008)
+material = SubResource("Mat_Eye_Shine")
+
+
+[node name="ArmsNode" type="Node3D" parent="Room_Sahil/Sahil"]
+
+
+[node name="ArmL_Upper" type="CSGBox3D" parent="Room_Sahil/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Sahil_Jacket")
+
+
+[node name="ArmL_Forearm" type="CSGBox3D" parent="Room_Sahil/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Sahil_Jacket")
+
+
+[node name="HandL" type="CSGBox3D" parent="Room_Sahil/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+
+[node name="ArmR_Upper" type="CSGBox3D" parent="Room_Sahil/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 1.05, 0)
+size = Vector3(0.13, 0.28, 0.15)
+material = SubResource("Mat_Sahil_Jacket")
+
+
+[node name="ArmR_Forearm" type="CSGBox3D" parent="Room_Sahil/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.78, 0)
+size = Vector3(0.11, 0.26, 0.13)
+material = SubResource("Mat_Sahil_Jacket")
+
+
+[node name="HandR" type="CSGBox3D" parent="Room_Sahil/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.60, 0)
+size = Vector3(0.075, 0.10, 0.09)
+material = SubResource("Mat_Skin")
+
+
+[node name="LegsNode" type="Node3D" parent="Room_Sahil/Sahil"]
+
+
+[node name="LegL_Thigh" type="CSGBox3D" parent="Room_Sahil/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Sahil_Cargo")
+
+
+[node name="LegL_Shin" type="CSGBox3D" parent="Room_Sahil/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Sahil_Cargo")
+
+
+[node name="BootL_Base" type="CSGBox3D" parent="Room_Sahil/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Black")
+
+
+[node name="BootL_Sole" type="CSGBox3D" parent="Room_Sahil/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
+
+
+[node name="LegR_Thigh" type="CSGBox3D" parent="Room_Sahil/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.52, 0)
+size = Vector3(0.17, 0.36, 0.20)
+material = SubResource("Mat_Sahil_Cargo")
+
+
+[node name="LegR_Shin" type="CSGBox3D" parent="Room_Sahil/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.22, 0)
+size = Vector3(0.15, 0.36, 0.18)
+material = SubResource("Mat_Sahil_Cargo")
+
+
+[node name="BootR_Base" type="CSGBox3D" parent="Room_Sahil/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.07, 0.02)
+size = Vector3(0.16, 0.12, 0.23)
+material = SubResource("Mat_Boots_Black")
+
+
+[node name="BootR_Sole" type="CSGBox3D" parent="Room_Sahil/Sahil/LegsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.015, 0.02)
+size = Vector3(0.17, 0.03, 0.25)
+material = SubResource("Mat_Sneakers_Sole")
+
+
+
+[node name="NameTag" type="Label3D" parent="Room_Sahil/Sahil"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.88, 0)
+text = "🧢 साहिल (SAHIL)"
+font_size = 16
+outline_size = 4
+
+
+# ==============================================================
+# UI CANVAS LAYER (PHONE CALL HUD & SUBTITLES)
+# ==============================================================
+[node name="PhoneUI" type="CanvasLayer" parent="."]
+
+[node name="TopCallBar" type="PanelContainer" parent="PhoneUI"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 76.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBox_GlassPanel")
+
+[node name="Margin" type="MarginContainer" parent="PhoneUI/TopCallBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 10
+
+[node name="HBox" type="HBoxContainer" parent="PhoneUI/TopCallBar/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="CallStatus" type="Label" parent="PhoneUI/TopCallBar/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1.0, 0.5, 1)
+theme_override_font_sizes/font_size = 17
+text = "🟢 LIVE 3-WAY CONFERENCE CALL — [TWO DAYS LATER]"
+
+[node name="Spacer" type="Control" parent="PhoneUI/TopCallBar/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BadgeAashu" type="Label" parent="PhoneUI/TopCallBar/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.75, 1.0, 1)
+theme_override_font_sizes/font_size = 15
+text = "👓 AASHUTOSH [ONLINE]"
+
+[node name="BadgePlayer" type="Label" parent="PhoneUI/TopCallBar/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 1.0, 1)
+theme_override_font_sizes/font_size = 15
+text = "🎒 YOU (तू) [ONLINE]"
+
+[node name="BadgeSahil" type="Label" parent="PhoneUI/TopCallBar/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 15
+text = "🧢 SAHIL [ONLINE]"
+
+[node name="SubtitlePanel" type="PanelContainer" parent="PhoneUI"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = -180.0
+offset_right = -60.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBox_GlassPanel")
+
+[node name="Margin" type="MarginContainer" parent="PhoneUI/SubtitlePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="PhoneUI/SubtitlePanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SpeakerLabel" type="Label" parent="PhoneUI/SubtitlePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.85, 0.25, 1)
+theme_override_font_sizes/font_size = 18
+text = "👓 AASHUTOSH (आशुतोष) — [IN HIS ROOM]"
+
+[node name="DialogueText" type="Label" parent="PhoneUI/SubtitlePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1.0, 1)
+theme_override_font_sizes/font_size = 20
+text = "भाई, मैं कृपाल के घर गया था यार... उसके पेरेंट्स बहुत टेंशन में हैं और बहुत दुखी हैं!"
+autowrap_mode = 2
+
+[node name="AdvanceTip" type="Label" parent="PhoneUI/SubtitlePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 0.8)
+theme_override_font_sizes/font_size = 13
+text = "[CLICK / SPACE TO ADVANCE ➔]"
+horizontal_alignment = 2
+
+# ==============================================================
+# CHAPTER 1 FINALE BRIEFING CARD (POST-CALL)
+# ==============================================================
+[node name="ExpeditionCard" type="PanelContainer" parent="PhoneUI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -220.0
+offset_right = 380.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_Card")
+
+[node name="Margin" type="MarginContainer" parent="PhoneUI/ExpeditionCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="PhoneUI/ExpeditionCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="PhoneUI/ExpeditionCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.85, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "★ CHAPTER 1 FINALE : THE RESCUE PACT ★"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="PhoneUI/ExpeditionCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1.0, 1)
+theme_override_font_sizes/font_size = 15
+text = "KRIPAL RESCUE EXPEDITION COMMENCES TONIGHT"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="PhoneUI/ExpeditionCard/Margin/VBox"]
+layout_mode = 2
+
+[node name="Body" type="Label" parent="PhoneUI/ExpeditionCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.95, 1.0, 1)
+theme_override_font_sizes/font_size = 14
+text = "• Two days have passed. The police searched outer Bhangarh but found zero trace of Kripal.
+• Kripal's mother and father are heartbroken, waiting anxiously at home.
+• The three friends have decided: they cannot leave Kripal behind!
+• Midnight rendezvous set at Sahil's car with high-power EMF meters and thermal gear.
+• Destination: Bhangarh Fort, Rajasthan — The Most Haunted Place in India."
+autowrap_mode = 2
+
+[node name="ProceedBtn" type="Button" parent="PhoneUI/ExpeditionCard/Margin/VBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "➔ COMMENCE CHAPTER 2: EXPEDITION TO BHANGARH FORT"

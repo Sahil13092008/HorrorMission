@@ -414,18 +414,14 @@ func trigger_2_days_later_sequence() -> void:
 	# Wait 4.5 seconds for dramatic suspense
 	await get_tree().create_timer(4.5).timeout
 	
-	# Show Chapter End Card
-	if chapter_end_card:
-		chapter_end_card.visible = true
-		chapter_end_card.modulate.a = 0.0
-		var end_tw = create_tween()
-		end_tw.tween_property(chapter_end_card, "modulate:a", 1.0, 0.8)
+	# Transition into the 3-Way Phone Call Conference between the friends in their bedrooms!
+	get_tree().change_scene_to_file("res://scenes/phone_call_convo.tscn")
 
 func _on_start_chapter2_pressed() -> void:
 	if start_chapter2_btn:
 		start_chapter2_btn.disabled = true
-		start_chapter2_btn.text = "➔ LOADING CHAPTER 2: BHANGARH RUINS..."
-	get_tree().change_scene_to_file("res://scenes/bhangarh_ruins.tscn")
+		start_chapter2_btn.text = "➔ LOADING 3-WAY CONFERENCE CALL..."
+	get_tree().change_scene_to_file("res://scenes/phone_call_convo.tscn")
 
 func _on_replay_station_pressed() -> void:
 	get_tree().reload_current_scene()
