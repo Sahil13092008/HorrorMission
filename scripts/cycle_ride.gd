@@ -141,9 +141,9 @@ func _ready() -> void:
 		bicycle_audio.play()
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode in [KEY_SPACE, KEY_ESCAPE, KEY_ENTER]:
-			_on_skip_pressed()
+	if (event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_SPACE, KEY_ESCAPE, KEY_ENTER, KEY_E]) or \
+	   (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("interact"):
+		_on_skip_pressed()
 
 func _physics_process(delta: float) -> void:
 	if is_transitioning:

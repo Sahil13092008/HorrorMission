@@ -171,7 +171,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not can_advance: return
 	
 	if (event is InputEventKey and event.pressed and not event.echo and (event.keycode == KEY_SPACE or event.keycode == KEY_ENTER or event.keycode == KEY_E)) or \
-	   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+	   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or \
+	   (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("interact"):
 		advance_dialogue()
 
 func start_phone_call_sequence() -> void:

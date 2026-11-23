@@ -294,38 +294,53 @@ func start_school_exit_intro() -> void:
 	
 	await cam_tw.finished
 	cutscene_active = false
-	objective_banner.text = "✦ MISSION: RIDE BICYCLE IN THUNDERSTORM TO KRIPAL'S HOUSE [WASD / SHIFT]"
+	objective_banner.text = "✦ MISSION: RIDE BICYCLE IN THUNDERSTORM TO KRIPAL'S HOUSE [WASD / TOUCH]"
+
+func skip_school_exit_intro() -> void:
+	if not cutscene_active: return
+	cutscene_active = false
+	camera.position = Vector3(0, 0.75, 3.4)
+	camera.rotation_degrees = Vector3.ZERO
+	if objective_banner:
+		objective_banner.text = "✦ MISSION: RIDE BICYCLE IN THUNDERSTORM TO KRIPAL'S HOUSE [WASD / TOUCH]"
+	show_subtitle("🚲 तूफ़ानी शाम में कृपाल के घर की तरफ साइकिल चलाओ!", 2.5)
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion and mouse_captured and not cutscene_active and not is_town_map_open:
-		if current_mode != PlayerMode.DRIVING_CAR:
+	if (event is InputEventMouseMotion or event is InputEventScreenDrag) and not is_town_map_open:
+		if not cutscene_active and current_mode != PlayerMode.DRIVING_CAR:
 			player.rotation.y -= event.relative.x * MOUSE_SENSITIVITY
 			camera_rot_x -= event.relative.y * MOUSE_SENSITIVITY
 			camera_rot_x = clamp(camera_rot_x, -deg_to_rad(75), deg_to_rad(75))
 			camera_pivot.rotation.x = camera_rot_x
 
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_M:
+	if (event is InputEventKey and event.pressed and not event.echo) or event.is_action_pressed("interact") or event.is_action_pressed("flashlight"):
+		if event is InputEventKey and event.keycode == KEY_M:
 			toggle_town_map()
-		elif event.keycode == KEY_V:
+		elif (event is InputEventKey and event.keycode == KEY_V):
 			toggle_camera_mode()
-		elif event.keycode == KEY_B and current_mode == PlayerMode.CYCLING and not cutscene_active:
+		elif (event is InputEventKey and event.keycode == KEY_B) and current_mode == PlayerMode.CYCLING and not cutscene_active:
 			ring_cycle_bell()
-		elif event.keycode == KEY_BACKSPACE and current_mode == PlayerMode.DRIVING_CAR:
+		elif (event is InputEventKey and event.keycode == KEY_BACKSPACE) and current_mode == PlayerMode.DRIVING_CAR:
 			exit_car()
-		elif event.keycode == KEY_E or event.keycode == KEY_SPACE or event.keycode == KEY_ENTER:
+		elif (event is InputEventKey and (event.keycode == KEY_E or event.keycode == KEY_SPACE or event.keycode == KEY_ENTER)) or event.is_action_pressed("interact"):
 			handle_interaction()
 
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if dialogue_in_progress and can_advance_dialogue:
+	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
+		if cutscene_active:
+			skip_school_exit_intro()
+		elif dialogue_in_progress and can_advance_dialogue:
 			advance_dialogue()
+		elif not cutscene_active and not dialogue_in_progress:
+			handle_interaction()
 
 func handle_interaction() -> void:
+	if cutscene_active:
+		skip_school_exit_intro()
+		return
+		
 	if dialogue_in_progress and can_advance_dialogue:
 		advance_dialogue()
 		return
-		
-	if cutscene_active: return
 	
 	var dist_door_quick = player.global_position.distance_to(Vector3(9.0, 0.5, -85.0))
 	if (is_near_door or dist_door_quick < 6.5) and not door_opened:
@@ -340,13 +355,12 @@ func handle_interaction() -> void:
 		else:
 			ring_cycle_bell()
 	elif current_mode == PlayerMode.FOOT_KRIPAL:
-		if is_near_door and not door_opened:
+		if (is_near_door or dist_door_quick < 6.5) and not door_opened:
 			start_door_interaction()
 		elif is_near_car and door_opened:
 			enter_car()
 	elif current_mode == PlayerMode.DRIVING_CAR:
-		if abs(car_speed) < 2.0:
-			exit_car()
+		exit_car()
 	elif current_mode == PlayerMode.FOOT_POLICE:
 		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		if is_near_police_door or dist_to_police < 10.0:
@@ -521,13 +535,15 @@ func _physics_process(delta: float) -> void:
 
 func _handle_cycling_movement(delta: float) -> void:
 	var input_dir: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	if Input.is_key_pressed(KEY_A): input_dir.x -= 1.0
-	if Input.is_key_pressed(KEY_D): input_dir.x += 1.0
-	if Input.is_key_pressed(KEY_W): input_dir.y -= 1.0
-	if Input.is_key_pressed(KEY_S): input_dir.y += 1.0
+	if input_dir == Vector2.ZERO:
+		input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("move_left") or Input.is_action_pressed("ui_left"): input_dir.x -= 1.0
+	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("move_right") or Input.is_action_pressed("ui_right"): input_dir.x += 1.0
+	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("move_forward") or Input.is_action_pressed("ui_up"): input_dir.y -= 1.0
+	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("move_backward") or Input.is_action_pressed("ui_down"): input_dir.y += 1.0
 	input_dir = input_dir.normalized()
 	
-	var is_sprinting: bool = Input.is_key_pressed(KEY_SHIFT)
+	var is_sprinting: bool = Input.is_key_pressed(KEY_SHIFT) or Input.is_action_pressed("sprint")
 	var max_speed: float = SPRINT_CYCLE_SPEED if is_sprinting else CYCLE_SPEED
 	var direction: Vector3 = (player.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
@@ -560,10 +576,12 @@ func _handle_foot_movement(delta: float) -> void:
 	if cycle_audio and cycle_audio.playing: cycle_audio.stop()
 	
 	var input_dir: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	if Input.is_key_pressed(KEY_A): input_dir.x -= 1.0
-	if Input.is_key_pressed(KEY_D): input_dir.x += 1.0
-	if Input.is_key_pressed(KEY_W): input_dir.y -= 1.0
-	if Input.is_key_pressed(KEY_S): input_dir.y += 1.0
+	if input_dir == Vector2.ZERO:
+		input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("move_left") or Input.is_action_pressed("ui_left"): input_dir.x -= 1.0
+	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("move_right") or Input.is_action_pressed("ui_right"): input_dir.x += 1.0
+	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("move_forward") or Input.is_action_pressed("ui_up"): input_dir.y -= 1.0
+	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("move_backward") or Input.is_action_pressed("ui_down"): input_dir.y += 1.0
 	input_dir = input_dir.normalized()
 	
 	var direction: Vector3 = (player.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
@@ -573,7 +591,7 @@ func _handle_foot_movement(delta: float) -> void:
 	else:
 		player.velocity.y = 0.0
 		
-	var is_sprint: bool = Input.is_key_pressed(KEY_SHIFT)
+	var is_sprint: bool = Input.is_key_pressed(KEY_SHIFT) or Input.is_action_pressed("sprint")
 	var foot_speed: float = 6.0 if is_sprint else WALK_SPEED
 	if direction != Vector3.ZERO:
 		player.velocity.x = direction.x * foot_speed
@@ -591,13 +609,13 @@ func _handle_car_driving(delta: float) -> void:
 	var forward_input: float = 0.0
 	var steer_input: float = 0.0
 	
-	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("ui_up"):
+	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("ui_up") or Input.is_action_pressed("move_forward"):
 		forward_input += 1.0
-	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("ui_down"):
+	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("ui_down") or Input.is_action_pressed("move_backward"):
 		forward_input -= 1.0
-	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("ui_left"):
+	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("ui_left") or Input.is_action_pressed("move_left"):
 		steer_input += 1.0   # Turn Left
-	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("ui_right"):
+	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("ui_right") or Input.is_action_pressed("move_right"):
 		steer_input -= 1.0   # Turn Right
 		
 	# Accelerate forward or reverse/brake

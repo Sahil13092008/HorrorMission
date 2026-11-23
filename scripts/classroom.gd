@@ -220,38 +220,33 @@ func _process(delta):
 func _input(event):
 	# 1. Advance Group Discussion
 	if is_in_group_discussion:
-		if event is InputEventKey and event.pressed:
-			if event.keycode in [KEY_E, KEY_SPACE, KEY_ENTER]:
-				advance_discussion()
-				get_viewport().set_input_as_handled()
-		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if (event is InputEventKey and event.pressed and event.keycode in [KEY_E, KEY_SPACE, KEY_ENTER]) or \
+		   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or \
+		   (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("interact"):
 			advance_discussion()
 			get_viewport().set_input_as_handled()
 			
 	# 2. Advance Chapter 1 Card
 	elif is_in_chapter_card:
-		if event is InputEventKey and event.pressed:
-			if event.keycode in [KEY_E, KEY_SPACE, KEY_ENTER]:
-				dismiss_chapter_card()
-				get_viewport().set_input_as_handled()
-		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if (event is InputEventKey and event.pressed and event.keycode in [KEY_E, KEY_SPACE, KEY_ENTER]) or \
+		   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or \
+		   (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("interact"):
 			dismiss_chapter_card()
 			get_viewport().set_input_as_handled()
 			
-	# 3. Open Classroom Door (Key E / Click when near door)
+	# 3. Open Classroom Door (Key E / Touch / Click when near door)
 	elif is_waiting_for_door_open and not is_door_opening:
-		if event is InputEventKey and event.pressed and event.keycode in [KEY_E, KEY_SPACE, KEY_ENTER]:
-			if player and player.global_position.distance_to(doorway.global_position) < 4.5:
-				trigger_door_open()
-				get_viewport().set_input_as_handled()
-		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if (event is InputEventKey and event.pressed and event.keycode in [KEY_E, KEY_SPACE, KEY_ENTER]) or \
+		   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or \
+		   (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("interact"):
 			if player and player.global_position.distance_to(doorway.global_position) < 4.5:
 				trigger_door_open()
 				get_viewport().set_input_as_handled()
 				
-	# 4. In Bhangarh Map: Space or Enter to Depart
+	# 4. In Bhangarh Map: Space, Enter, or Touch to Depart
 	elif is_in_bhangarh_map:
-		if event is InputEventKey and event.pressed and event.keycode in [KEY_SPACE, KEY_ENTER]:
+		if (event is InputEventKey and event.pressed and event.keycode in [KEY_SPACE, KEY_ENTER]) or \
+		   (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("interact"):
 			on_enter_bhangarh_clicked()
 			get_viewport().set_input_as_handled()
 
@@ -622,19 +617,18 @@ func pulse_radar_beacon():
 
 func on_enter_bhangarh_clicked():
 	if map_dialogue_feed:
-		map_dialogue_feed.text = "👁️ कृपाल के साथ क्या हुआ था? (KRIPAL'S VIEW LOADING...)"
+		map_dialogue_feed.text = "🚲 साइकिल उठाओ और कृपाल के घर चलो! (RUSHING TO KRIPAL'S HOUSE...)"
 	
 	if enter_bhangarh_btn:
 		enter_bhangarh_btn.disabled = true
-		enter_bhangarh_btn.text = "🚨 LOADING KRIPAL'S POV..."
+		enter_bhangarh_btn.text = "🚲 RIDING CYCLES TO KRIPAL'S HOUSE..."
 	if beacon_btn:
 		beacon_btn.disabled = true
 
-	# Dramatic transition fade out into Kripal's POV scene
+	# Dramatic transition fade out into Cycle Ride cutscene
 	var tw = create_tween()
 	tw.tween_property(bhangarh_map_ui, "modulate", Color(0.0, 0.0, 0.0, 1.0), 0.8)
 	if sfx_ambience:
 		tw.parallel().tween_property(sfx_ambience, "volume_db", -25.0, 0.8)
 	await tw.finished
-	# -- Antigravity: After Bhangarh map confirm, transition to Kripal's POV (Bhangarh Ruins Prologue) --
-	get_tree().change_scene_to_file("res://scenes/bhangarh_ruins.tscn")
+	get_tree().change_scene_to_file("res://scenes/cycle_ride.tscn")

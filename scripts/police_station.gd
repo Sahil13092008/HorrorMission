@@ -174,13 +174,16 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	var input_dir: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	if Input.is_key_pressed(KEY_A): input_dir.x -= 1.0
-	if Input.is_key_pressed(KEY_D): input_dir.x += 1.0
-	if Input.is_key_pressed(KEY_W): input_dir.y -= 1.0
-	if Input.is_key_pressed(KEY_S): input_dir.y += 1.0
+	if input_dir == Vector2.ZERO:
+		input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("move_left") or Input.is_action_pressed("ui_left"): input_dir.x -= 1.0
+	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("move_right") or Input.is_action_pressed("ui_right"): input_dir.x += 1.0
+	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("move_forward") or Input.is_action_pressed("ui_up"): input_dir.y -= 1.0
+	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("move_backward") or Input.is_action_pressed("ui_down"): input_dir.y += 1.0
 	input_dir = input_dir.normalized()
 	
-	var walk_speed: float = 2.4
+	var is_sprint: bool = Input.is_key_pressed(KEY_SHIFT) or Input.is_action_pressed("sprint")
+	var walk_speed: float = 4.2 if is_sprint else 2.4
 	if input_dir != Vector2.ZERO:
 		var move_dir = (player.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 		player.velocity.x = move_dir.x * walk_speed
@@ -218,7 +221,8 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if in_two_days_later_screen:
 		if (event is InputEventKey and event.pressed and not event.echo) or \
-		   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+		   (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or \
+		   (event is InputEventScreenTouch and event.pressed) or event.is_action_pressed("interact"):
 			_transition_to_phone_call()
 			return
 
@@ -232,16 +236,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		if camera_pivot:
 			camera_pivot.rotation.x = cam_rot_x
 
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_V:
+	if (event is InputEventKey and event.pressed and not event.echo) or event.is_action_pressed("interact"):
+		if event is InputEventKey and event.keycode == KEY_V:
 			toggle_camera_mode()
-		elif event.keycode == KEY_E or event.keycode == KEY_SPACE or event.keycode == KEY_ENTER:
+		elif (event is InputEventKey and (event.keycode == KEY_E or event.keycode == KEY_SPACE or event.keycode == KEY_ENTER)) or event.is_action_pressed("interact"):
 			if not is_seated:
 				sit_down_on_chair()
 			elif dialogue_in_progress and can_advance_dialogue:
 				advance_dialogue()
 
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
 		if not is_seated:
 			sit_down_on_chair()
 		elif dialogue_in_progress and can_advance_dialogue:

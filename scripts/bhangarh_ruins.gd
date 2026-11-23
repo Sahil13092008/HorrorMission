@@ -119,34 +119,34 @@ func _input(event):
 		camera_pivot.rotate_x(-event.relative.y * MOUSE_SENSITIVITY)
 		camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, deg_to_rad(-65), deg_to_rad(75))
 
-	if event is InputEventKey and event.pressed:
-		# Advance Chapter Card with Space or Enter
+	if (event is InputEventKey and event.pressed) or event.is_action_pressed("interact") or event.is_action_pressed("flashlight"):
+		# Advance Chapter Card with Space or Enter or E
 		if chapter_card and chapter_card.visible:
-			if event.keycode in [KEY_SPACE, KEY_ENTER]:
+			if (event is InputEventKey and event.keycode in [KEY_SPACE, KEY_ENTER, KEY_E]) or event.is_action_pressed("interact"):
 				on_continue_clicked()
 				return
 
 		# Toggle 1st / 3rd Person View with Key V
-		if event.keycode == KEY_V and is_control_active and not is_jumpscare_triggered:
+		if event is InputEventKey and event.keycode == KEY_V and is_control_active and not is_jumpscare_triggered:
 			toggle_view()
 
-		# Toggle Flashlight with Key F
-		if event.keycode == KEY_F and is_control_active and not is_jumpscare_triggered:
+		# Toggle Flashlight with Key F or Action
+		if ((event is InputEventKey and event.keycode == KEY_F) or event.is_action_pressed("flashlight")) and is_control_active and not is_jumpscare_triggered:
 			flashlight.visible = !flashlight.visible
 
 		# Escape to free/capture mouse
-		if event.keycode == KEY_ESCAPE and not is_jumpscare_triggered:
+		if event is InputEventKey and event.keycode == KEY_ESCAPE and not is_jumpscare_triggered:
 			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 			else:
 				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
-	# Click to advance Chapter Card or recapture mouse
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	# Click or Touch to advance Chapter Card or recapture mouse
+	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
 		if chapter_card and chapter_card.visible:
 			on_continue_clicked()
 			return
-		if is_control_active and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not is_jumpscare_triggered:
+		if is_control_active and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not is_jumpscare_triggered and not OS.has_feature("mobile"):
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func toggle_view():
@@ -255,14 +255,16 @@ func _physics_process(delta):
 		return
 
 	# Handle player movement
-	var is_sprinting = Input.is_key_pressed(KEY_SHIFT)
+	var is_sprinting = Input.is_key_pressed(KEY_SHIFT) or Input.is_action_pressed("sprint")
 	var speed = SPRINT_SPEED if is_sprinting else WALK_SPEED
 
-	var input_dir = Vector2.ZERO
-	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP): input_dir.y -= 1
-	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN): input_dir.y += 1
-	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT): input_dir.x -= 1
-	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT): input_dir.x += 1
+	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	if input_dir == Vector2.ZERO:
+		input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP) or Input.is_action_pressed("move_forward"): input_dir.y -= 1
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or Input.is_action_pressed("move_backward"): input_dir.y += 1
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT) or Input.is_action_pressed("move_left"): input_dir.x -= 1
+	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("move_right") or Input.is_action_pressed("move_right"): input_dir.x += 1
 	input_dir = input_dir.normalized()
 
 	var direction = (kripal.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()

@@ -110,11 +110,13 @@ func _physics_process(delta):
 	if Input.is_key_pressed(KEY_SHIFT) or Input.is_action_pressed("sprint"):
 		current_speed = SPRINT_SPEED
 
-	var input_dir = Vector2.ZERO
-	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("move_forward"): input_dir.y -= 1
-	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("move_backward"): input_dir.y += 1
-	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("move_left"): input_dir.x -= 1
-	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("move_right"): input_dir.x += 1
+	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	if input_dir == Vector2.ZERO:
+		input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("move_forward") or Input.is_action_pressed("ui_up"): input_dir.y -= 1
+	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("move_backward") or Input.is_action_pressed("ui_down"): input_dir.y += 1
+	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("move_left") or Input.is_action_pressed("ui_left"): input_dir.x -= 1
+	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("move_right") or Input.is_action_pressed("ui_right"): input_dir.x += 1
 	input_dir = input_dir.normalized()
 
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
