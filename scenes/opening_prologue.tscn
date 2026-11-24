@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3q0wprologue01"]
+
+[ext_resource type="Script" path="res://scripts/opening_prologue.gd" id="1_prologue"]
+
+[node name="OpeningPrologue" type="Node3D"]
+script = ExtResource("1_prologue")
