@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
 [ext_resource type="Texture2D" path="res://textures/vignette.png" id="2_vignette"]
 [ext_resource type="Texture2D" path="res://textures/ghost_jumpscare.png" id="3_ghost"]
-[ext_resource type="AudioStream" path="res://audio/jumpscare_4s.wav" id="4_jumpscare_4s"]
+[ext_resource type="AudioStream" path="res://audio/scary_jumpscare_impact.mp3" id="4_jumpscare_4s"]
 [ext_resource type="AudioStream" path="res://audio/player_scream.wav" id="5_player_scream"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]

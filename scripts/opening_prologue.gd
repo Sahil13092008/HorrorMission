@@ -321,8 +321,10 @@ func _setup_audio() -> void:
 	audio_root.add_child(audio_heartbeat)
 	
 	audio_jumpscare = AudioStreamPlayer.new()
-	audio_jumpscare.stream = _load_audio("res://audio/jumpscare.wav")
-	audio_jumpscare.volume_db = 3.0
+	var js_stream = _load_audio("res://audio/scary_jumpscare_impact.mp3")
+	if not js_stream: js_stream = _load_audio("res://audio/jumpscare.wav")
+	audio_jumpscare.stream = js_stream
+	audio_jumpscare.volume_db = 5.0
 	audio_root.add_child(audio_jumpscare)
 	
 	audio_door_open = AudioStreamPlayer.new()

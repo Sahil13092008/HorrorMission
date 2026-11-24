@@ -168,8 +168,12 @@ func trigger_chit_jumpscare():
 	ghost_face.rotation = 0.0
 	trauma = 1.0
 	
-	# Play full 4-second demonic audio
+	# Play full 4-second demonic jumpscare audio
 	if jumpscare_audio:
+		var custom_st = load("res://audio/scary_jumpscare_impact.mp3")
+		if custom_st:
+			jumpscare_audio.stream = custom_st
+		jumpscare_audio.volume_db = 6.0
 		jumpscare_audio.play()
 
 	# 4-Second Jumpscare Sequence: Ghost lunges, screen pulses blood-red, flashlight strobes
