@@ -95,6 +95,10 @@ var tea_steam_mesh: MeshInstance3D
 
 var char_player_sprint: Node3D
 var front_door_mesh: CSGBox3D
+var front_door_pivot: Node3D
+var gate_pivot_l: Node3D
+var gate_pivot_r: Node3D
+var van_passenger_door: Node3D
 var school_van_exterior: Node3D
 var street_trees: Array = []
 
@@ -1359,12 +1363,23 @@ func _build_act4_neighborhood_van() -> void:
 	porch_canopy.material = mat_villa_charcoal
 	set_neighborhood_street.add_child(porch_canopy)
 	
-	# Front Entrance Door (Animated Open in Beat 15)
+	# Front Entrance Porch Niche & Doorway Opening
+	var porch_door_niche = CSGBox3D.new()
+	porch_door_niche.size = Vector3(1.8, 2.6, 0.5)
+	porch_door_niche.position = Vector3(2.5, 1.3, -0.25)
+	porch_door_niche.material = _create_mat(Color(0.12, 0.12, 0.14), 0.8) # Dark lit hallway opening
+	set_neighborhood_street.add_child(porch_door_niche)
+	
+	# Front Entrance Door with Hinge Pivot
+	front_door_pivot = Node3D.new()
+	front_door_pivot.position = Vector3(1.8, 0, 0.0) # Hinge on left jamb
+	set_neighborhood_street.add_child(front_door_pivot)
+	
 	front_door_mesh = CSGBox3D.new()
-	front_door_mesh.size = Vector3(0.12, 2.4, 1.4)
-	front_door_mesh.position = Vector3(2.5, 1.2, 0.0)
+	front_door_mesh.size = Vector3(1.4, 2.4, 0.08)
+	front_door_mesh.position = Vector3(0.7, 1.2, 0.0)
 	front_door_mesh.material = _create_mat(Color(0.42, 0.28, 0.15), 0.6)
-	set_neighborhood_street.add_child(front_door_mesh)
+	front_door_pivot.add_child(front_door_mesh)
 	
 	# Warm Porch Recessed Light
 	var porch_light = OmniLight3D.new()
@@ -1489,19 +1504,38 @@ func _build_act4_neighborhood_van() -> void:
 	sconce_light.omni_range = 3.0
 	set_neighborhood_street.add_child(sconce_light)
 	
-	# Modern Horizontal Black Slat Gate between pillars
-	var gate_frame = CSGBox3D.new()
-	gate_frame.size = Vector3(3.4, 1.45, 0.08)
-	gate_frame.position = Vector3(2.6, 0.85, 3.5)
-	gate_frame.material = mat_black_gate
-	set_neighborhood_street.add_child(gate_frame)
+	# Modern Horizontal Black Slat Gate with Dual Opening Pivots
+	gate_pivot_l = Node3D.new()
+	gate_pivot_l.position = Vector3(0.85, 0, 3.5) # Left pillar hinge
+	set_neighborhood_street.add_child(gate_pivot_l)
 	
+	var gate_l = CSGBox3D.new()
+	gate_l.size = Vector3(1.7, 1.45, 0.06)
+	gate_l.position = Vector3(0.85, 0.85, 0)
+	gate_l.material = mat_black_gate
+	gate_pivot_l.add_child(gate_l)
 	for s_i in range(6):
-		var slat = CSGBox3D.new()
-		slat.size = Vector3(3.3, 0.12, 0.1)
-		slat.position = Vector3(2.6, 0.25 + (s_i * 0.22), 3.5)
-		slat.material = mat_black_gate
-		set_neighborhood_street.add_child(slat)
+		var slat_l = CSGBox3D.new()
+		slat_l.size = Vector3(1.65, 0.12, 0.08)
+		slat_l.position = Vector3(0.85, 0.25 + (s_i * 0.22), 0)
+		slat_l.material = mat_black_gate
+		gate_pivot_l.add_child(slat_l)
+	
+	gate_pivot_r = Node3D.new()
+	gate_pivot_r.position = Vector3(4.35, 0, 3.5) # Right pillar hinge
+	set_neighborhood_street.add_child(gate_pivot_r)
+	
+	var gate_r = CSGBox3D.new()
+	gate_r.size = Vector3(1.7, 1.45, 0.06)
+	gate_r.position = Vector3(-0.85, 0.85, 0)
+	gate_r.material = mat_black_gate
+	gate_pivot_r.add_child(gate_r)
+	for s_i in range(6):
+		var slat_r = CSGBox3D.new()
+		slat_r.size = Vector3(1.65, 0.12, 0.08)
+		slat_r.position = Vector3(-0.85, 0.25 + (s_i * 0.22), 0)
+		slat_r.material = mat_black_gate
+		gate_pivot_r.add_child(slat_r)
 	
 	# Two Tall Black Modern Post Lamps on sidewalk corners
 	for lamp_x in [-4.5, 9.5]:
@@ -2316,6 +2350,23 @@ func _build_detailed_school_van() -> Node3D:
 		w.material = mat_black
 		van.add_child(w)
 	
+	# Passenger Folding Door on Right Side (Facing sidewalk)
+	van_passenger_door = Node3D.new()
+	van_passenger_door.position = Vector3(1.16, 0.45, 0.0)
+	van.add_child(van_passenger_door)
+	
+	var door_leaf = CSGBox3D.new()
+	door_leaf.size = Vector3(0.06, 1.5, 0.95)
+	door_leaf.position = Vector3(0.0, 0.75, 0.45)
+	door_leaf.material = mat_yellow
+	van_passenger_door.add_child(door_leaf)
+	
+	var door_win = CSGBox3D.new()
+	door_win.size = Vector3(0.08, 0.65, 0.7)
+	door_win.position = Vector3(0.0, 1.05, 0.45)
+	door_win.material = mat_glass
+	van_passenger_door.add_child(door_win)
+	
 	return van
 
 # --- CUTSCENE FLOW & PROCEDURAL ANIMATIONS ---
@@ -2344,6 +2395,29 @@ func _process(delta: float) -> void:
 		# Move forward down the road together
 		char_group_walk.position.z -= delta * 2.0
 		cam_pivot.position.z -= delta * 2.0
+	
+	# 1b. Clear Road Parting & Kripal Walking in Beat 5 (Matching User Screenshot Scene)
+	if current_beat == 5 and char_group_walk:
+		_animate_char_walk(char_kripal_walk, anim_time, 4.8)
+		_animate_char_walk(char_sahil_walk, anim_time, 4.2)
+		_animate_char_walk(char_aashu_walk, anim_time + 0.3, 4.2)
+		_animate_char_walk(char_player_walk, anim_time + 0.6, 4.2)
+		
+		# Kripal walks straight forward down the center road towards the dark forest shortcut!
+		char_kripal_walk.position.z -= delta * 2.8
+		
+		# Sahil & Aashutosh turn left and walk into town side road
+		char_sahil_walk.position.x -= delta * 2.2
+		char_sahil_walk.rotation_degrees.y = -85.0
+		char_aashu_walk.position.x -= delta * 2.0
+		char_aashu_walk.rotation_degrees.y = -85.0
+		
+		# Protagonist turns right towards home
+		char_player_walk.position.x += delta * 2.2
+		char_player_walk.rotation_degrees.y = 85.0
+		
+		# Camera slowly dollies forward following Kripal down the road
+		cam_pivot.position.z -= delta * 0.9
 	
 	# 2. Forest walk animation in Beat 6
 	if current_beat == 6 and char_kripal_forest:
@@ -2383,17 +2457,29 @@ func _process(delta: float) -> void:
 		tea_steam_mesh.position.y = 1.35 + (fmod(anim_time * 0.6, 0.4))
 		tea_steam_mesh.scale = Vector3.ONE * (0.8 + fmod(anim_time * 0.8, 0.5))
 	
-	# 9. Sprinting Protagonist in Act 4 (From front porch through A-101 gate to school van)
+	# 9. Sprinting Protagonist in Act 4 (From front porch through open gate to school van)
 	if current_beat == 15 and char_player_sprint and char_player_sprint.visible:
 		_animate_char_walk(char_player_sprint, anim_time, 12.0, true)
-		if char_player_sprint.position.z < 3.6:
+		if char_player_sprint.position.z < 3.5:
+			# Running from porch (Z=-0.2) down walkway to open gate (Z=3.5)
 			char_player_sprint.position.z += delta * 3.8
 			char_player_sprint.rotation_degrees.y = 0.0
-		else:
+		elif char_player_sprint.position.x > 0.85:
+			# Stepping cleanly through open gate towards van passenger door at (X=0.65, Z=5.8)
 			char_player_sprint.position.x -= delta * 3.2
-			char_player_sprint.position.z += delta * 0.9
-			char_player_sprint.rotation_degrees.y = -65.0
-		cam_pivot.position.x = lerpf(cam_pivot.position.x, 600.0 + char_player_sprint.position.x * 0.6, delta * 2.0)
+			char_player_sprint.position.z += delta * 2.2
+			char_player_sprint.rotation_degrees.y = -60.0
+		else:
+			# Stepping UP onto the bus entrance step!
+			char_player_sprint.position.y += delta * 2.2
+			char_player_sprint.position.x -= delta * 1.5
+			if char_player_sprint.position.y >= 0.4:
+				char_player_sprint.visible = false # Safely inside the van!
+				if audio_door_close: audio_door_close.play()
+				if van_passenger_door:
+					var tw_vd = create_tween()
+					tw_vd.tween_property(van_passenger_door, "rotation_degrees:y", 0.0, 0.4)
+		cam_pivot.position.x = lerpf(cam_pivot.position.x, 600.0 + char_player_sprint.position.x * 0.5, delta * 2.0)
 	
 	# 10. Van scenery scrolling and dashboard fan rotation in Act 5
 	if current_beat in [16, 17, 18, 19, 20] and van_scenery_scroll:
@@ -2464,7 +2550,6 @@ func _advance_beat() -> void:
 			_set_dialogue("FRIENDS (WALKING HOME)", Color(0.9, 0.85, 0.4),
 				"मैच खत्म होने के बाद चारों दोस्त सड़क पर साथ-साथ बातें करते हुए आगे बढ़ रहे थे...",
 				"After playing cricket, the four friends walked together down the road under the eerie blood sky...")
-			_play_voice("res://audio/prologue_sahil_1.mp3")
 			
 		1:
 			# Friends HALT. Switch to FIRST-PERSON (FP) MODE looking directly at friends!
@@ -2516,8 +2601,8 @@ func _advance_beat() -> void:
 			_play_voice("res://audio/prologue_kripal_1.mp3")
 			
 		5:
-			# Clean road parting sequence
-			auto_advance_time = 5.0
+			# Clean road parting sequence (Matching user screenshot view with Kripal walking forward)
+			auto_advance_time = 5.8
 			fp_crosshair.visible = false
 			char_player_walk.visible = true
 			
@@ -2525,14 +2610,20 @@ func _advance_beat() -> void:
 				"चारों दोस्त तीराहे पर अलग हो गए... साहिल-आशुतोष बाएँ मुड़े, और कृपाल घने अंधेरे जंगल की तरफ चल पड़ा...",
 				"The friends parted ways on the clear road... Kripal headed forward into the dark forest path...")
 			
-			cam_pivot.position = Vector3(0, 3.8, -12.0)
-			cam.rotation_degrees = Vector3(-18, 0, 0)
+			# Position group right at the crossroads (Z = -20.0) facing -Z down the clear road!
+			char_group_walk.position = Vector3(0, 0, -20.0)
+			char_sahil_walk.position = Vector3(-1.0, 0, 0.2)
+			char_sahil_walk.rotation_degrees = Vector3(0, 0, 0)
+			char_aashu_walk.position = Vector3(-0.3, 0, 0.5)
+			char_aashu_walk.rotation_degrees = Vector3(0, 0, 0)
+			char_player_walk.position = Vector3(1.2, 0, 0.4)
+			char_player_walk.rotation_degrees = Vector3(0, 0, 0)
+			char_kripal_walk.position = Vector3(0.0, 0, -0.8)
+			char_kripal_walk.rotation_degrees = Vector3(0, 0, 0)
 			
-			var tw_part = create_tween().set_parallel(true)
-			tw_part.tween_property(char_sahil_walk, "position:x", -10.0, 4.0)
-			tw_part.tween_property(char_aashu_walk, "position:x", -9.0, 4.0)
-			tw_part.tween_property(char_player_walk, "position:x", 10.0, 4.0)
-			tw_part.tween_property(char_kripal_walk, "position:z", -20.0, 4.0)
+			# Camera framing clear road directly behind the group looking down the road, matching user photo!
+			cam_pivot.position = Vector3(0, 2.3, -15.5)
+			cam.rotation_degrees = Vector3(-6, 0, 0)
 			
 		# --- ACT 2: DENSE FOREST & GLOWING ANOMALY (CLEAR LINE OF SIGHT) ---
 		6:
@@ -2545,7 +2636,6 @@ func _advance_beat() -> void:
 			_set_dialogue("DENSE FOREST — 8:45 PM", Color(0.6, 0.85, 1.0),
 				"रात का गहरा सन्नाटा... पेड़ों के बीच अजीब नीली रौशनी... कृपाल अकेला जंगल के रास्ते पर चल रहा था...",
 				"The deep silence of the forest... Kripal walks alone along the dark dirt trail towards the strange light...")
-			_play_voice("res://audio/prologue_kripal_forest1.mp3")
 			
 		7:
 			# Kripal stops, camera cuts to an over-the-shoulder close view of the pulsing light!
@@ -2662,22 +2752,33 @@ func _advance_beat() -> void:
 			)
 			if audio_van_horn: audio_van_horn.play()
 			
+			# Gate swings open cleanly for arrival
+			if gate_pivot_l:
+				create_tween().tween_property(gate_pivot_l, "rotation_degrees:y", -95.0, 1.2)
+			if gate_pivot_r:
+				create_tween().tween_property(gate_pivot_r, "rotation_degrees:y", 95.0, 1.2)
+			
+			# Van passenger door opens ready for student
+			if van_passenger_door:
+				create_tween().tween_property(van_passenger_door, "rotation_degrees:y", 85.0, 1.0)
+			
 			_set_dialogue("SCHOOL VAN DRIVER UNCLE (BEEP BEEP!)", Color(1.0, 0.88, 0.2),
 				"\"भाभी जी! जल्दी भेजो ना बच्चे को! 7:35 हो गए हैं, आगे कृपाल और बाकी बच्चों को भी पिक करना है... लेट हो रहा है!\"",
 				"\"Bhabhi ji! Jaldi bhejo na bachhe ko! 7:35 ho gaye hain, aage Kripal aur baki bachhon ko bhi lena hai... late ho raha hai!\"")
 			_play_voice("res://audio/prologue_driver_call.mp3")
 			
 		15:
-			# Panel 1: Front door opens, Arjun sprints across yard, through A-101 black slat gate into van
-			auto_advance_time = 5.5
-			front_door_mesh.rotation_degrees.y = 85.0
+			# Panel 1: Front door swings open cleanly on hinge, Arjun steps out from porch, through open gate into van
+			auto_advance_time = 5.8
+			if front_door_pivot:
+				create_tween().tween_property(front_door_pivot, "rotation_degrees:y", -105.0, 0.8)
 			char_player_sprint.visible = true
-			char_player_sprint.position = Vector3(2.5, 0, 0.0)
+			char_player_sprint.position = Vector3(2.5, 0, -0.2)
 			char_player_sprint.rotation_degrees = Vector3(0, 0, 0)
-			_tween_cam(Vector3(601.8, 2.0, 6.2), Vector3(-6, -28, 0), 4.5)
+			_tween_cam(Vector3(602.0, 2.0, 6.2), Vector3(-6, -26, 0), 4.5)
 			_set_dialogue("PROTAGONIST RUNNING TO VAN", Color(0.35, 0.85, 0.95),
 				"\"अरे बाप रे! वैन तो आ भी गई! जल्दी बैग पकड़ो!\"\n— आप गेट से दौड़ते हुए स्कूल वैन में बैठ जाते हैं!",
-				"\"Arey baap re! Van to aa bhi gayi! Jaldi bag pakdo!\"\n— You sprint through the A-101 gate and hop into the van!")
+				"\"Arey baap re! Van to aa bhi gayi! Jaldi bag pakdo!\"\n— You sprint through the open gate and board the school van!")
 			_play_voice("res://audio/prologue_player_hurry.mp3")
 			
 		# --- ACT 5: INDIAN SCHOOL VAN INTERIOR & WINDOW GAZING (SONG / BGM SCENE) ---
@@ -2704,7 +2805,6 @@ func _advance_beat() -> void:
 			_set_dialogue("SCHOOL BUS DRIVER (ON THE ROAD)", Color(1.0, 0.85, 0.2),
 				"\"चलो भाई सब लोग संभल के बैठो! वैन टाइम से पहुंचनी चाहिए आज!\"\n— सुबह की धूप में वैन सड़क पर आगे बढ़ती है...",
 				"\"Chalo bhai sab log sambhal ke baitho! Van time se pahunchni chahiye aaj!\"\n— The bus cruises down the sunny street under the bright morning sun...")
-			_play_voice("res://audio/prologue_driver_inside.mp3")
 			
 		18:
 			# Panel 3 View: Across the aisle looking at Protagonist seated by the window
@@ -2714,7 +2814,6 @@ func _advance_beat() -> void:
 			_set_dialogue("PROTAGONIST (LOOKING OUT THE WINDOW)", Color(0.4, 0.8, 1.0),
 				"खिड़की से बाहर सुबह की ठंडी हवा, पेड़ और घर पीछे छूट रहे हैं... और वैन कृपाल के घर की तरफ मुड़ रही है...",
 				"Looking out the window past the safety bars as morning breeze, trees and houses rush past... the van turns towards Kripal's house...")
-			_play_voice("res://audio/prologue_player_window.mp3")
 			
 		19:
 			# Cinematic 3/4 Window Gazing Close-Up
