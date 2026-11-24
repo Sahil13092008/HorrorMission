@@ -675,6 +675,13 @@ func build_mobile_controls() -> void:
 		ev.pressed = pressed
 		Input.parse_input_event(ev)
 
+	# Helper to dispatch action event
+	var send_action = func(action: String, pressed: bool):
+		var ev = InputEventAction.new()
+		ev.action = action
+		ev.pressed = pressed
+		Input.parse_input_event(ev)
+
 	# --- Bottom-Left: Movement D-Pad (Medium 76x76 Buttons) ---
 	var dpad = Control.new()
 	dpad.name = "DPad"
@@ -785,9 +792,13 @@ func build_mobile_controls() -> void:
 		"⚡ [E]\nACTION", Vector2(110, 92), Vector2(180, 130),
 		Color(0.12, 0.45, 0.25, 0.85), Color(0.3, 1.0, 0.6, 0.95), 17,
 		func():
-			Input.action_press("interact"),
+			Input.action_press("interact")
+			send_action.call("interact", true)
+			send_key.call(KEY_E, true),
 		func():
 			Input.action_release("interact")
+			send_action.call("interact", false)
+			send_key.call(KEY_E, false)
 	)
 	actions.add_child(btn_action)
 
@@ -797,9 +808,11 @@ func build_mobile_controls() -> void:
 		Color(0.48, 0.36, 0.1, 0.85), Color(1.0, 0.85, 0.3, 0.95), 15,
 		func():
 			Input.action_press("flashlight")
+			send_action.call("flashlight", true)
 			send_key.call(KEY_F, true),
 		func():
 			Input.action_release("flashlight")
+			send_action.call("flashlight", false)
 			send_key.call(KEY_F, false)
 	)
 	actions.add_child(btn_light)
@@ -941,9 +954,13 @@ func build_mobile_controls() -> void:
 		"🚪 EXIT CAR\n[उतरें]", Vector2(130, 56), Vector2(210, 36),
 		Color(0.52, 0.15, 0.12, 0.95), Color(1.0, 0.65, 0.35, 0.98), 14,
 		func():
-			Input.action_press("exit_car"),
+			Input.action_press("exit_car")
+			send_action.call("exit_car", true)
+			send_key.call(KEY_BACKSPACE, true),
 		func():
 			Input.action_release("exit_car")
+			send_action.call("exit_car", false)
+			send_key.call(KEY_BACKSPACE, false)
 	)
 	veh_drive.add_child(btn_exit_car)
 

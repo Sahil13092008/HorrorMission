@@ -177,6 +177,7 @@ var is_lightning_flashing: bool = false
 var pulse_time: float = 0.0
 var radar_update_timer: float = 0.0
 var car_cooldown_timer: float = 0.0
+var _last_interaction_frame: int = -1
 
 # Preloaded Audio
 var stream_cycle_riding: AudioStream = preload("res://audio/cycle_riding.wav")
@@ -488,6 +489,11 @@ func _input(event: InputEvent) -> void:
 			advance_dialogue()
 
 func handle_interaction() -> void:
+	var cur_frame = Engine.get_process_frames()
+	if cur_frame == _last_interaction_frame:
+		return
+	_last_interaction_frame = cur_frame
+
 	if cutscene_active:
 		skip_school_exit_intro()
 		return
@@ -498,8 +504,8 @@ func handle_interaction() -> void:
 
 	# MODE 1: CYCLING
 	if current_mode == PlayerMode.CYCLING:
-		# Only dismount when player has reached Kripal's house
-		if can_dismount or player.global_position.z <= -75.0:
+		# Dismount when approaching or at Kripal's house
+		if can_dismount or player.global_position.z <= -68.0:
 			dismount_bicycle()
 		else:
 			ring_cycle_bell()
@@ -665,15 +671,19 @@ func _physics_process(delta: float) -> void:
 		if cycle_audio and cycle_audio.playing: cycle_audio.stop()
 		return
 		
+	# Catch interact action in physics process as backup for mobile touch
+	if Input.is_action_just_pressed("interact"):
+		handle_interaction()
+
 	# MODE 1: CYCLING
 	if current_mode == PlayerMode.CYCLING:
 		var dist_to_kripal: int = int(abs(player.global_position.z - (-85.0)))
 		# Check if approaching Kripal's house to show dismount option
-		if player.global_position.z <= -75.0:
+		if player.global_position.z <= -68.0:
 			can_dismount = true
 			if action_prompt:
 				action_prompt.visible = true
-				action_prompt.text = "🚲 [E] दबाकर साइकिल से उतरें (PRESS [E] TO DISMOUNT BICYCLE)"
+				action_prompt.text = "🚲 [E] / ACTION दबाकर साइकिल से उतरें (PRESS [E] TO DISMOUNT BICYCLE)"
 			if objective_banner:
 				objective_banner.text = "🏠 KRIPAL'S HOUSE REACHED! PRESS [E] TO DISMOUNT & GO TO FRONT DOOR"
 		else:
