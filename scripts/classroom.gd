@@ -538,6 +538,11 @@ func start_door_sequence():
 			tw_s.finished.connect(func():
 				if is_instance_valid(leg_l): leg_l.rotation.x = 0.0
 				if is_instance_valid(leg_r): leg_r.rotation.x = 0.0
+				if is_instance_valid(char_sahil):
+					char_sahil.look_at(doorway.global_position, Vector3.UP)
+					char_sahil.rotation.y += PI
+					char_sahil.rotation.x = 0
+					char_sahil.rotation.z = 0
 			)
 		
 	if char_aashutosh:
@@ -560,6 +565,11 @@ func start_door_sequence():
 			tw_a.finished.connect(func():
 				if is_instance_valid(leg_l_a): leg_l_a.rotation.x = 0.0
 				if is_instance_valid(leg_r_a): leg_r_a.rotation.x = 0.0
+				if is_instance_valid(char_aashutosh):
+					char_aashutosh.look_at(doorway.global_position, Vector3.UP)
+					char_aashutosh.rotation.y += PI
+					char_aashutosh.rotation.x = 0
+					char_aashutosh.rotation.z = 0
 			)
 
 	if door_prompt:

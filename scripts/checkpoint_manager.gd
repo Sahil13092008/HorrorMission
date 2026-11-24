@@ -119,11 +119,10 @@ func _update_mobile_controls_layout() -> void:
 	if not mobile_controls_root:
 		return
 	var vp = get_viewport()
-	if not vp:
-		return
-	var vp_size = vp.get_visible_rect().size
+	var vp_size: Vector2 = vp.get_visible_rect().size if vp else Vector2(1280, 720)
 	if vp_size.x < 100 or vp_size.y < 100:
-		return
+		vp_size = Vector2(1280, 720)
+	mobile_controls_root.position = Vector2.ZERO
 	mobile_controls_root.size = vp_size
 	
 	if dpad_node:
@@ -592,9 +591,10 @@ func jump_to_next_scene() -> void:
 func build_mobile_controls() -> void:
 	mobile_controls_root = Control.new()
 	mobile_controls_root.name = "MobileControls"
-	mobile_controls_root.anchors_preset = Control.PRESET_FULL_RECT
-	mobile_controls_root.anchor_right = 1.0
-	mobile_controls_root.anchor_bottom = 1.0
+	mobile_controls_root.anchor_left = 0.0
+	mobile_controls_root.anchor_top = 0.0
+	mobile_controls_root.anchor_right = 0.0
+	mobile_controls_root.anchor_bottom = 0.0
 	mobile_controls_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(mobile_controls_root)
 
@@ -678,13 +678,12 @@ func build_mobile_controls() -> void:
 	# --- Bottom-Left: Movement D-Pad (Medium 76x76 Buttons) ---
 	var dpad = Control.new()
 	dpad.name = "DPad"
-	dpad.anchors_preset = Control.PRESET_BOTTOM_LEFT
-	dpad.anchor_top = 1.0
-	dpad.anchor_bottom = 1.0
-	dpad.offset_left = 28
-	dpad.offset_top = -285
-	dpad.offset_right = 285
-	dpad.offset_bottom = -28
+	dpad.anchor_left = 0.0
+	dpad.anchor_top = 0.0
+	dpad.anchor_right = 0.0
+	dpad.anchor_bottom = 0.0
+	dpad.size = Vector2(260, 260)
+	dpad.position = Vector2(25, 440)
 	dpad.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mobile_controls_root.add_child(dpad)
 	dpad_node = dpad
@@ -771,15 +770,12 @@ func build_mobile_controls() -> void:
 	# --- Bottom-Right: Action, Flashlight, Sprint & Camera View Buttons ---
 	var actions = Control.new()
 	actions.name = "Actions"
-	actions.anchors_preset = Control.PRESET_BOTTOM_RIGHT
-	actions.anchor_left = 1.0
-	actions.anchor_right = 1.0
-	actions.anchor_top = 1.0
-	actions.anchor_bottom = 1.0
-	actions.offset_left = -340
-	actions.offset_top = -270
-	actions.offset_right = -20
-	actions.offset_bottom = -20
+	actions.anchor_left = 0.0
+	actions.anchor_top = 0.0
+	actions.anchor_right = 0.0
+	actions.anchor_bottom = 0.0
+	actions.size = Vector2(320, 250)
+	actions.position = Vector2(940, 450)
 	actions.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mobile_controls_root.add_child(actions)
 	actions_node = actions
@@ -841,16 +837,15 @@ func build_mobile_controls() -> void:
 	# ==============================================================
 	# --- Vehicle Controls (for Car Driving: Left Steer, Right Gas/Brake/Exit) ---
 	# ==============================================================
-	# Left Cluster: Steering (PRESET_BOTTOM_LEFT on mobile_controls_root)
+	# Left Cluster: Steering
 	var veh_steer = Control.new()
 	veh_steer.name = "VehSteer"
-	veh_steer.anchors_preset = Control.PRESET_BOTTOM_LEFT
-	veh_steer.anchor_top = 1.0
-	veh_steer.anchor_bottom = 1.0
-	veh_steer.offset_left = 30
-	veh_steer.offset_top = -250
-	veh_steer.offset_right = 320
-	veh_steer.offset_bottom = -25
+	veh_steer.anchor_left = 0.0
+	veh_steer.anchor_top = 0.0
+	veh_steer.anchor_right = 0.0
+	veh_steer.anchor_bottom = 0.0
+	veh_steer.size = Vector2(290, 225)
+	veh_steer.position = Vector2(25, 480)
 	veh_steer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mobile_controls_root.add_child(veh_steer)
 	veh_steer_node = veh_steer
@@ -900,18 +895,15 @@ func build_mobile_controls() -> void:
 	steer_tip.add_theme_color_override("font_color", Color(0.6, 0.85, 1.0, 0.9))
 	veh_steer.add_child(steer_tip)
 
-	# Right Cluster: Gas, Brake, Exit Car (PRESET_BOTTOM_RIGHT on mobile_controls_root)
+	# Right Cluster: Gas, Brake, Exit Car
 	var veh_drive = Control.new()
 	veh_drive.name = "VehDrive"
-	veh_drive.anchors_preset = Control.PRESET_BOTTOM_RIGHT
-	veh_drive.anchor_left = 1.0
-	veh_drive.anchor_right = 1.0
-	veh_drive.anchor_top = 1.0
-	veh_drive.anchor_bottom = 1.0
-	veh_drive.offset_left = -380
-	veh_drive.offset_top = -250
-	veh_drive.offset_right = -20
-	veh_drive.offset_bottom = -20
+	veh_drive.anchor_left = 0.0
+	veh_drive.anchor_top = 0.0
+	veh_drive.anchor_right = 0.0
+	veh_drive.anchor_bottom = 0.0
+	veh_drive.size = Vector2(360, 230)
+	veh_drive.position = Vector2(900, 480)
 	veh_drive.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mobile_controls_root.add_child(veh_drive)
 	veh_drive_node = veh_drive

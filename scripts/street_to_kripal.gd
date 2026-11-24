@@ -253,7 +253,7 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if not InputMap.has_action("exit_car"):
 		InputMap.add_action("exit_car")
-	CheckpointManager.set_control_mode("adventure")
+	_set_checkpoint_control_mode("adventure")
 	
 	dialogues[0]["audio"] = stream_mummy_1
 	dialogues[1]["audio"] = stream_player_talk
@@ -312,7 +312,7 @@ func _ready() -> void:
 	if parked_bicycles: parked_bicycles.visible = false
 	if gps_arrows: gps_arrows.visible = false
 	
-	CheckpointManager.set_control_mode("adventure")
+	_set_checkpoint_control_mode("adventure")
 	_save_default_limb_transforms()
 	
 	start_school_exit_intro()
@@ -509,7 +509,7 @@ func handle_interaction() -> void:
 			else:
 				show_subtitle("🚶 कृपाल के घर के मुख्य दरवाजे के पास जाकर घंटी [E] बजाएं", 2.0)
 		else:
-			if (is_near_car or dist_to_car < 5.0) and car_cooldown_timer <= 0.0:
+			if (is_near_car or dist_to_car < 6.5) and car_cooldown_timer <= 0.0:
 				enter_car()
 			elif is_near_door or dist_to_door < 4.0:
 				show_subtitle("👩 कृपाल की माँ: 'बेटा, बाहर गाड़ी खड़ी है, जल्दी उसमें बैठो!'", 2.5)
@@ -683,14 +683,14 @@ func _physics_process(delta: float) -> void:
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🔔 [E] दबाकर डोरबेल बजाएं (PRESS [E] TO RING DOORBELL)"
-		elif (is_near_car or dist_to_car < 4.5) and door_opened:
+		elif (is_near_car or dist_to_car < 6.5) and door_opened:
 			is_near_car = true
 			if action_prompt:
 				action_prompt.visible = true
-				action_prompt.text = "🚗 [E] दबाकर कार में बैठें और चलाएं (PRESS [E] TO DRIVE CAR)"
+				action_prompt.text = "🚗 [E] / ACTION दबाकर कार में बैठें और चलाएं (PRESS [E] TO DRIVE CAR)"
 		else:
 			if dist_to_door >= 4.5: is_near_door = false
-			if dist_to_car >= 4.5: is_near_car = false
+			if dist_to_car >= 7.0: is_near_car = false
 			if action_prompt and not can_advance_dialogue:
 				if not door_opened:
 					action_prompt.visible = true
@@ -848,13 +848,13 @@ func _handle_car_driving(delta: float) -> void:
 	var forward_input: float = 0.0
 	var steer_input: float = 0.0
 	
-	if Input.is_key_pressed(KEY_W) or Input.is_action_pressed("ui_up") or Input.is_action_pressed("move_forward"):
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP) or Input.is_action_pressed("ui_up") or Input.is_action_pressed("move_forward"):
 		forward_input += 1.0
-	if Input.is_key_pressed(KEY_S) or Input.is_action_pressed("ui_down") or Input.is_action_pressed("move_backward"):
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or Input.is_action_pressed("ui_down") or Input.is_action_pressed("move_backward"):
 		forward_input -= 1.0
-	if Input.is_key_pressed(KEY_A) or Input.is_action_pressed("ui_left") or Input.is_action_pressed("move_left"):
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT) or Input.is_action_pressed("ui_left") or Input.is_action_pressed("move_left"):
 		steer_input += 1.0   # Turn Left
-	if Input.is_key_pressed(KEY_D) or Input.is_action_pressed("ui_right") or Input.is_action_pressed("move_right"):
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT) or Input.is_action_pressed("ui_right") or Input.is_action_pressed("move_right"):
 		steer_input -= 1.0   # Turn Right
 		
 	# Accelerate forward or reverse/brake
@@ -926,7 +926,7 @@ func enter_car() -> void:
 	car_cooldown_timer = 3.5
 	can_reenter_car = false
 	is_near_car = false
-	CheckpointManager.set_control_mode("vehicle")
+	_set_checkpoint_control_mode("vehicle")
 	if action_prompt: action_prompt.text = "🚗 [GAS] ACCEL | [BRAKE] REV | [STEER L/R] TURN | [EXIT CAR] LEAVE"
 	
 	# Disable player and companion collisions completely to eliminate physics blockage
@@ -943,11 +943,15 @@ func enter_car() -> void:
 		sahil.collision_mask = 0
 		sahil.velocity = Vector3.ZERO
 		sahil.visible = false
+		var scol = sahil.get_node_or_null("CollisionShape3D")
+		if scol: scol.set_deferred("disabled", true)
 	if aashutosh:
 		aashutosh.collision_layer = 0
 		aashutosh.collision_mask = 0
 		aashutosh.velocity = Vector3.ZERO
 		aashutosh.visible = false
+		var acol = aashutosh.get_node_or_null("CollisionShape3D")
+		if acol: acol.set_deferred("disabled", true)
 	if kripal_mummy:
 		kripal_mummy.collision_layer = 0
 		kripal_mummy.collision_mask = 0
@@ -986,7 +990,7 @@ func exit_car() -> void:
 	car_cooldown_timer = 3.5
 	can_reenter_car = false
 	is_near_car = false
-	CheckpointManager.set_control_mode("adventure")
+	_set_checkpoint_control_mode("adventure")
 	car_speed = 0.0
 	if kripal_car:
 		kripal_car.velocity = Vector3.ZERO
@@ -1017,11 +1021,15 @@ func exit_car() -> void:
 		sahil.collision_mask = 1
 		sahil.visible = true
 		sahil.global_position = player.global_position + Vector3(1.0, 0, 0.6)
+		var scol = sahil.get_node_or_null("CollisionShape3D")
+		if scol: scol.set_deferred("disabled", false)
 	if aashutosh:
 		aashutosh.collision_layer = 2
 		aashutosh.collision_mask = 1
 		aashutosh.visible = true
 		aashutosh.global_position = player.global_position + Vector3(-1.4, 0, 0.8)
+		var acol = aashutosh.get_node_or_null("CollisionShape3D")
+		if acol: acol.set_deferred("disabled", false)
 	if kripal_mummy:
 		kripal_mummy.collision_layer = 2
 		kripal_mummy.collision_mask = 1
@@ -1407,3 +1415,8 @@ func _on_start_police_pressed() -> void:
 
 func _on_replay_street_pressed() -> void:
 	get_tree().reload_current_scene()
+
+func _set_checkpoint_control_mode(mode: String) -> void:
+	var cm = get_node_or_null("/root/CheckpointManager")
+	if cm and cm.has_method("set_control_mode"):
+		cm.set_control_mode(mode)
