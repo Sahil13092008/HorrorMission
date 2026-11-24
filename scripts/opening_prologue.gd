@@ -348,13 +348,17 @@ func _setup_audio() -> void:
 	audio_voice.volume_db = 3.5
 	audio_root.add_child(audio_voice)
 	
-	# Dedicated Song / BGM slot
+	# Dedicated Song / BGM slot (Plays continuously from start until classroom is entered)
 	audio_bgm_song = AudioStreamPlayer.new()
-	audio_bgm_song.volume_db = -4.0
-	var song_stream = _load_audio("res://audio/prologue_song.mp3")
-	if not song_stream: song_stream = _load_audio("res://audio/prologue_bgm.mp3")
+	audio_bgm_song.volume_db = -2.5
+	var song_stream = _load_audio("res://audio/prologue_bgm.mp3")
+	if not song_stream: song_stream = _load_audio("res://audio/prologue_song.mp3")
 	if not song_stream: song_stream = _load_audio("res://audio/bhangarh_ambience.wav")
 	audio_bgm_song.stream = song_stream
+	audio_bgm_song.finished.connect(func():
+		if is_instance_valid(audio_bgm_song) and is_inside_tree():
+			audio_bgm_song.play()
+	)
 	audio_root.add_child(audio_bgm_song)
 
 func _play_voice(path: String) -> void:
@@ -1712,6 +1716,13 @@ func _on_continue_pressed() -> void:
 
 func _transition_to_classroom() -> void:
 	is_beat_active = false
+	if audio_bgm_song and audio_bgm_song.playing:
+		var tw_audio = create_tween()
+		tw_audio.tween_property(audio_bgm_song, "volume_db", -40.0, 0.7)
+		tw_audio.tween_callback(func():
+			if is_instance_valid(audio_bgm_song):
+				audio_bgm_song.stop()
+		)
 	var tw = create_tween()
 	tw.tween_property(fade_overlay, "color:a", 1.0, 0.8)
 	tw.tween_callback(func():
