@@ -148,8 +148,8 @@ func _ensure_controls_visibility() -> void:
 	var cur = get_tree().current_scene
 	var cur_path = cur.scene_file_path if cur else ""
 	
-	# Hide controls during phone call conference or pure cutscenes
-	if cur_path == "res://scenes/phone_call_convo.tscn" or cur_path == "res://scenes/cycle_ride.tscn":
+	# Hide controls during phone call conference, prologue, or pure cutscenes
+	if cur_path in ["res://scenes/phone_call_convo.tscn", "res://scenes/cycle_ride.tscn", "res://scenes/opening_prologue.tscn"] or "prologue" in cur_path.to_lower():
 		mobile_controls_root.visible = false
 	else:
 		var is_mobile = OS.has_feature("mobile") or OS.has_feature("android") or DisplayServer.is_touchscreen_available()
