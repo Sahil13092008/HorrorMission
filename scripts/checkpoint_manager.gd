@@ -785,15 +785,9 @@ func build_mobile_controls() -> void:
 		"⚡ [E]\nACTION", Vector2(110, 92), Vector2(180, 130),
 		Color(0.12, 0.45, 0.25, 0.85), Color(0.3, 1.0, 0.6, 0.95), 17,
 		func():
-			Input.action_press("interact")
-			send_key.call(KEY_E, true)
-			send_key.call(KEY_SPACE, true)
-			send_key.call(KEY_ENTER, true),
+			Input.action_press("interact"),
 		func():
 			Input.action_release("interact")
-			send_key.call(KEY_E, false)
-			send_key.call(KEY_SPACE, false)
-			send_key.call(KEY_ENTER, false)
 	)
 	actions.add_child(btn_action)
 
@@ -947,11 +941,9 @@ func build_mobile_controls() -> void:
 		"🚪 EXIT CAR\n[उतरें]", Vector2(130, 56), Vector2(210, 36),
 		Color(0.52, 0.15, 0.12, 0.95), Color(1.0, 0.65, 0.35, 0.98), 14,
 		func():
-			Input.action_press("exit_car")
-			send_key.call(KEY_BACKSPACE, true),
+			Input.action_press("exit_car"),
 		func():
 			Input.action_release("exit_car")
-			send_key.call(KEY_BACKSPACE, false)
 	)
 	veh_drive.add_child(btn_exit_car)
 

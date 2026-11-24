@@ -466,14 +466,20 @@ func _input(event: InputEvent) -> void:
 	if (event is InputEventKey and event.pressed and not event.echo) or event.is_action_pressed("interact") or event.is_action_pressed("exit_car") or event.is_action_pressed("flashlight"):
 		if event is InputEventKey and event.keycode == KEY_M:
 			toggle_town_map()
+			get_viewport().set_input_as_handled()
 		elif (event is InputEventKey and event.keycode == KEY_V):
 			toggle_camera_mode()
+			get_viewport().set_input_as_handled()
 		elif (event is InputEventKey and event.keycode == KEY_B) and current_mode == PlayerMode.CYCLING and not cutscene_active:
 			ring_cycle_bell()
-		elif ((event is InputEventKey and (event.keycode == KEY_BACKSPACE or event.keycode == KEY_E)) or event.is_action_pressed("exit_car")) and current_mode == PlayerMode.DRIVING_CAR:
-			exit_car()
+			get_viewport().set_input_as_handled()
+		elif (event.is_action_pressed("exit_car") or (event is InputEventKey and event.keycode == KEY_BACKSPACE)) and current_mode == PlayerMode.DRIVING_CAR:
+			if car_cooldown_timer <= 0.0:
+				exit_car()
+			get_viewport().set_input_as_handled()
 		elif (event is InputEventKey and (event.keycode == KEY_E or event.keycode == KEY_SPACE or event.keycode == KEY_ENTER)) or event.is_action_pressed("interact"):
 			handle_interaction()
+			get_viewport().set_input_as_handled()
 
 	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
 		if cutscene_active:
@@ -519,7 +525,13 @@ func handle_interaction() -> void:
 
 	# MODE 3: DRIVING CAR
 	elif current_mode == PlayerMode.DRIVING_CAR:
-		exit_car()
+		# In driving car mode, [E] only exits when vehicle has arrived at destination (police station) and stopped!
+		if car_cooldown_timer <= 0.0 and abs(car_speed) < 1.0:
+			var dist_to_police = abs(kripal_car.global_position.z - (-235.0)) if kripal_car else 999.0
+			if dist_to_police < 25.0 or kripal_car.global_position.z <= -215.0:
+				exit_car()
+			else:
+				show_subtitle("🚗 पुलिस स्टेशन पहुँचने के लिए सड़क पर चमकते तीरों का पीछा करें!", 2.0)
 		return
 
 	# MODE 4: FOOT AT POLICE STATION OR ROAD
@@ -922,8 +934,12 @@ func _handle_car_driving(delta: float) -> void:
 			action_prompt.text = "🚗 [GAS] ACCEL | [BRAKE] REV | [STEER L/R] TURN | [EXIT CAR] LEAVE"
 
 func enter_car() -> void:
+	if current_mode == PlayerMode.DRIVING_CAR:
+		return
+	if car_cooldown_timer > 0.0:
+		return
 	current_mode = PlayerMode.DRIVING_CAR
-	car_cooldown_timer = 3.5
+	car_cooldown_timer = 2.5
 	can_reenter_car = false
 	is_near_car = false
 	_set_checkpoint_control_mode("vehicle")
@@ -986,8 +1002,12 @@ func enter_car() -> void:
 	show_subtitle("🚗 [कार स्टार्ट हुई]... सड़क पर चमकते तीरों (GPS ARROWS) का पीछा करते हुए पुलिस स्टेशन चलें!", 4.0)
 
 func exit_car() -> void:
+	if current_mode != PlayerMode.DRIVING_CAR:
+		return
+	if car_cooldown_timer > 0.0:
+		return
 	current_mode = PlayerMode.FOOT_POLICE
-	car_cooldown_timer = 3.5
+	car_cooldown_timer = 2.5
 	can_reenter_car = false
 	is_near_car = false
 	_set_checkpoint_control_mode("adventure")
