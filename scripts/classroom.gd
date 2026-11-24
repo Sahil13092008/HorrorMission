@@ -349,6 +349,7 @@ func start_group_discussion():
 		var tw_s = create_tween()
 		tw_s.tween_property(char_sahil, "global_position", Vector3(-1.8, 0.0, -2.3), 1.6)
 		char_sahil.look_at(Vector3(-3.0, 0.0, -0.9), Vector3.UP)
+		char_sahil.rotation.y += PI
 		char_sahil.rotation.x = 0
 		char_sahil.rotation.z = 0
 		
@@ -356,6 +357,7 @@ func start_group_discussion():
 		var tw_a = create_tween()
 		tw_a.tween_property(char_aashutosh, "global_position", Vector3(-4.2, 0.0, -2.3), 1.8)
 		char_aashutosh.look_at(Vector3(-3.0, 0.0, -0.9), Vector3.UP)
+		char_aashutosh.rotation.y += PI
 		char_aashutosh.rotation.x = 0
 		char_aashutosh.rotation.z = 0
 
@@ -515,20 +517,50 @@ func start_door_sequence():
 	subtitle.text = "🎯 मिशन: साहिल और आशुतोष के साथ कृपाल के घर की ओर निकलो [E दबाएं]"
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 
-	# Sahil and Aashutosh run/walk over to the door facing forward!
+	# Sahil and Aashutosh run/walk over to the door facing forward towards the gate!
 	if char_sahil:
 		var tw_s = create_tween()
 		tw_s.tween_property(char_sahil, "position", Vector3(6.6, 0.0, 3.8), 2.0)
 		char_sahil.look_at(doorway.global_position, Vector3.UP)
+		char_sahil.rotation.y += PI
 		char_sahil.rotation.x = 0
 		char_sahil.rotation.z = 0
+		
+		# Animate walking legs
+		var leg_l = char_sahil.get_node_or_null("LegsNode/LegL_Thigh")
+		var leg_r = char_sahil.get_node_or_null("LegsNode/LegR_Thigh")
+		if leg_l and leg_r:
+			var tw_legs = create_tween().set_loops(4)
+			tw_legs.tween_property(leg_l, "rotation:x", deg_to_rad(24.0), 0.25)
+			tw_legs.parallel().tween_property(leg_r, "rotation:x", deg_to_rad(-24.0), 0.25)
+			tw_legs.tween_property(leg_l, "rotation:x", deg_to_rad(-24.0), 0.25)
+			tw_legs.parallel().tween_property(leg_r, "rotation:x", deg_to_rad(24.0), 0.25)
+			tw_s.finished.connect(func():
+				if is_instance_valid(leg_l): leg_l.rotation.x = 0.0
+				if is_instance_valid(leg_r): leg_r.rotation.x = 0.0
+			)
 		
 	if char_aashutosh:
 		var tw_a = create_tween()
 		tw_a.tween_property(char_aashutosh, "position", Vector3(6.6, 0.0, 5.2), 2.2)
 		char_aashutosh.look_at(doorway.global_position, Vector3.UP)
+		char_aashutosh.rotation.y += PI
 		char_aashutosh.rotation.x = 0
 		char_aashutosh.rotation.z = 0
+		
+		# Animate walking legs
+		var leg_l_a = char_aashutosh.get_node_or_null("LegsNode/LegL_Thigh")
+		var leg_r_a = char_aashutosh.get_node_or_null("LegsNode/LegR_Thigh")
+		if leg_l_a and leg_r_a:
+			var tw_legs_a = create_tween().set_loops(4)
+			tw_legs_a.tween_property(leg_l_a, "rotation:x", deg_to_rad(-24.0), 0.25)
+			tw_legs_a.parallel().tween_property(leg_r_a, "rotation:x", deg_to_rad(24.0), 0.25)
+			tw_legs_a.tween_property(leg_l_a, "rotation:x", deg_to_rad(24.0), 0.25)
+			tw_legs_a.parallel().tween_property(leg_r_a, "rotation:x", deg_to_rad(-24.0), 0.25)
+			tw_a.finished.connect(func():
+				if is_instance_valid(leg_l_a): leg_l_a.rotation.x = 0.0
+				if is_instance_valid(leg_r_a): leg_r_a.rotation.x = 0.0
+			)
 
 	if door_prompt:
 		door_prompt.visible = true

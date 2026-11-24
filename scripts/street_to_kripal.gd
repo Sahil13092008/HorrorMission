@@ -175,6 +175,7 @@ var lightning_timer: float = 3.5
 var is_lightning_flashing: bool = false
 var pulse_time: float = 0.0
 var radar_update_timer: float = 0.0
+var car_cooldown_timer: float = 0.0
 
 # Preloaded Audio
 var stream_cycle_riding: AudioStream = preload("res://audio/cycle_riding.wav")
@@ -249,6 +250,8 @@ var dialogues = [
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	if not InputMap.has_action("exit_car"):
+		InputMap.add_action("exit_car")
 	
 	dialogues[0]["audio"] = stream_mummy_1
 	dialogues[1]["audio"] = stream_player_talk
@@ -465,7 +468,7 @@ func _input(event: InputEvent) -> void:
 			toggle_camera_mode()
 		elif (event is InputEventKey and event.keycode == KEY_B) and current_mode == PlayerMode.CYCLING and not cutscene_active:
 			ring_cycle_bell()
-		elif (event is InputEventKey and event.keycode == KEY_BACKSPACE) and current_mode == PlayerMode.DRIVING_CAR:
+		elif ((event is InputEventKey and (event.keycode == KEY_BACKSPACE or event.keycode == KEY_E)) or event.is_action_pressed("exit_car")) and current_mode == PlayerMode.DRIVING_CAR:
 			exit_car()
 		elif (event is InputEventKey and (event.keycode == KEY_E or event.keycode == KEY_SPACE or event.keycode == KEY_ENTER)) or event.is_action_pressed("interact"):
 			handle_interaction()
@@ -504,7 +507,7 @@ func handle_interaction() -> void:
 			else:
 				show_subtitle("🚶 कृपाल के घर के मुख्य दरवाजे के पास जाकर घंटी [E] बजाएं", 2.0)
 		else:
-			if is_near_car or dist_to_car < 5.0:
+			if (is_near_car or dist_to_car < 5.0) and car_cooldown_timer <= 0.0:
 				enter_car()
 			elif is_near_door or dist_to_door < 4.0:
 				show_subtitle("👩 कृपाल की माँ: 'बेटा, बाहर गाड़ी खड़ी है, जल्दी उसमें बैठो!'", 2.5)
@@ -522,16 +525,18 @@ func handle_interaction() -> void:
 		var dist_to_police: float = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		
-		# If closer to car and within 4.8m, re-enter car!
+		# If closer to car and within 4.8m, re-enter car (only when cooldown is done!)
 		if (is_near_car or dist_to_car < 4.8) and dist_to_car < dist_to_police:
-			enter_car()
+			if car_cooldown_timer <= 0.0:
+				enter_car()
 			return
 		# If closer to police door and within 5.5m, enter police station!
 		elif is_near_police_door or dist_to_police < 5.5:
 			_on_start_police_pressed()
 			return
 		elif is_near_car or dist_to_car < 4.8:
-			enter_car()
+			if car_cooldown_timer <= 0.0:
+				enter_car()
 			return
 		else:
 			if dist_to_police < 15.0:
@@ -619,6 +624,8 @@ func trigger_lightning(is_close: bool = false) -> void:
 
 func _physics_process(delta: float) -> void:
 	pulse_time += delta
+	if car_cooldown_timer > 0.0:
+		car_cooldown_timer -= delta
 	# Safety Floor Clamping - Permanently prevents falling through ground into void
 	if player and player.global_position.y < -0.10:
 		player.global_position.y = 0.05
@@ -918,6 +925,7 @@ func _handle_car_driving(delta: float) -> void:
 
 func enter_car() -> void:
 	current_mode = PlayerMode.DRIVING_CAR
+	car_cooldown_timer = 1.0
 	CheckpointManager.set_control_mode("vehicle")
 	if action_prompt: action_prompt.text = "🚗 [GAS] ACCEL | [BRAKE] REV | [STEER L/R] TURN | [EXIT CAR] LEAVE"
 	
@@ -971,8 +979,11 @@ func enter_car() -> void:
 
 func exit_car() -> void:
 	current_mode = PlayerMode.FOOT_POLICE
+	car_cooldown_timer = 1.2
 	CheckpointManager.set_control_mode("adventure")
 	car_speed = 0.0
+	if kripal_car:
+		kripal_car.velocity = Vector3.ZERO
 	if car_engine_audio: car_engine_audio.stop()
 	
 	if car_door_open_audio: car_door_open_audio.play()
@@ -982,8 +993,10 @@ func exit_car() -> void:
 	if camera: camera.make_current()
 	if visual_model: visual_model.visible = true
 	
-	# Place player safely beside car on the ground
-	player.global_position = kripal_car.global_position + Vector3(-2.2, 0.05, 0)
+	# Place player safely beside car on the ground (using car local basis)
+	var exit_offset = kripal_car.transform.basis * Vector3(-2.2, 0.05, 0.0)
+	player.global_position = kripal_car.global_position + exit_offset
+	player.global_position.y = 0.05
 	player.velocity = Vector3.ZERO
 	
 	# Re-enable player and companion collisions
@@ -1010,11 +1023,19 @@ func exit_car() -> void:
 		aashutosh.visible = true
 		aashutosh.global_position = player.global_position + Vector3(-1.4, 0, 0.8)
 		
-	objective_banner.text = "✦ पानसेमल पुलिस थाने की सीढ़ियां चढ़ें और अंदर प्रवेश करें [E]"
-	show_subtitle("🚓 [गाड़ी से बाहर निकले]... सामने पानसेमल पुलिस थाना है, अंदर चलें!", 3.5)
-	if action_prompt:
-		action_prompt.visible = true
-		action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
+	var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
+	if dist_to_police < 25.0:
+		objective_banner.text = "✦ पानसेमल पुलिस थाने की सीढ़ियां चढ़ें और अंदर प्रवेश करें [E]"
+		show_subtitle("🚓 [गाड़ी से बाहर निकले]... सामने पानसेमल पुलिस थाना है, अंदर चलें!", 3.5)
+		if action_prompt:
+			action_prompt.visible = true
+			action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
+	else:
+		objective_banner.text = "✦ कार से बाहर निकले — वापस बैठने के लिए कार के पास जाकर [E] दबाएं"
+		show_subtitle("🚶 [गाड़ी से बाहर निकले]... वापस गाड़ी चलाने के लिए कार के पास [E] दबाएं", 3.0)
+		if action_prompt:
+			action_prompt.visible = true
+			action_prompt.text = "🚗 [E] / ACTION दबाकर वापस कार में बैठें (ENTER CAR)"
 
 func _update_walking_companions(delta: float) -> void:
 	# Companions follow BEHIND the player on foot so they never block the front path

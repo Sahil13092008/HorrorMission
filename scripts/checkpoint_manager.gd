@@ -92,7 +92,7 @@ func _ready() -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	
 	# Register standard gameplay actions
-	for action in ["move_forward", "move_backward", "move_left", "move_right", "interact", "flashlight", "sprint"]:
+	for action in ["move_forward", "move_backward", "move_left", "move_right", "interact", "flashlight", "sprint", "exit_car"]:
 		if not InputMap.has_action(action):
 			InputMap.add_action(action)
 	
@@ -924,16 +924,16 @@ func build_mobile_controls() -> void:
 	)
 	veh_drive.add_child(btn_brake)
 
-	# Exit Car button
+	# Exit Car button (High visibility, cleanly triggers car exit without re-entry bounce)
 	var btn_exit_car = make_touch_btn.call(
-		"🚪 EXIT CAR\n[उतरें]", Vector2(130, 56), Vector2(210, 36),
-		Color(0.28, 0.24, 0.10, 0.92), Color(1.0, 0.85, 0.3, 0.95), 13,
+		"🚪 EXIT CAR\n[उतरें]", Vector2(140, 64), Vector2(205, 30),
+		Color(0.48, 0.18, 0.12, 0.95), Color(1.0, 0.65, 0.35, 0.98), 14,
 		func():
-			send_key.call(KEY_BACKSPACE, true)
-			send_key.call(KEY_E, true),
+			Input.action_press("exit_car")
+			send_key.call(KEY_BACKSPACE, true),
 		func():
+			Input.action_release("exit_car")
 			send_key.call(KEY_BACKSPACE, false)
-			send_key.call(KEY_E, false)
 	)
 	veh_drive.add_child(btn_exit_car)
 
