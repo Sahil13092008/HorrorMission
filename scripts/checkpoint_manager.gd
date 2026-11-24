@@ -100,6 +100,7 @@ func _ready() -> void:
 	build_hud()
 	build_modal()
 	build_mobile_controls()
+	get_viewport().size_changed.connect(_update_mobile_controls_layout)
 	_ensure_controls_visibility()
 
 func _process(_delta: float) -> void:
@@ -113,6 +114,30 @@ func _process(_delta: float) -> void:
 func set_control_mode(mode: String) -> void:
 	control_mode = mode
 	_ensure_controls_visibility()
+
+func _update_mobile_controls_layout() -> void:
+	if not mobile_controls_root:
+		return
+	var vp = get_viewport()
+	if not vp:
+		return
+	var vp_size = vp.get_visible_rect().size
+	if vp_size.x < 100 or vp_size.y < 100:
+		return
+	mobile_controls_root.size = vp_size
+	
+	if dpad_node:
+		dpad_node.position = Vector2(25, vp_size.y - 280)
+		dpad_node.size = Vector2(260, 260)
+	if actions_node:
+		actions_node.position = Vector2(vp_size.x - 340, vp_size.y - 270)
+		actions_node.size = Vector2(320, 250)
+	if veh_steer_node:
+		veh_steer_node.position = Vector2(25, vp_size.y - 240)
+		veh_steer_node.size = Vector2(290, 225)
+	if veh_drive_node:
+		veh_drive_node.position = Vector2(vp_size.x - 380, vp_size.y - 240)
+		veh_drive_node.size = Vector2(360, 230)
 
 func _ensure_controls_visibility() -> void:
 	if not mobile_controls_root:
@@ -131,6 +156,8 @@ func _ensure_controls_visibility() -> void:
 		var is_mobile = OS.has_feature("mobile") or OS.has_feature("android") or DisplayServer.is_touchscreen_available()
 		mobile_controls_root.visible = is_mobile or force_show_controls
 		
+	_update_mobile_controls_layout()
+
 	var is_veh = (control_mode == "vehicle")
 	if dpad_node:
 		dpad_node.visible = not is_veh
@@ -637,6 +664,8 @@ func build_mobile_controls() -> void:
 					else:
 						do_release.call()
 		)
+		btn.button_down.connect(func(): do_press.call())
+		btn.button_up.connect(func(): do_release.call())
 		return btn
 
 	# Helper to dispatch key event

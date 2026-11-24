@@ -527,15 +527,12 @@ func handle_interaction() -> void:
 		var dist_to_police: float = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		
-		# Only allow re-entering car if player stepped away (>3.8m) first and cooldown finished
-		if can_reenter_car and car_cooldown_timer <= 0.0 and (is_near_car or dist_to_car < 3.0) and dist_to_car < dist_to_police:
-			enter_car()
-			return
-		# If closer to police door and within 5.5m, enter police station!
-		elif is_near_police_door or dist_to_police < 5.5:
+		# Prioritize entering the police station
+		if is_near_police_door or dist_to_police < 5.5:
 			_on_start_police_pressed()
 			return
-		elif can_reenter_car and car_cooldown_timer <= 0.0 and (is_near_car or dist_to_car < 3.0):
+		# Only allow re-entering car if player stepped far away (>4.5m) first, returned close (<2.5m), and cooldown finished!
+		elif can_reenter_car and car_cooldown_timer <= 0.0 and (is_near_car or dist_to_car < 2.5):
 			enter_car()
 			return
 		else:
@@ -714,27 +711,22 @@ func _physics_process(delta: float) -> void:
 		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		
-		# Player must walk away from the car (> 3.8m) to unlock re-entering
-		if dist_to_car > 3.8:
+		# Player must walk far away from the car (> 4.5m) to unlock re-entering
+		if dist_to_car > 4.5:
 			can_reenter_car = true
 		
-		if can_reenter_car and (is_near_car or dist_to_car < 3.0) and dist_to_car < dist_to_police:
-			is_near_car = true
-			if action_prompt:
-				action_prompt.visible = true
-				action_prompt.text = "🚗 [E] / ACTION दबाकर वापस कार में बैठें (ENTER CAR)"
-		elif is_near_police_door or dist_to_police < 5.5:
+		if is_near_police_door or dist_to_police < 5.5:
 			is_near_police_door = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
-		elif can_reenter_car and (is_near_car or dist_to_car < 3.0):
+		elif can_reenter_car and (is_near_car or dist_to_car < 2.5):
 			is_near_car = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚗 [E] / ACTION दबाकर वापस कार में बैठें (ENTER CAR)"
 		else:
-			if dist_to_car >= 3.0 or not can_reenter_car:
+			if dist_to_car >= 2.5 or not can_reenter_car:
 				is_near_car = false
 			if dist_to_police >= 5.5:
 				is_near_police_door = false
@@ -868,23 +860,23 @@ func _handle_car_driving(delta: float) -> void:
 	# Accelerate forward or reverse/brake
 	if forward_input > 0:
 		if car_speed < -0.1:
-			car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 2.5 * delta)
+			car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 3.0 * delta)
 		else:
-			car_speed = move_toward(car_speed, CAR_MAX_SPEED, CAR_ACCEL * delta)
+			car_speed = move_toward(car_speed, CAR_MAX_SPEED, CAR_ACCEL * 1.5 * delta)
 	elif forward_input < 0:
 		if car_speed > 0.5:
-			car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 2.8 * delta)
+			car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 3.0 * delta)
 		else:
-			car_speed = move_toward(car_speed, -CAR_MAX_SPEED * 0.45, CAR_ACCEL * 1.2 * delta)
+			car_speed = move_toward(car_speed, -CAR_MAX_SPEED * 0.5, CAR_ACCEL * 1.5 * delta)
 	else:
-		car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 0.8 * delta)
+		car_speed = move_toward(car_speed, 0.0, CAR_ACCEL * 1.0 * delta)
 		
 	# Steer car: allow steering whenever A or D is pressed (both stationary & moving)
 	if steer_input != 0.0:
 		var dir_factor: float = -1.0 if car_speed < -0.1 else 1.0
-		var turn_rate: float = CAR_STEER_SPEED
+		var turn_rate: float = CAR_STEER_SPEED * 1.2
 		if abs(car_speed) < 0.5 and forward_input == 0:
-			turn_rate *= 0.65
+			turn_rate *= 0.8
 		kripal_car.rotate_y(steer_input * turn_rate * delta * dir_factor)
 		
 	# Lock pitch and roll so car never tilts up or rolls over
@@ -931,69 +923,74 @@ func _handle_car_driving(delta: float) -> void:
 
 func enter_car() -> void:
 	current_mode = PlayerMode.DRIVING_CAR
-	car_cooldown_timer = 1.5
+	car_cooldown_timer = 3.5
 	can_reenter_car = false
 	is_near_car = false
 	CheckpointManager.set_control_mode("vehicle")
 	if action_prompt: action_prompt.text = "🚗 [GAS] ACCEL | [BRAKE] REV | [STEER L/R] TURN | [EXIT CAR] LEAVE"
 	
-	# Disable player and companion collisions to eliminate physics repulsion
+	# Disable player and companion collisions completely to eliminate physics blockage
 	if player_collision:
 		player_collision.set_deferred("disabled", true)
 	if player:
 		player.collision_layer = 0
 		player.collision_mask = 0
 		player.velocity = Vector3.ZERO
+	if visual_model:
+		visual_model.visible = false
 	if sahil:
 		sahil.collision_layer = 0
 		sahil.collision_mask = 0
 		sahil.velocity = Vector3.ZERO
+		sahil.visible = false
 	if aashutosh:
 		aashutosh.collision_layer = 0
 		aashutosh.collision_mask = 0
 		aashutosh.velocity = Vector3.ZERO
+		aashutosh.visible = false
+	if kripal_mummy:
+		kripal_mummy.collision_layer = 0
+		kripal_mummy.collision_mask = 0
+		kripal_mummy.velocity = Vector3.ZERO
+		kripal_mummy.visible = false
+		var mummy_col = kripal_mummy.get_node_or_null("CollisionShape3D")
+		if mummy_col:
+			mummy_col.set_deferred("disabled", true)
 		
-	# Reset and ground the car firmly on the road
+	# Setup car physics and ground firmly
 	if kripal_car:
+		kripal_car.collision_mask = 1 # Only collide with world environment, never companions
+		kripal_car.motion_mode = CharacterBody3D.MOTION_MODE_FLOATING
 		kripal_car.global_position.y = 0.35
 		kripal_car.velocity = Vector3.ZERO
 		kripal_car.rotation.x = 0.0
 		kripal_car.rotation.z = 0.0
 	car_speed = 0.0
 	
-	if car_door_open_audio: car_door_open_audio.play()
-	await get_tree().create_timer(0.3).timeout
-	if car_door_close_audio: car_door_close_audio.play()
-	if car_start_audio: car_start_audio.play()
-	
-	await get_tree().create_timer(0.8).timeout
-	if car_engine_audio:
-		car_engine_audio.play()
-		
-	# Hide player and companions visual models inside car
-	if visual_model: visual_model.visible = false
-	if kripal_mummy: kripal_mummy.visible = false
-	if sahil: sahil.visible = false
-	if aashutosh: aashutosh.visible = false
-	
-	# Switch to car chase camera
+	# Switch to car chase camera immediately
 	if car_camera: car_camera.make_current()
 	
 	# Show GPS navigation road arrows
 	if gps_arrows: gps_arrows.visible = true
+	
+	if car_door_open_audio: car_door_open_audio.play()
+	if car_door_close_audio: car_door_close_audio.play()
+	if car_start_audio: car_start_audio.play()
+	if car_engine_audio: car_engine_audio.play()
 	
 	objective_banner.text = "✦ GPS NAVIGATION: FOLLOW GLOWING ROAD ARROWS TO PANSEMAL POLICE STATION"
 	show_subtitle("🚗 [कार स्टार्ट हुई]... सड़क पर चमकते तीरों (GPS ARROWS) का पीछा करते हुए पुलिस स्टेशन चलें!", 4.0)
 
 func exit_car() -> void:
 	current_mode = PlayerMode.FOOT_POLICE
-	car_cooldown_timer = 2.0
+	car_cooldown_timer = 3.5
 	can_reenter_car = false
 	is_near_car = false
 	CheckpointManager.set_control_mode("adventure")
 	car_speed = 0.0
 	if kripal_car:
 		kripal_car.velocity = Vector3.ZERO
+		kripal_car.collision_mask = 7
 	if car_engine_audio: car_engine_audio.stop()
 	
 	if car_door_open_audio: car_door_open_audio.play()
@@ -1003,8 +1000,8 @@ func exit_car() -> void:
 	if camera: camera.make_current()
 	if visual_model: visual_model.visible = true
 	
-	# Place player safely beside car on the ground (using car local basis, -3.2m to clear trigger)
-	var exit_offset = kripal_car.transform.basis * Vector3(-3.2, 0.05, 0.0)
+	# Place player safely beside car on the sidewalk (-3.8m away to clear trigger and avoid car body)
+	var exit_offset = kripal_car.transform.basis * Vector3(-3.8, 0.05, 0.0)
 	player.global_position = kripal_car.global_position + exit_offset
 	player.global_position.y = 0.05
 	player.velocity = Vector3.ZERO
@@ -1018,20 +1015,20 @@ func exit_car() -> void:
 	if sahil:
 		sahil.collision_layer = 2
 		sahil.collision_mask = 1
-	if aashutosh:
-		aashutosh.collision_layer = 2
-		aashutosh.collision_mask = 1
-	
-	# Position companions outside car
-	if kripal_mummy:
-		kripal_mummy.visible = true
-		kripal_mummy.global_position = player.global_position + Vector3(-0.8, 0, 0.4)
-	if sahil:
 		sahil.visible = true
 		sahil.global_position = player.global_position + Vector3(1.0, 0, 0.6)
 	if aashutosh:
+		aashutosh.collision_layer = 2
+		aashutosh.collision_mask = 1
 		aashutosh.visible = true
 		aashutosh.global_position = player.global_position + Vector3(-1.4, 0, 0.8)
+	if kripal_mummy:
+		kripal_mummy.collision_layer = 2
+		kripal_mummy.collision_mask = 1
+		kripal_mummy.visible = true
+		kripal_mummy.global_position = player.global_position + Vector3(-0.8, 0, 0.4)
+		var mummy_col = kripal_mummy.get_node_or_null("CollisionShape3D")
+		if mummy_col: mummy_col.set_deferred("disabled", false)
 		
 	var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 	if dist_to_police < 25.0:
