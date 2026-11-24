@@ -583,7 +583,43 @@ func _build_act2_dense_forest() -> void:
 	set_dense_forest.add_child(char_kripal_forest)
 
 # ------------------------------------------------------------------------------
-# ACT 3: FULL COZY INDIAN HOUSE (Living Room, Kitchen with Stove & Bedroom)
+# HELPER: INDOOR POTTED PLANT GENERATOR (Matching User Reference Image)
+# ------------------------------------------------------------------------------
+func _create_potted_plant(pot_rad: float = 0.22, pot_h: float = 0.55, plant_h: float = 0.85, is_table_plant: bool = false) -> Node3D:
+	var plant_root = Node3D.new()
+	var pot = CSGCylinder3D.new()
+	pot.radius = pot_rad
+	pot.height = pot_h
+	pot.material = _create_mat(Color(0.96, 0.96, 0.96), 0.3)
+	pot.position.y = pot_h * 0.5
+	plant_root.add_child(pot)
+	
+	var leaves_mat = _create_mat(Color(0.12, 0.52, 0.18), 0.8)
+	if is_table_plant:
+		var foliage = CSGSphere3D.new()
+		foliage.radius = pot_rad * 1.35
+		foliage.position.y = pot_h + foliage.radius * 0.5
+		foliage.material = leaves_mat
+		plant_root.add_child(foliage)
+	else:
+		var stem = CSGCylinder3D.new()
+		stem.radius = 0.03
+		stem.height = plant_h * 0.5
+		stem.position.y = pot_h + stem.height * 0.5
+		stem.material = _create_mat(Color(0.28, 0.18, 0.1))
+		plant_root.add_child(stem)
+		
+		for a in [0.0, 72.0, 144.0, 216.0, 288.0]:
+			var leaf = CSGBox3D.new()
+			leaf.size = Vector3(pot_rad * 1.5, 0.02, pot_rad * 0.9)
+			leaf.position = Vector3(sin(deg_to_rad(a)) * pot_rad * 0.7, pot_h + plant_h * 0.55, cos(deg_to_rad(a)) * pot_rad * 0.7)
+			leaf.rotation_degrees = Vector3(randf_range(-15, 15), a, randf_range(20, 45))
+			leaf.material = leaves_mat
+			plant_root.add_child(leaf)
+	return plant_root
+
+# ------------------------------------------------------------------------------
+# ACT 3: FULL TWO-STORY MODERN VILLA INTERIOR (Matching User 6-Panel Reference)
 # ------------------------------------------------------------------------------
 func _build_act3_full_house() -> void:
 	set_full_house = Node3D.new()
@@ -591,144 +627,665 @@ func _build_act3_full_house() -> void:
 	set_full_house.position = Vector3(400, 0, 0)
 	add_child(set_full_house)
 	
-	var mat_wall_hall = _create_mat(Color(0.94, 0.9, 0.85), 0.9)
-	var mat_tile_floor = _create_mat(Color(0.85, 0.82, 0.78), 0.5)
-	var mat_kitchen_slab = _create_mat(Color(0.16, 0.16, 0.18), 0.3)
-	var mat_wood = _create_mat(Color(0.42, 0.25, 0.14), 0.7)
-	var mat_sofa = _create_mat(Color(0.35, 0.18, 0.38), 0.85)
+	# Reference-faithful luxury materials
+	var mat_white_wall = _create_mat(Color(0.96, 0.96, 0.97), 0.85)
+	var mat_periwinkle = _create_mat(Color(0.52, 0.60, 0.76), 0.9) # Panel 2 accent wall
+	var mat_charcoal_wall = _create_mat(Color(0.18, 0.20, 0.23), 0.55) # Panel 3 TV accent wall & cabinets
+	var mat_marble_floor = _create_mat(Color(0.94, 0.95, 0.96), 0.18, 0.0) # Panel 3 polished marble
+	var mat_wood_warm = _create_mat(Color(0.48, 0.32, 0.18), 0.65) # Coffee/dining tables & doors
+	var mat_sofa_navy = _create_mat(Color(0.12, 0.15, 0.26), 0.85) # Panel 3 navy seating
+	var mat_rug_blue = _create_mat(Color(0.10, 0.32, 0.78), 0.95) # Panel 2 royal blue area rug
+	var mat_quilt_blue = _create_mat(Color(0.12, 0.38, 0.82), 0.8) # Panel 2 pixel quilt
+	var mat_curtain_blue = _create_mat(Color(0.10, 0.25, 0.62), 0.85) # Panel 2 window curtains
+	var mat_black_metal = _create_mat(Color(0.12, 0.12, 0.14), 0.3, 0.7) # Railing posts & window frames
+	var mat_silver_metal = _create_mat(Color(0.75, 0.76, 0.80), 0.25, 0.85) # Chimney hood & fridge
+	var mat_countertop = _create_mat(Color(0.96, 0.96, 0.96), 0.25, 0.0) # White quartz counter
+	var mat_glass = _create_mat(Color(0.75, 0.90, 1.0, 0.32), 0.05, 0.1) # Transparent glass balustrades
+	var mat_water_blue = _create_mat(Color(0.15, 0.55, 0.90, 0.75), 0.15, 0.05) # Water dispenser carboy
+	var mat_screen = _create_mat(Color(0.2, 0.6, 0.9), 0.2, 0.0, Color(0.3, 0.7, 1.0), 2.5)
+	var mat_cyan_led = _create_mat(Color(0.0, 0.80, 1.0), 0.2, 0.0, Color(0.0, 0.80, 1.0), 4.5) # Glowing cyan TV backlight strip!
+	var mat_pc_blue = _create_mat(Color(0.15, 0.65, 1.0), 0.2, 0.0, Color(0.15, 0.65, 1.0), 3.0) # Ultrawide PC display
+	var mat_ceiling_light = _create_mat(Color(1.0, 1.0, 0.95), 0.2, 0.0, Color(1.0, 1.0, 0.95), 2.5)
 	
+	# Ground floor polished marble slab
 	var floor_g = CSGBox3D.new()
-	floor_g.size = Vector3(16.0, 0.2, 12.0)
+	floor_g.size = Vector3(18.0, 0.2, 14.0)
 	floor_g.position = Vector3(0, -0.1, 0)
-	floor_g.material = mat_tile_floor
+	floor_g.material = mat_marble_floor
 	set_full_house.add_child(floor_g)
 	
-	# Enclosed solid walls for cozy interior feel
+	# Exterior enclosed perimeter walls (7.2m height for two full floors!)
 	var wall_back = CSGBox3D.new()
-	wall_back.size = Vector3(16.0, 6.8, 0.3)
-	wall_back.position = Vector3(0, 3.4, -6.0)
-	wall_back.material = mat_wall_hall
+	wall_back.size = Vector3(18.0, 7.2, 0.3)
+	wall_back.position = Vector3(0, 3.6, -7.0)
+	wall_back.material = mat_white_wall
 	set_full_house.add_child(wall_back)
 	
 	var wall_left = CSGBox3D.new()
-	wall_left.size = Vector3(0.3, 6.8, 12.0)
-	wall_left.position = Vector3(-8.0, 3.4, 0)
-	wall_left.material = mat_wall_hall
+	wall_left.size = Vector3(0.3, 7.2, 14.0)
+	wall_left.position = Vector3(-9.0, 3.6, 0)
+	wall_left.material = mat_white_wall
 	set_full_house.add_child(wall_left)
 	
 	var wall_right = CSGBox3D.new()
-	wall_right.size = Vector3(0.3, 6.8, 12.0)
-	wall_right.position = Vector3(8.0, 3.4, 0)
-	wall_right.material = mat_wall_hall
+	wall_right.size = Vector3(0.3, 7.2, 14.0)
+	wall_right.position = Vector3(9.0, 3.6, 0)
+	wall_right.material = mat_white_wall
 	set_full_house.add_child(wall_right)
 	
-	# Partition wall dividing Hall (left) and Kitchen (right) with arched doorway
-	var wall_partition = CSGBox3D.new()
-	wall_partition.size = Vector3(0.3, 3.5, 8.0)
-	wall_partition.position = Vector3(0, 1.75, -2.0)
-	wall_partition.material = mat_wall_hall
-	set_full_house.add_child(wall_partition)
+	var wall_front = CSGBox3D.new()
+	wall_front.size = Vector3(18.0, 7.2, 0.3)
+	wall_front.position = Vector3(0, 3.6, 7.0)
+	wall_front.material = mat_white_wall
+	set_full_house.add_child(wall_front)
 	
-	# --- LIVING ROOM (Left) ---
-	var sofa_main = CSGBox3D.new()
-	sofa_main.size = Vector3(3.2, 0.85, 1.1)
-	sofa_main.position = Vector3(-4.5, 0.42, 1.5)
-	sofa_main.material = mat_sofa
-	set_full_house.add_child(sofa_main)
+	# Mezzanine upper floor structure (Leaves double-height living room atrium open below!)
+	# 1. Arjun's Room floor (Upper floor left/front):
+	var floor_bedroom = CSGBox3D.new()
+	floor_bedroom.size = Vector3(8.8, 0.25, 6.8)
+	floor_bedroom.position = Vector3(-4.5, 3.6, 3.5)
+	floor_bedroom.material = mat_white_wall
+	set_full_house.add_child(floor_bedroom)
 	
-	var sofa_back = CSGBox3D.new()
-	sofa_back.size = Vector3(3.2, 0.8, 0.3)
-	sofa_back.position = Vector3(-4.5, 1.0, 1.9)
-	sofa_back.material = mat_sofa
-	set_full_house.add_child(sofa_back)
+	# 2. Upper hallway / mezzanine walkway overlooking living room:
+	var floor_mezzanine = CSGBox3D.new()
+	floor_mezzanine.size = Vector3(2.6, 0.25, 7.2)
+	floor_mezzanine.position = Vector3(0.5, 3.6, -3.4)
+	floor_mezzanine.material = mat_marble_floor
+	set_full_house.add_child(floor_mezzanine)
 	
-	var table = CSGBox3D.new()
-	table.size = Vector3(1.8, 0.45, 0.9)
-	table.position = Vector3(-4.5, 0.22, 0.0)
-	table.material = mat_wood
-	set_full_house.add_child(table)
+	# 3. Master suite floor above kitchen (Upper floor right):
+	var floor_master = CSGBox3D.new()
+	floor_master.size = Vector3(7.4, 0.25, 14.0)
+	floor_master.position = Vector3(5.3, 3.6, 0)
+	floor_master.material = mat_white_wall
+	set_full_house.add_child(floor_master)
 	
-	var newspaper = CSGBox3D.new()
-	newspaper.size = Vector3(0.5, 0.02, 0.4)
-	newspaper.position = Vector3(-4.8, 0.46, 0.0)
-	newspaper.material = _create_mat(Color(0.9, 0.9, 0.88))
-	set_full_house.add_child(newspaper)
+	# Bedroom dividing wall between Arjun's room and living room mezzanine
+	var wall_bedroom_sep = CSGBox3D.new()
+	wall_bedroom_sep.size = Vector3(8.8, 3.5, 0.25)
+	wall_bedroom_sep.position = Vector3(-4.5, 5.35, 0.1)
+	wall_bedroom_sep.material = mat_periwinkle # Back accent wall for Arjun's bedroom!
+	set_full_house.add_child(wall_bedroom_sep)
 	
-	var tv_cabinet = CSGBox3D.new()
-	tv_cabinet.size = Vector3(2.6, 0.7, 0.5)
-	tv_cabinet.position = Vector3(-4.5, 0.35, -5.2)
-	tv_cabinet.material = mat_wood
-	set_full_house.add_child(tv_cabinet)
+	# --------------------------------------------------------------------------
+	# PANEL 3: HALL / LIVING ROOM (Ground Floor Left)
+	# --------------------------------------------------------------------------
+	# TV Accent Wall Panel (Dark Slate / Charcoal)
+	var tv_accent_panel = CSGBox3D.new()
+	tv_accent_panel.size = Vector3(4.2, 2.5, 0.08)
+	tv_accent_panel.position = Vector3(-4.2, 1.75, -6.82)
+	tv_accent_panel.material = mat_charcoal_wall
+	set_full_house.add_child(tv_accent_panel)
 	
+	# Glowing Cyan LED Backlight Strip around TV Panel (Signature Feature!)
+	var led_top = CSGBox3D.new()
+	led_top.size = Vector3(4.35, 0.08, 0.06)
+	led_top.position = Vector3(-4.2, 3.02, -6.8)
+	led_top.material = mat_cyan_led
+	set_full_house.add_child(led_top)
+	
+	var led_bot = CSGBox3D.new()
+	led_bot.size = Vector3(4.35, 0.08, 0.06)
+	led_bot.position = Vector3(-4.2, 0.48, -6.8)
+	led_bot.material = mat_cyan_led
+	set_full_house.add_child(led_bot)
+	
+	var led_l = CSGBox3D.new()
+	led_l.size = Vector3(0.08, 2.6, 0.06)
+	led_l.position = Vector3(-6.35, 1.75, -6.8)
+	led_l.material = mat_cyan_led
+	set_full_house.add_child(led_l)
+	
+	var led_r = CSGBox3D.new()
+	led_r.size = Vector3(0.08, 2.6, 0.06)
+	led_r.position = Vector3(-2.05, 1.75, -6.8)
+	led_r.material = mat_cyan_led
+	set_full_house.add_child(led_r)
+	
+	# Soft cyan halo bounce light
+	var tv_led_light = OmniLight3D.new()
+	tv_led_light.position = Vector3(-4.2, 1.75, -6.6)
+	tv_led_light.light_color = Color(0.0, 0.8, 1.0)
+	tv_led_light.light_energy = 2.2
+	tv_led_light.omni_range = 4.5
+	set_full_house.add_child(tv_led_light)
+	
+	# Large Flat Screen TV
 	tv_screen_mesh = CSGBox3D.new()
-	tv_screen_mesh.size = Vector3(2.0, 1.2, 0.08)
-	tv_screen_mesh.position = Vector3(-4.5, 1.5, -5.2)
-	tv_screen_mesh.material = _create_mat(Color(0.2, 0.6, 0.9), 0.2, 0.0, Color(0.3, 0.7, 1.0), 2.5)
+	tv_screen_mesh.size = Vector3(2.5, 1.4, 0.05)
+	tv_screen_mesh.position = Vector3(-4.2, 1.75, -6.74)
+	tv_screen_mesh.material = mat_screen
 	set_full_house.add_child(tv_screen_mesh)
 	
-	# Papa NPC sitting on sofa
-	char_papa = _build_rigged_human("Papa", Color(0.85, 0.82, 0.75), Color(0.9, 0.9, 0.9), false, false, false, true)
-	char_papa.position = Vector3(-4.5, 0.35, 1.5)
+	# Modern Round Wall Clock above TV
+	var clock_ring = CSGCylinder3D.new()
+	clock_ring.radius = 0.32
+	clock_ring.height = 0.04
+	clock_ring.rotation_degrees = Vector3(90, 0, 0)
+	clock_ring.position = Vector3(-4.2, 3.32, -6.82)
+	clock_ring.material = mat_black_metal
+	set_full_house.add_child(clock_ring)
+	
+	var clock_face = CSGCylinder3D.new()
+	clock_face.radius = 0.28
+	clock_face.height = 0.05
+	clock_face.rotation_degrees = Vector3(90, 0, 0)
+	clock_face.position = Vector3(-4.2, 3.32, -6.81)
+	clock_face.material = _create_mat(Color(0.96, 0.96, 0.96))
+	set_full_house.add_child(clock_face)
+	
+	# Floating Display Shelves with Succulents
+	for sh_x in [-6.6, -1.8]:
+		var shelf = CSGBox3D.new()
+		shelf.size = Vector3(0.9, 0.05, 0.25)
+		shelf.position = Vector3(sh_x, 2.3, -6.75)
+		shelf.material = mat_wood_warm
+		set_full_house.add_child(shelf)
+		var p1 = _create_potted_plant(0.08, 0.12, 0.15, true)
+		p1.position = Vector3(sh_x - 0.2, 2.35, -6.72)
+		set_full_house.add_child(p1)
+		var p2 = _create_potted_plant(0.07, 0.1, 0.12, true)
+		p2.position = Vector3(sh_x + 0.2, 2.35, -6.72)
+		set_full_house.add_child(p2)
+	
+	# Tall Audio Tower Speakers flanking TV
+	for spk_x in [-6.8, -1.6]:
+		var spk = CSGBox3D.new()
+		spk.size = Vector3(0.35, 1.5, 0.35)
+		spk.position = Vector3(spk_x, 0.75, -6.5)
+		spk.material = mat_black_metal
+		set_full_house.add_child(spk)
+	
+	# Low Media Console Unit
+	var media_console = CSGBox3D.new()
+	media_console.size = Vector3(3.4, 0.52, 0.6)
+	media_console.position = Vector3(-4.2, 0.26, -6.4)
+	media_console.material = mat_charcoal_wall
+	set_full_house.add_child(media_console)
+	
+	# Modern Navy 3-Seater Sofa
+	var sofa_base = CSGBox3D.new()
+	sofa_base.size = Vector3(3.0, 0.5, 1.1)
+	sofa_base.position = Vector3(-4.2, 0.25, -2.5)
+	sofa_base.material = mat_sofa_navy
+	set_full_house.add_child(sofa_base)
+	
+	var sofa_back = CSGBox3D.new()
+	sofa_back.size = Vector3(3.0, 0.65, 0.35)
+	sofa_back.position = Vector3(-4.2, 0.85, -1.95)
+	sofa_back.material = mat_sofa_navy
+	set_full_house.add_child(sofa_back)
+	
+	var sofa_arm_l = CSGBox3D.new()
+	sofa_arm_l.size = Vector3(0.3, 0.55, 1.3)
+	sofa_arm_l.position = Vector3(-5.8, 0.55, -2.4)
+	sofa_arm_l.material = mat_sofa_navy
+	set_full_house.add_child(sofa_arm_l)
+	
+	var sofa_arm_r = CSGBox3D.new()
+	sofa_arm_r.size = Vector3(0.3, 0.55, 1.3)
+	sofa_arm_r.position = Vector3(-2.6, 0.55, -2.4)
+	sofa_arm_r.material = mat_sofa_navy
+	set_full_house.add_child(sofa_arm_r)
+	
+	# Navy Armchair
+	var armchair = CSGBox3D.new()
+	armchair.size = Vector3(1.1, 0.5, 1.0)
+	armchair.position = Vector3(-6.8, 0.25, -3.4)
+	armchair.material = mat_sofa_navy
+	set_full_house.add_child(armchair)
+	var armchair_back = CSGBox3D.new()
+	armchair_back.size = Vector3(0.3, 0.65, 1.0)
+	armchair_back.position = Vector3(-7.3, 0.75, -3.4)
+	armchair_back.material = mat_sofa_navy
+	set_full_house.add_child(armchair_back)
+	
+	# Low Wooden Coffee Table with Plant Centerpiece
+	var coffee_table = CSGBox3D.new()
+	coffee_table.size = Vector3(1.8, 0.42, 0.9)
+	coffee_table.position = Vector3(-4.2, 0.21, -4.2)
+	coffee_table.material = mat_wood_warm
+	set_full_house.add_child(coffee_table)
+	
+	var ct_plant = _create_potted_plant(0.16, 0.16, 0.3, true)
+	ct_plant.position = Vector3(-4.2, 0.42, -4.2)
+	set_full_house.add_child(ct_plant)
+	
+	# Papa NPC seated on sofa watching TV
+	char_papa = _build_rigged_human("Papa", Color(0.85, 0.82, 0.75), Color(0.2, 0.22, 0.28), false, false, false, true)
+	char_papa.position = Vector3(-4.2, 0.38, -2.4)
 	char_papa.rotation_degrees = Vector3(0, 180, 0)
 	set_full_house.add_child(char_papa)
 	
-	# --- KITCHEN (Right) ---
+	# Indoor Floor Plants in Living Room
+	var plant_lr1 = _create_potted_plant(0.28, 0.65, 1.1)
+	plant_lr1.position = Vector3(-7.8, 0, -6.2)
+	set_full_house.add_child(plant_lr1)
+	
+	var plant_lr2 = _create_potted_plant(0.25, 0.6, 0.95)
+	plant_lr2.position = Vector3(-0.6, 0, -6.2)
+	set_full_house.add_child(plant_lr2)
+	
+	# --------------------------------------------------------------------------
+	# PANEL 5: STAIRS TO ROOM (Architectural Open-Tread Glass Staircase)
+	# --------------------------------------------------------------------------
+	var stair_wall = CSGBox3D.new()
+	stair_wall.size = Vector3(0.25, 7.2, 6.0)
+	stair_wall.position = Vector3(1.9, 3.6, -3.2)
+	stair_wall.material = mat_white_wall
+	set_full_house.add_child(stair_wall)
+	
+	# 10 Polished Marble Steps rising to Y = 3.6
+	for i in range(10):
+		var step = CSGBox3D.new()
+		step.size = Vector3(1.6, 0.36, 0.55)
+		step.position = Vector3(0.8, 0.18 + (i * 0.36), -5.8 + (i * 0.55))
+		step.material = mat_marble_floor
+		set_full_house.add_child(step)
+	
+	# Continuous Black Handrail & Glass Balustrade alongside steps
+	var stair_glass = CSGBox3D.new()
+	stair_glass.size = Vector3(0.04, 1.1, 5.6)
+	stair_glass.position = Vector3(0.0, 2.3, -3.3)
+	stair_glass.rotation_degrees = Vector3(33.0, 0, 0)
+	stair_glass.material = mat_glass
+	set_full_house.add_child(stair_glass)
+	
+	var stair_rail = CSGBox3D.new()
+	stair_rail.size = Vector3(0.08, 0.08, 6.2)
+	stair_rail.position = Vector3(0.0, 2.85, -3.3)
+	stair_rail.rotation_degrees = Vector3(33.0, 0, 0)
+	stair_rail.material = mat_black_metal
+	set_full_house.add_child(stair_rail)
+	
+	# "DREAM BIG" Framed Black Poster on Staircase Wall (Panel 5 Signature!)
+	var poster_frame = CSGBox3D.new()
+	poster_frame.size = Vector3(0.04, 1.5, 1.1)
+	poster_frame.position = Vector3(1.76, 2.6, -3.5)
+	poster_frame.material = mat_black_metal
+	set_full_house.add_child(poster_frame)
+	
+	var poster_label = Label3D.new()
+	poster_label.text = "DREAM\nBIG"
+	poster_label.font_size = 42
+	poster_label.modulate = Color(1.0, 1.0, 1.0)
+	poster_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	poster_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	poster_label.position = Vector3(1.73, 2.6, -3.5)
+	poster_label.rotation_degrees = Vector3(0, -90, 0)
+	set_full_house.add_child(poster_label)
+	
+	# Vertical Cylinder Wall Sconces illuminating steps
+	for sc_pos in [Vector3(1.75, 1.6, -4.8), Vector3(1.75, 2.7, -3.0), Vector3(1.75, 3.8, -1.2)]:
+		var sc_body = CSGCylinder3D.new()
+		sc_body.radius = 0.05
+		sc_body.height = 0.38
+		sc_body.position = sc_pos
+		sc_body.material = mat_black_metal
+		set_full_house.add_child(sc_body)
+		
+		var sc_light = OmniLight3D.new()
+		sc_light.position = sc_pos + Vector3(-0.15, 0, 0)
+		sc_light.light_color = Color(1.0, 0.92, 0.7)
+		sc_light.light_energy = 1.8
+		sc_light.omni_range = 3.5
+		set_full_house.add_child(sc_light)
+	
+	# Potted floor plant at bottom of stairs
+	var plant_stair = _create_potted_plant(0.24, 0.6, 1.0)
+	plant_stair.position = Vector3(0.2, 0, -6.2)
+	set_full_house.add_child(plant_stair)
+	
+	# --------------------------------------------------------------------------
+	# PANEL 6: UPPER FLOOR HALL / MEZZANINE (Overlooking Living Room)
+	# --------------------------------------------------------------------------
+	# Glass Balustrade guarding the open edge looking down into living room
+	var balustrade_glass = CSGBox3D.new()
+	balustrade_glass.size = Vector3(0.04, 1.05, 6.8)
+	balustrade_glass.position = Vector3(-0.75, 4.25, -3.4)
+	balustrade_glass.material = mat_glass
+	set_full_house.add_child(balustrade_glass)
+	
+	var balustrade_rail = CSGBox3D.new()
+	balustrade_rail.size = Vector3(0.08, 0.08, 6.8)
+	balustrade_rail.position = Vector3(-0.75, 4.8, -3.4)
+	balustrade_rail.material = mat_black_metal
+	set_full_house.add_child(balustrade_rail)
+	
+	# Wooden doors along upper hallway
+	var door_arjun = CSGBox3D.new()
+	door_arjun.size = Vector3(1.1, 2.2, 0.08)
+	door_arjun.position = Vector3(-1.4, 4.8, 0.15)
+	door_arjun.material = mat_wood_warm
+	set_full_house.add_child(door_arjun)
+	
+	var door_master = CSGBox3D.new()
+	door_master.size = Vector3(0.08, 2.2, 1.1)
+	door_master.position = Vector3(1.88, 4.8, -2.5)
+	door_master.material = mat_wood_warm
+	set_full_house.add_child(door_master)
+	
+	# Hallway Art Posters & Window
+	var poster_hall1 = CSGBox3D.new()
+	poster_hall1.size = Vector3(0.04, 1.1, 0.8)
+	poster_hall1.position = Vector3(1.88, 5.2, -4.5)
+	poster_hall1.material = _create_mat(Color(0.15, 0.35, 0.65))
+	set_full_house.add_child(poster_hall1)
+	
+	var hall_window = CSGBox3D.new()
+	hall_window.size = Vector3(2.2, 1.6, 0.1)
+	hall_window.position = Vector3(0.5, 5.2, -6.95)
+	hall_window.material = _create_mat(Color(0.85, 0.95, 1.0, 0.4), 0.1, 0.0, Color(0.9, 0.95, 1.0), 1.5)
+	set_full_house.add_child(hall_window)
+	
+	# --------------------------------------------------------------------------
+	# PANEL 4: KITCHEN & DINING (Ground Floor Right)
+	# --------------------------------------------------------------------------
+	# Dark Charcoal Modular Base Cabinets along Z = -6.4
+	var base_cabinets = CSGBox3D.new()
+	base_cabinets.size = Vector3(4.8, 0.85, 0.9)
+	base_cabinets.position = Vector3(5.5, 0.42, -6.4)
+	base_cabinets.material = mat_charcoal_wall
+	set_full_house.add_child(base_cabinets)
+	
+	# Seamless White Quartz Countertop
 	var kitchen_counter = CSGBox3D.new()
-	kitchen_counter.size = Vector3(4.0, 0.9, 1.2)
-	kitchen_counter.position = Vector3(4.5, 0.45, -5.0)
-	kitchen_counter.material = mat_kitchen_slab
+	kitchen_counter.size = Vector3(5.0, 0.08, 1.0)
+	kitchen_counter.position = Vector3(5.5, 0.88, -6.4)
+	kitchen_counter.material = mat_countertop
 	set_full_house.add_child(kitchen_counter)
 	
+	# Overhead Matching Upper Cabinets
+	var upper_cabinets = CSGBox3D.new()
+	upper_cabinets.size = Vector3(4.6, 0.85, 0.55)
+	upper_cabinets.position = Vector3(5.5, 2.5, -6.6)
+	upper_cabinets.material = mat_charcoal_wall
+	set_full_house.add_child(upper_cabinets)
+	
+	# Gas Stove / Cooktop
 	var stove = CSGBox3D.new()
-	stove.size = Vector3(1.2, 0.1, 0.6)
-	stove.position = Vector3(4.5, 0.95, -5.0)
-	stove.material = _create_mat(Color(0.2, 0.2, 0.22), 0.3, 0.8)
+	stove.size = Vector3(1.1, 0.06, 0.65)
+	stove.position = Vector3(5.5, 0.92, -6.4)
+	stove.material = _create_mat(Color(0.25, 0.27, 0.3), 0.3, 0.8)
 	set_full_house.add_child(stove)
 	
+	# Overhead Stainless Steel Chimney Hood
+	var chimney_hood = CSGBox3D.new()
+	chimney_hood.size = Vector3(1.2, 0.35, 0.7)
+	chimney_hood.position = Vector3(5.5, 2.15, -6.4)
+	chimney_hood.material = mat_silver_metal
+	set_full_house.add_child(chimney_hood)
+	
+	var chimney_duct = CSGBox3D.new()
+	chimney_duct.size = Vector3(0.45, 1.2, 0.4)
+	chimney_duct.position = Vector3(5.5, 2.9, -6.4)
+	chimney_duct.material = mat_silver_metal
+	set_full_house.add_child(chimney_duct)
+	
+	# Chai Pot on Stove Burner
 	var chai_pot = CSGCylinder3D.new()
 	chai_pot.radius = 0.2
 	chai_pot.height = 0.25
-	chai_pot.position = Vector3(4.5, 1.15, -5.0)
-	chai_pot.material = _create_mat(Color(0.7, 0.7, 0.72), 0.2, 0.9)
+	chai_pot.position = Vector3(5.5, 1.08, -6.4)
+	chai_pot.material = mat_silver_metal
 	set_full_house.add_child(chai_pot)
 	
+	# Rising Tea Steam Mesh
 	tea_steam_mesh = MeshInstance3D.new()
 	var steam_s = SphereMesh.new()
-	steam_s.radius = 0.12
-	steam_s.height = 0.25
+	steam_s.radius = 0.14
+	steam_s.height = 0.3
 	tea_steam_mesh.mesh = steam_s
-	tea_steam_mesh.material_override = _create_mat(Color(1, 1, 1, 0.3), 0.9, 0.0, Color.WHITE, 0.5)
-	tea_steam_mesh.position = Vector3(4.5, 1.4, -5.0)
+	tea_steam_mesh.material_override = _create_mat(Color(1, 1, 1, 0.4), 0.9, 0.0, Color.WHITE, 0.6)
+	tea_steam_mesh.position = Vector3(5.5, 1.4, -6.4)
 	set_full_house.add_child(tea_steam_mesh)
 	
+	# Countertop Microwave Oven
+	var microwave = CSGBox3D.new()
+	microwave.size = Vector3(0.7, 0.42, 0.48)
+	microwave.position = Vector3(7.1, 1.15, -6.4)
+	microwave.material = _create_mat(Color(0.18, 0.18, 0.2), 0.4, 0.6)
+	set_full_house.add_child(microwave)
+	
+	# Water Dispenser (White Stand + Inverted Blue Carboy Bottle - Panel 4 Signature!)
+	var wd_stand = CSGBox3D.new()
+	wd_stand.size = Vector3(0.42, 0.85, 0.42)
+	wd_stand.position = Vector3(2.5, 0.42, -6.4)
+	wd_stand.material = _create_mat(Color(0.96, 0.96, 0.96), 0.4)
+	set_full_house.add_child(wd_stand)
+	
+	var wd_bottle = CSGCylinder3D.new()
+	wd_bottle.radius = 0.16
+	wd_bottle.height = 0.45
+	wd_bottle.position = Vector3(2.5, 1.1, -6.4)
+	wd_bottle.material = mat_water_blue
+	set_full_house.add_child(wd_bottle)
+	
+	# Tall Double-Door Silver Refrigerator
+	var fridge = CSGBox3D.new()
+	fridge.size = Vector3(0.95, 1.95, 0.85)
+	fridge.position = Vector3(8.2, 0.98, -6.3)
+	fridge.material = mat_silver_metal
+	set_full_house.add_child(fridge)
+	
+	# Center Dining Table with 4 Chairs & Centerpiece Plant
+	var dining_table = CSGBox3D.new()
+	dining_table.size = Vector3(2.2, 0.78, 1.1)
+	dining_table.position = Vector3(5.5, 0.39, -3.2)
+	dining_table.material = mat_wood_warm
+	set_full_house.add_child(dining_table)
+	
+	var dining_plant = _create_potted_plant(0.14, 0.14, 0.28, true)
+	dining_plant.position = Vector3(5.5, 0.78, -3.2)
+	set_full_house.add_child(dining_plant)
+	
+	var mat_chair_grey = _create_mat(Color(0.24, 0.26, 0.29), 0.7)
+	for ch_pos in [Vector3(4.8, 0.45, -2.4), Vector3(6.2, 0.45, -2.4), Vector3(4.8, 0.45, -4.0), Vector3(6.2, 0.45, -4.0)]:
+		var chair = CSGBox3D.new()
+		chair.size = Vector3(0.45, 0.85, 0.45)
+		chair.position = ch_pos
+		chair.material = mat_chair_grey
+		set_full_house.add_child(chair)
+	
+	# Mummy NPC cooking at stove
 	char_mummy = _build_rigged_human("Mummy", Color(0.85, 0.2, 0.35), Color(0.85, 0.2, 0.35), false, false, true)
-	char_mummy.position = Vector3(4.5, 0, -3.6)
+	char_mummy.position = Vector3(5.5, 0, -5.2)
 	char_mummy.rotation_degrees = Vector3(0, 0, 0)
 	set_full_house.add_child(char_mummy)
 	
-	# --- UPSTAIRS BEDROOM ---
-	for i in range(8):
-		var step = CSGBox3D.new()
-		step.size = Vector3(1.8, 0.35, 0.45)
-		step.position = Vector3(-0.5, 0.18 + (i * 0.35), 1.0 + (i * 0.45))
-		step.material = mat_wood
-		set_full_house.add_child(step)
+	# --------------------------------------------------------------------------
+	# PANEL 2: ARJUN'S ROOM (Protagonist Bedroom - 1st Floor Left)
+	# --------------------------------------------------------------------------
+	# Large Royal Blue Area Rug under bed & desk
+	var blue_rug = CSGBox3D.new()
+	blue_rug.size = Vector3(4.8, 0.02, 4.2)
+	blue_rug.position = Vector3(-4.5, 3.62, 3.5)
+	blue_rug.material = mat_rug_blue
+	set_full_house.add_child(blue_rug)
 	
-	var floor_up = CSGBox3D.new()
-	floor_up.size = Vector3(9.0, 0.2, 8.0)
-	floor_up.position = Vector3(-3.5, 2.9, 2.0)
-	floor_up.material = mat_wood
-	set_full_house.add_child(floor_up)
+	# Modern Platform Bed
+	var bed_platform = CSGBox3D.new()
+	bed_platform.size = Vector3(2.4, 0.35, 2.8)
+	bed_platform.position = Vector3(-4.5, 3.78, 2.5)
+	bed_platform.material = mat_charcoal_wall
+	set_full_house.add_child(bed_platform)
 	
-	# Spinning Ceiling fan
+	var mattress = CSGBox3D.new()
+	mattress.size = Vector3(2.2, 0.25, 2.6)
+	mattress.position = Vector3(-4.5, 4.05, 2.5)
+	mattress.material = _create_mat(Color(0.9, 0.92, 0.96))
+	set_full_house.add_child(mattress)
+	
+	# Blue Pixelated / Checkered Quilt Cover
+	var quilt = CSGBox3D.new()
+	quilt.size = Vector3(2.2, 0.22, 2.2)
+	quilt.position = Vector3(-4.5, 4.18, 2.3)
+	quilt.material = mat_quilt_blue
+	set_full_house.add_child(quilt)
+	
+	# Patterned Pixel Quilt Accent Squares
+	for qx in [-0.6, 0.0, 0.6]:
+		for qz in [-0.5, 0.5]:
+			var qtile = CSGBox3D.new()
+			qtile.size = Vector3(0.42, 0.02, 0.42)
+			qtile.position = Vector3(-4.5 + qx, 4.29, 2.3 + qz)
+			qtile.material = _create_mat(Color(0.08, 0.24, 0.65) if (qx == 0.0) else Color(0.18, 0.52, 0.95))
+			set_full_house.add_child(qtile)
+	
+	# Two Royal Blue Pillows at Headboard
+	for px in [-5.1, -3.9]:
+		var pil = CSGBox3D.new()
+		pil.size = Vector3(0.9, 0.18, 0.55)
+		pil.position = Vector3(px, 4.25, 3.4)
+		pil.material = _create_mat(Color(0.15, 0.42, 0.88))
+		set_full_house.add_child(pil)
+	
+	# Sleeping Protagonist in Black Hoodie with White Sleeve Details!
+	char_player_sleeping = _build_rigged_human("ProtagonistSleeping", Color(0.12, 0.12, 0.14), Color(0.14, 0.14, 0.17))
+	char_player_sleeping.position = Vector3(-4.5, 4.15, 2.5)
+	char_player_sleeping.rotation_degrees = Vector3(-90, 0, 0)
+	set_full_house.add_child(char_player_sleeping)
+	
+	# Posters on Periwinkle Accent Wall:
+	# 1. "GAME ON" Poster (Black frame, white text & controller)
+	var p_gameon_frame = CSGBox3D.new()
+	p_gameon_frame.size = Vector3(0.85, 1.15, 0.03)
+	p_gameon_frame.position = Vector3(-5.4, 5.4, 0.25)
+	p_gameon_frame.material = mat_black_metal
+	set_full_house.add_child(p_gameon_frame)
+	
+	var p_gameon_lbl = Label3D.new()
+	p_gameon_lbl.text = "GAME\nON\n🎮"
+	p_gameon_lbl.font_size = 36
+	p_gameon_lbl.modulate = Color(1.0, 1.0, 1.0)
+	p_gameon_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	p_gameon_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	p_gameon_lbl.position = Vector3(-5.4, 5.4, 0.27)
+	set_full_house.add_child(p_gameon_lbl)
+	
+	# 2. Golden Crown "👑" Poster
+	var p_crown_frame = CSGBox3D.new()
+	p_crown_frame.size = Vector3(0.75, 0.95, 0.03)
+	p_crown_frame.position = Vector3(-3.6, 5.4, 0.25)
+	p_crown_frame.material = mat_black_metal
+	set_full_house.add_child(p_crown_frame)
+	
+	var p_crown_lbl = Label3D.new()
+	p_crown_lbl.text = "👑"
+	p_crown_lbl.font_size = 54
+	p_crown_lbl.modulate = Color(0.98, 0.82, 0.15)
+	p_crown_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	p_crown_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	p_crown_lbl.position = Vector3(-3.6, 5.4, 0.27)
+	set_full_house.add_child(p_crown_lbl)
+	
+	# Floating Wooden Shelves with Books & Plants
+	for sy in [5.4, 4.8]:
+		var sh = CSGBox3D.new()
+		sh.size = Vector3(1.4, 0.05, 0.25)
+		sh.position = Vector3(-1.8, sy, 1.2)
+		sh.material = mat_wood_warm
+		set_full_house.add_child(sh)
+		var b_plant = _create_potted_plant(0.08, 0.1, 0.14, true)
+		b_plant.position = Vector3(-1.4, sy + 0.05, 1.2)
+		set_full_house.add_child(b_plant)
+	
+	# Corner Gaming Desk
+	var desk = CSGBox3D.new()
+	desk.size = Vector3(2.2, 0.75, 0.9)
+	desk.position = Vector3(-1.6, 3.98, 4.5)
+	desk.material = mat_charcoal_wall
+	set_full_house.add_child(desk)
+	
+	# PC Tower Chassis with Cyan RGB Strip
+	var pc_tower = CSGBox3D.new()
+	pc_tower.size = Vector3(0.28, 0.55, 0.55)
+	pc_tower.position = Vector3(-2.4, 4.65, 4.6)
+	pc_tower.material = mat_black_metal
+	set_full_house.add_child(pc_tower)
+	
+	var pc_rgb = CSGBox3D.new()
+	pc_rgb.size = Vector3(0.02, 0.45, 0.45)
+	pc_rgb.position = Vector3(-2.25, 4.65, 4.6)
+	pc_rgb.material = mat_cyan_led
+	set_full_house.add_child(pc_rgb)
+	
+	# Ultrawide Gaming Monitor with Glowing Blue Display
+	var monitor = CSGBox3D.new()
+	monitor.size = Vector3(1.25, 0.62, 0.06)
+	monitor.position = Vector3(-1.4, 4.75, 4.5)
+	monitor.material = mat_pc_blue
+	set_full_house.add_child(monitor)
+	
+	# Racing Gaming Chair (Black with Royal Blue Bolsters)
+	var chair_base = CSGBox3D.new()
+	chair_base.size = Vector3(0.6, 0.45, 0.6)
+	chair_base.position = Vector3(-1.4, 3.82, 3.4)
+	chair_base.material = mat_black_metal
+	set_full_house.add_child(chair_base)
+	
+	var chair_back = CSGBox3D.new()
+	chair_back.size = Vector3(0.55, 0.85, 0.12)
+	chair_back.position = Vector3(-1.4, 4.45, 3.1)
+	chair_back.material = _create_mat(Color(0.12, 0.12, 0.14))
+	set_full_house.add_child(chair_back)
+	
+	var chair_blue_strip = CSGBox3D.new()
+	chair_blue_strip.size = Vector3(0.35, 0.75, 0.04)
+	chair_blue_strip.position = Vector3(-1.4, 4.45, 3.16)
+	chair_blue_strip.material = _create_mat(Color(0.12, 0.45, 0.95))
+	set_full_house.add_child(chair_blue_strip)
+	
+	# Bedroom Window & Royal Blue Draped Curtains
+	var bed_win = CSGBox3D.new()
+	bed_win.size = Vector3(2.2, 1.8, 0.1)
+	bed_win.position = Vector3(-1.0, 5.0, 6.95)
+	bed_win.material = _create_mat(Color(0.85, 0.95, 1.0, 0.4), 0.1, 0.0, Color(1.0, 0.96, 0.8), 2.0)
+	set_full_house.add_child(bed_win)
+	
+	var curt_l = CSGBox3D.new()
+	curt_l.size = Vector3(0.45, 2.2, 0.15)
+	curt_l.position = Vector3(-2.3, 5.0, 6.85)
+	curt_l.material = mat_curtain_blue
+	set_full_house.add_child(curt_l)
+	
+	var curt_r = CSGBox3D.new()
+	curt_r.size = Vector3(0.45, 2.2, 0.15)
+	curt_r.position = Vector3(0.3, 5.0, 6.85)
+	curt_r.material = mat_curtain_blue
+	set_full_house.add_child(curt_r)
+	
+	# Tall Dark Charcoal Double-Door Wardrobe
+	var wardrobe = CSGBox3D.new()
+	wardrobe.size = Vector3(0.7, 2.5, 1.8)
+	wardrobe.position = Vector3(-8.6, 4.85, 2.5)
+	wardrobe.material = mat_charcoal_wall
+	set_full_house.add_child(wardrobe)
+	
+	# Bedside Nightstand & Lamp
+	var nightstand = CSGBox3D.new()
+	nightstand.size = Vector3(0.55, 0.55, 0.55)
+	nightstand.position = Vector3(-6.2, 3.88, 3.4)
+	nightstand.material = mat_wood_warm
+	set_full_house.add_child(nightstand)
+	
+	var lamp = CSGCylinder3D.new()
+	lamp.radius = 0.14
+	lamp.height = 0.35
+	lamp.position = Vector3(-6.2, 4.35, 3.4)
+	lamp.material = _create_mat(Color(1.0, 0.95, 0.8), 0.2, 0.0, Color(1.0, 0.92, 0.7), 2.2)
+	set_full_house.add_child(lamp)
+	
+	# Spinning Ceiling Fan
 	var fan_pivot = Node3D.new()
-	fan_pivot.position = Vector3(-4.8, 5.8, 2.5)
+	fan_pivot.position = Vector3(-4.5, 6.8, 3.5)
 	set_full_house.add_child(fan_pivot)
 	var fan_rod = CSGCylinder3D.new()
 	fan_rod.radius = 0.04
-	fan_rod.height = 0.8
-	fan_rod.position = Vector3(0, 0.4, 0)
-	fan_rod.material = _create_mat(Color(0.85, 0.85, 0.85))
+	fan_rod.height = 0.6
+	fan_rod.position = Vector3(0, 0.3, 0)
+	fan_rod.material = mat_white_wall
 	fan_pivot.add_child(fan_rod)
 	ceiling_fan_blades = Node3D.new()
 	fan_pivot.add_child(ceiling_fan_blades)
@@ -737,47 +1294,11 @@ func _build_act3_full_house() -> void:
 		blade.size = Vector3(1.2, 0.02, 0.15)
 		blade.position = Vector3(0.6, 0, 0)
 		blade.rotation_degrees = Vector3(0, r, 0)
-		blade.material = _create_mat(Color(0.8, 0.8, 0.8))
+		blade.material = _create_mat(Color(0.85, 0.85, 0.85))
 		ceiling_fan_blades.add_child(blade)
-	
-	# Wooden bed with mattress & blanket
-	var bed_frame = CSGBox3D.new()
-	bed_frame.size = Vector3(2.2, 0.4, 3.2)
-	bed_frame.position = Vector3(-4.8, 3.2, 2.5)
-	bed_frame.material = mat_wood
-	set_full_house.add_child(bed_frame)
-	
-	var mattress = CSGBox3D.new()
-	mattress.size = Vector3(2.0, 0.35, 3.0)
-	mattress.position = Vector3(-4.8, 3.5, 2.5)
-	mattress.material = _create_mat(Color(0.2, 0.45, 0.8))
-	set_full_house.add_child(mattress)
-	
-	var pillow = CSGBox3D.new()
-	pillow.size = Vector3(1.3, 0.18, 0.6)
-	pillow.position = Vector3(-4.8, 3.75, 3.6)
-	pillow.material = _create_mat(Color(0.95, 0.95, 0.95))
-	set_full_house.add_child(pillow)
-	
-	var blanket = CSGBox3D.new()
-	blanket.size = Vector3(1.8, 0.25, 2.2)
-	blanket.position = Vector3(-4.8, 3.8, 2.0)
-	blanket.material = _create_mat(Color(0.85, 0.3, 0.3))
-	set_full_house.add_child(blanket)
-	
-	var bedroom_window = CSGBox3D.new()
-	bedroom_window.size = Vector3(2.4, 1.8, 0.2)
-	bedroom_window.position = Vector3(-4.8, 4.5, 5.9)
-	bedroom_window.material = _create_mat(Color(0.85, 0.95, 1.0, 0.5), 0.1, 0.0, Color(1.0, 0.96, 0.75), 3.0)
-	set_full_house.add_child(bedroom_window)
-	
-	char_player_sleeping = _build_rigged_human("ProtagonistSleeping", Color(0.9, 0.9, 0.9), Color(0.2, 0.35, 0.6))
-	char_player_sleeping.position = Vector3(-4.8, 3.7, 2.6)
-	char_player_sleeping.rotation_degrees = Vector3(-90, 0, 0)
-	set_full_house.add_child(char_player_sleeping)
 
 # ------------------------------------------------------------------------------
-# ACT 4: NEIGHBORHOOD MAP & SCHOOL VAN ARRIVAL
+# ACT 4: MODERN TWO-STORY VILLA EXTERIOR & NEIGHBORHOOD (Matching Panel 1)
 # ------------------------------------------------------------------------------
 func _build_act4_neighborhood_van() -> void:
 	set_neighborhood_street = Node3D.new()
@@ -785,36 +1306,225 @@ func _build_act4_neighborhood_van() -> void:
 	set_neighborhood_street.position = Vector3(600, 0, 0)
 	add_child(set_neighborhood_street)
 	
-	var ground = CSGBox3D.new()
-	ground.size = Vector3(30.0, 0.2, 80.0)
-	ground.position = Vector3(0, -0.1, 0)
-	ground.material = _create_mat(Color(0.2, 0.2, 0.22), 0.9)
-	set_neighborhood_street.add_child(ground)
+	var mat_villa_white = _create_mat(Color(0.96, 0.96, 0.97), 0.85)
+	var mat_villa_charcoal = _create_mat(Color(0.18, 0.19, 0.22), 0.6)
+	var mat_asphalt = _create_mat(Color(0.2, 0.2, 0.22), 0.9)
+	var mat_sidewalk = _create_mat(Color(0.68, 0.69, 0.72), 0.8)
+	var mat_hedge = _create_mat(Color(0.14, 0.50, 0.18), 0.85)
+	var mat_black_gate = _create_mat(Color(0.12, 0.13, 0.15), 0.3, 0.7)
+	var mat_glass = _create_mat(Color(0.75, 0.90, 1.0, 0.35), 0.05, 0.1)
+	var mat_gold_lamp = _create_mat(Color(1.0, 0.9, 0.55), 0.2, 0.0, Color(1.0, 0.9, 0.55), 3.0)
 	
-	var house_facade = CSGBox3D.new()
-	house_facade.size = Vector3(10.0, 6.0, 8.0)
-	house_facade.position = Vector3(10.0, 3.0, 0)
-	house_facade.material = _create_mat(Color(0.88, 0.84, 0.78))
-	set_neighborhood_street.add_child(house_facade)
+	# Asphalt Road
+	var road = CSGBox3D.new()
+	road.size = Vector3(30.0, 0.2, 80.0)
+	road.position = Vector3(0, -0.1, 0)
+	road.material = mat_asphalt
+	set_neighborhood_street.add_child(road)
 	
+	# Yellow Center Dividing Line
+	var yellow_line = CSGBox3D.new()
+	yellow_line.size = Vector3(0.25, 0.02, 80.0)
+	yellow_line.position = Vector3(0, 0.01, 0)
+	yellow_line.material = _create_mat(Color(0.95, 0.8, 0.15), 0.6)
+	set_neighborhood_street.add_child(yellow_line)
+	
+	# Paved Sidewalk in front of Villa
+	var sidewalk = CSGBox3D.new()
+	sidewalk.size = Vector3(18.0, 0.15, 4.0)
+	sidewalk.position = Vector3(2.5, 0.05, 1.5)
+	sidewalk.material = mat_sidewalk
+	set_neighborhood_street.add_child(sidewalk)
+	
+	# --------------------------------------------------------------------------
+	# TWO-STORY MODERN VILLA MAIN BUILDING (Panel 1)
+	# --------------------------------------------------------------------------
+	var villa_body = CSGBox3D.new()
+	villa_body.size = Vector3(14.0, 7.0, 8.5)
+	villa_body.position = Vector3(4.0, 3.5, -4.5)
+	villa_body.material = mat_villa_white
+	set_neighborhood_street.add_child(villa_body)
+	
+	# Dark Architectural Borders & Parapet Coping
+	var roof_trim = CSGBox3D.new()
+	roof_trim.size = Vector3(14.4, 0.4, 8.9)
+	roof_trim.position = Vector3(4.0, 7.1, -4.5)
+	roof_trim.material = mat_villa_charcoal
+	set_neighborhood_street.add_child(roof_trim)
+	
+	# Ground Floor Front Entrance Porch / Portico
+	var porch_canopy = CSGBox3D.new()
+	porch_canopy.size = Vector3(4.2, 0.35, 2.2)
+	porch_canopy.position = Vector3(2.5, 3.3, -0.8)
+	porch_canopy.material = mat_villa_charcoal
+	set_neighborhood_street.add_child(porch_canopy)
+	
+	# Front Entrance Door (Animated Open in Beat 15)
 	front_door_mesh = CSGBox3D.new()
-	front_door_mesh.size = Vector3(0.1, 2.5, 1.5)
-	front_door_mesh.position = Vector3(4.9, 1.25, 0)
-	front_door_mesh.material = _create_mat(Color(0.4, 0.25, 0.12))
+	front_door_mesh.size = Vector3(0.12, 2.4, 1.4)
+	front_door_mesh.position = Vector3(2.5, 1.2, 0.0)
+	front_door_mesh.material = _create_mat(Color(0.42, 0.28, 0.15), 0.6)
 	set_neighborhood_street.add_child(front_door_mesh)
 	
-	var c_wall = CSGBox3D.new()
-	c_wall.size = Vector3(0.25, 1.5, 18.0)
-	c_wall.position = Vector3(3.0, 0.75, 0)
-	c_wall.material = _create_mat(Color(0.65, 0.65, 0.65))
-	set_neighborhood_street.add_child(c_wall)
+	# Warm Porch Recessed Light
+	var porch_light = OmniLight3D.new()
+	porch_light.position = Vector3(2.5, 3.1, -0.8)
+	porch_light.light_color = Color(1.0, 0.92, 0.75)
+	porch_light.light_energy = 2.5
+	porch_light.omni_range = 6.0
+	set_neighborhood_street.add_child(porch_light)
 	
-	var gate_cut = CSGBox3D.new()
-	gate_cut.operation = CSGShape3D.OPERATION_SUBTRACTION
-	gate_cut.size = Vector3(0.5, 1.8, 3.0)
-	gate_cut.position = Vector3(3.0, 0.9, 0)
-	c_wall.add_child(gate_cut)
+	# Ground Floor Window (3x3 grid pane on left)
+	var win_g = CSGBox3D.new()
+	win_g.size = Vector3(2.8, 2.0, 0.15)
+	win_g.position = Vector3(-1.5, 1.5, -0.2)
+	win_g.material = _create_mat(Color(0.15, 0.15, 0.18), 0.3, 0.8)
+	set_neighborhood_street.add_child(win_g)
 	
+	# --------------------------------------------------------------------------
+	# 1ST-FLOOR RECESSED BALCONY WITH GLASS RAILING (Panel 1)
+	# --------------------------------------------------------------------------
+	var balcony_frame = CSGBox3D.new()
+	balcony_frame.size = Vector3(4.8, 3.3, 2.2)
+	balcony_frame.position = Vector3(5.5, 5.2, -1.0)
+	balcony_frame.material = mat_villa_charcoal
+	set_neighborhood_street.add_child(balcony_frame)
+	
+	var balcony_void = CSGBox3D.new()
+	balcony_void.size = Vector3(4.4, 3.0, 2.0)
+	balcony_void.position = Vector3(5.5, 5.2, -0.9)
+	balcony_void.material = mat_villa_white
+	set_neighborhood_street.add_child(balcony_void)
+	
+	# Transparent Glass Balustrade & Black Handrail
+	var balcony_glass = CSGBox3D.new()
+	balcony_glass.size = Vector3(4.3, 1.05, 0.06)
+	balcony_glass.position = Vector3(5.5, 4.15, 0.1)
+	balcony_glass.material = mat_glass
+	set_neighborhood_street.add_child(balcony_glass)
+	
+	var balcony_rail = CSGBox3D.new()
+	balcony_rail.size = Vector3(4.4, 0.08, 0.08)
+	balcony_rail.position = Vector3(5.5, 4.7, 0.1)
+	balcony_rail.material = mat_villa_charcoal
+	set_neighborhood_street.add_child(balcony_rail)
+	
+	# 1st-Floor Left Window (3x3 grid)
+	var win_1f = CSGBox3D.new()
+	win_1f.size = Vector3(2.8, 2.0, 0.15)
+	win_1f.position = Vector3(-1.5, 5.2, -0.2)
+	win_1f.material = _create_mat(Color(0.15, 0.15, 0.18), 0.3, 0.8)
+	set_neighborhood_street.add_child(win_1f)
+	
+	# --------------------------------------------------------------------------
+	# FRONT BOUNDARY WALL, TRIMMED HEDGE & BLACK SLAT GATE (Panel 1)
+	# --------------------------------------------------------------------------
+	# White Base Boundary Wall
+	var b_wall_l = CSGBox3D.new()
+	b_wall_l.size = Vector3(5.5, 0.65, 0.25)
+	b_wall_l.position = Vector3(-2.2, 0.32, 3.5)
+	b_wall_l.material = mat_villa_white
+	set_neighborhood_street.add_child(b_wall_l)
+	
+	var b_wall_r = CSGBox3D.new()
+	b_wall_r.size = Vector3(5.5, 0.65, 0.25)
+	b_wall_r.position = Vector3(7.2, 0.32, 3.5)
+	b_wall_r.material = mat_villa_white
+	set_neighborhood_street.add_child(b_wall_r)
+	
+	# Neatly Trimmed Green Box Hedge along top of wall
+	var hedge_l = CSGBox3D.new()
+	hedge_l.size = Vector3(5.5, 0.55, 0.35)
+	hedge_l.position = Vector3(-2.2, 0.9, 3.5)
+	hedge_l.material = mat_hedge
+	set_neighborhood_street.add_child(hedge_l)
+	
+	var hedge_r = CSGBox3D.new()
+	hedge_r.size = Vector3(5.5, 0.55, 0.35)
+	hedge_r.position = Vector3(7.2, 0.9, 3.5)
+	hedge_r.material = mat_hedge
+	set_neighborhood_street.add_child(hedge_r)
+	
+	# Sturdy White Gate Pillars flanking entrance
+	var pillar_l = CSGBox3D.new()
+	pillar_l.size = Vector3(0.8, 1.85, 0.8)
+	pillar_l.position = Vector3(0.8, 0.92, 3.5)
+	pillar_l.material = mat_villa_white
+	set_neighborhood_street.add_child(pillar_l)
+	
+	var pillar_r = CSGBox3D.new()
+	pillar_r.size = Vector3(0.8, 1.85, 0.8)
+	pillar_r.position = Vector3(4.4, 0.92, 3.5)
+	pillar_r.material = mat_villa_white
+	set_neighborhood_street.add_child(pillar_r)
+	
+	# "A-101" Plaque on Right Pillar (Panel 1 Signature!)
+	var plaque = CSGBox3D.new()
+	plaque.size = Vector3(0.05, 0.28, 0.45)
+	plaque.position = Vector3(4.42, 1.25, 3.5)
+	plaque.material = mat_black_gate
+	set_neighborhood_street.add_child(plaque)
+	
+	var plaque_lbl = Label3D.new()
+	plaque_lbl.text = "A-101"
+	plaque_lbl.font_size = 38
+	plaque_lbl.modulate = Color(1.0, 1.0, 1.0)
+	plaque_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	plaque_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	plaque_lbl.position = Vector3(4.45, 1.25, 3.5)
+	plaque_lbl.rotation_degrees = Vector3(0, 90, 0)
+	set_neighborhood_street.add_child(plaque_lbl)
+	
+	# Wall Sconce above Plaque
+	var plaque_sconce = CSGBox3D.new()
+	plaque_sconce.size = Vector3(0.08, 0.15, 0.15)
+	plaque_sconce.position = Vector3(4.42, 1.55, 3.5)
+	plaque_sconce.material = mat_gold_lamp
+	set_neighborhood_street.add_child(plaque_sconce)
+	
+	var sconce_light = OmniLight3D.new()
+	sconce_light.position = Vector3(4.6, 1.55, 3.5)
+	sconce_light.light_color = Color(1.0, 0.92, 0.7)
+	sconce_light.light_energy = 1.8
+	sconce_light.omni_range = 3.0
+	set_neighborhood_street.add_child(sconce_light)
+	
+	# Modern Horizontal Black Slat Gate between pillars
+	var gate_frame = CSGBox3D.new()
+	gate_frame.size = Vector3(3.4, 1.45, 0.08)
+	gate_frame.position = Vector3(2.6, 0.85, 3.5)
+	gate_frame.material = mat_black_gate
+	set_neighborhood_street.add_child(gate_frame)
+	
+	for s_i in range(6):
+		var slat = CSGBox3D.new()
+		slat.size = Vector3(3.3, 0.12, 0.1)
+		slat.position = Vector3(2.6, 0.25 + (s_i * 0.22), 3.5)
+		slat.material = mat_black_gate
+		set_neighborhood_street.add_child(slat)
+	
+	# Two Tall Black Modern Post Lamps on sidewalk corners
+	for lamp_x in [-4.5, 9.5]:
+		var post = CSGBox3D.new()
+		post.size = Vector3(0.18, 2.8, 0.18)
+		post.position = Vector3(lamp_x, 1.4, 3.5)
+		post.material = mat_black_gate
+		set_neighborhood_street.add_child(post)
+		
+		var lantern = CSGBox3D.new()
+		lantern.size = Vector3(0.42, 0.45, 0.42)
+		lantern.position = Vector3(lamp_x, 2.9, 3.5)
+		lantern.material = mat_gold_lamp
+		set_neighborhood_street.add_child(lantern)
+		
+		var l_omni = OmniLight3D.new()
+		l_omni.position = Vector3(lamp_x, 2.9, 3.5)
+		l_omni.light_color = Color(1.0, 0.9, 0.55)
+		l_omni.light_energy = 3.0
+		l_omni.omni_range = 8.0
+		set_neighborhood_street.add_child(l_omni)
+	
+	# Neighboring Houses & Trees across the street
 	for z in [-20, -5, 12, 28]:
 		var opp_house = CSGBox3D.new()
 		opp_house.size = Vector3(9.0, 5.0, 10.0)
@@ -828,13 +1538,15 @@ func _build_act4_neighborhood_van() -> void:
 		set_neighborhood_street.add_child(tree)
 		street_trees.append(tree)
 	
+	# School Van parked on road outside gate
 	school_van_exterior = _build_detailed_school_van()
-	school_van_exterior.position = Vector3(-0.5, 0, -2.5)
+	school_van_exterior.position = Vector3(-0.5, 0, 5.5)
 	set_neighborhood_street.add_child(school_van_exterior)
 	
-	char_player_sprint = _build_rigged_human("ProtagonistSprint", Color(0.95, 0.95, 0.95), Color(0.18, 0.28, 0.55), false, false, false, false, true)
-	char_player_sprint.position = Vector3(4.5, 0, 0)
-	char_player_sprint.rotation_degrees = Vector3(0, -90, 0)
+	# Sprinting Protagonist in Black Hoodie with Backpack
+	char_player_sprint = _build_rigged_human("ProtagonistSprint", Color(0.12, 0.12, 0.14), Color(0.14, 0.14, 0.17), false, false, false, false, true)
+	char_player_sprint.position = Vector3(2.5, 0, 0.0)
+	char_player_sprint.rotation_degrees = Vector3(0, 0, 0)
 	char_player_sprint.visible = false
 	set_neighborhood_street.add_child(char_player_sprint)
 
@@ -1671,11 +2383,17 @@ func _process(delta: float) -> void:
 		tea_steam_mesh.position.y = 1.35 + (fmod(anim_time * 0.6, 0.4))
 		tea_steam_mesh.scale = Vector3.ONE * (0.8 + fmod(anim_time * 0.8, 0.5))
 	
-	# 9. Sprinting Protagonist in Act 4
+	# 9. Sprinting Protagonist in Act 4 (From front porch through A-101 gate to school van)
 	if current_beat == 15 and char_player_sprint and char_player_sprint.visible:
 		_animate_char_walk(char_player_sprint, anim_time, 12.0, true)
-		char_player_sprint.position.x -= delta * 4.2
-		cam_pivot.position.x -= delta * 3.8
+		if char_player_sprint.position.z < 3.6:
+			char_player_sprint.position.z += delta * 3.8
+			char_player_sprint.rotation_degrees.y = 0.0
+		else:
+			char_player_sprint.position.x -= delta * 3.2
+			char_player_sprint.position.z += delta * 0.9
+			char_player_sprint.rotation_degrees.y = -65.0
+		cam_pivot.position.x = lerpf(cam_pivot.position.x, 600.0 + char_player_sprint.position.x * 0.6, delta * 2.0)
 	
 	# 10. Van scenery scrolling and dashboard fan rotation in Act 5
 	if current_beat in [16, 17, 18, 19, 20] and van_scenery_scroll:
@@ -1871,10 +2589,10 @@ func _advance_beat() -> void:
 				"कृपाल बदहवास हालत में सरपट भागते हुए जंगल से बाहर निकला और अपने घर का दरवाजा धड़ाम से बंद कर लिया!",
 				"In sheer terror, Kripal sprinted out of the woods, reached his house and slammed the door shut!")
 			
-		# --- ACT 3: FULL HOUSE (Sleeping in Bed, Living Room with Papa, Kitchen with Mummy) ---
+		# --- ACT 3: FULL TWO-STORY MODERN HOUSE (Matching User Reference Panels 2, 3, 4, 5, 6) ---
 		10:
-			# 10A: SLEEPING IN BEDROOM FIRST
-			auto_advance_time = 6.0
+			# Panel 2: Arjun's Room (Bed with blue pixel quilt, Game On & Crown posters, blue rug, gaming PC desk)
+			auto_advance_time = 6.2
 			if audio_ambience_night and audio_ambience_night.playing: audio_ambience_night.stop()
 			if audio_heartbeat and audio_heartbeat.playing: audio_heartbeat.stop()
 			if audio_ambience_morning: audio_ambience_morning.play()
@@ -1884,22 +2602,22 @@ func _advance_beat() -> void:
 			sun_light.visible = true
 			
 			_fade_to_black_and_call(func():
-				cam_pivot.position = Vector3(395.2, 4.4, 1.8) # Close view of Protagonist sleeping in bed
-				cam.rotation_degrees = Vector3(-18, 25, 0)
+				cam_pivot.position = Vector3(396.6, 4.65, 4.2) # Framing Arjun's Room matching Panel 2
+				cam.rotation_degrees = Vector3(-13, 30, 0)
 			)
 			
-			_show_title_card("अगली सुबह — 7:15 AM", "THE NEXT MORNING — PROTAGONIST'S HOUSE")
-			_set_dialogue("BEDROOM (कमरे में सोते हुए)", Color(0.4, 0.75, 1.0),
-				"सुबह 7:15... कमरे में खिड़की से मीठी धूप छनकर आ रही है... पंखा घूम रहा है और आप गहरी नींद में सो रहे हैं...",
-				"7:15 AM... Golden morning sunlight filters through the window... ceiling fan spinning softly as you sleep peacefully...")
+			_show_title_card("अगली सुबह — 7:15 AM", "THE NEXT MORNING — ARJUN'S ROOM")
+			_set_dialogue("ARJUN'S ROOM (कमरे में सोते हुए)", Color(0.4, 0.75, 1.0),
+				"सुबह 7:15... नीले पर्दों से छनकर खिड़की से मीठी धूप आ रही है... पंखा घूम रहा है और आप गहरी नींद में सो रहे हैं...",
+				"7:15 AM... Morning sunlight filters through the blue curtains... Game On posters on wall as you sleep peacefully in bed...")
 			
 		11:
-			# 10B: PAPA IN LIVING ROOM (Watching TV with remote)
-			auto_advance_time = 5.5
+			# Panel 3 & 5: Hall (Living Room) with Papa on Navy Sofa, TV with glowing cyan LED backlight halo, open glass staircase & mezzanine!
+			auto_advance_time = 5.8
 			_hide_title_card()
 			_fade_to_black_and_call(func():
-				cam_pivot.position = Vector3(395.5, 1.55, 2.8) # Living room view focusing on Papa on sofa
-				cam.rotation_degrees = Vector3(-8, -25, 0)
+				cam_pivot.position = Vector3(394.2, 1.55, 0.2) # Living room view framing Papa, TV with cyan LED halo & staircase
+				cam.rotation_degrees = Vector3(-6, -24, 0)
 			)
 			_set_dialogue("PAPA (LIVING ROOM MEIN TV DEKHTE HUE)", Color(1.0, 0.85, 0.35),
 				"\"अरे बेटा! 7:15 हो गए... उठ जाओ जल्दी! आज फिर तुम्हारी स्कूल वैन छूट जाएगी!\"",
@@ -1907,20 +2625,23 @@ func _advance_beat() -> void:
 			_play_voice("res://audio/prologue_papa_call.mp3")
 			
 		12:
-			# 10C: MUMMY IN KITCHEN (Boiling Chai at Stove)
+			# Panel 4: Modular Kitchen with Mummy at Stove, Chimney Hood, Water Dispenser & Fridge
 			auto_advance_time = 5.8
-			_tween_cam(Vector3(404.5, 1.5, -2.2), Vector3(-6, -110, 0), 2.2)
+			_fade_to_black_and_call(func():
+				cam_pivot.position = Vector3(403.8, 1.55, -0.6) # Kitchen view framing Mummy, chimney hood, water dispenser & dining
+				cam.rotation_degrees = Vector3(-8, -12, 0)
+			)
 			_set_dialogue("MUMMY (KITCHEN SE CHAI BANATE HUE)", Color(1.0, 0.45, 0.55),
 				"\"चाय बन गई है! पहले मुँह-हाथ धो लो और स्कूल यूनिफॉर्म पहनो! वैन किसी भी वक्त पहुँचती होगी!\"",
 				"\"Chai ban gayi hai! Pehle muh-haath dho lo aur uniform pehno! Van kisi bhi waqt pahunchti hogi!\"")
 			_play_voice("res://audio/prologue_mummy_call.mp3")
 			
 		13:
-			# 10D: WAKING UP IN BEDROOM
+			# Panel 2: Waking Up in Bedroom
 			auto_advance_time = 5.5
 			_fade_to_black_and_call(func():
-				cam_pivot.position = Vector3(395.2, 4.4, 1.8)
-				cam.rotation_degrees = Vector3(-14, 35, 0)
+				cam_pivot.position = Vector3(396.6, 4.65, 4.2)
+				cam.rotation_degrees = Vector3(-13, 30, 0)
 			)
 			
 			var tw_bed = create_tween()
@@ -1931,12 +2652,13 @@ func _advance_beat() -> void:
 				"\"Haan Papa, haan Mummy! Bas 5 minute... uth raha hoon! Chai peeta hoon...\"")
 			_play_voice("res://audio/prologue_player_wake.mp3")
 			
-		# --- ACT 4: NEIGHBORHOOD MAP, VAN ARRIVAL & 3D SPRINT ANIMATION ---
+		# --- ACT 4: MODERN VILLA EXTERIOR, A-101 GATE & VAN SPRINT (Panel 1) ---
 		14:
+			# Panel 1: Modern Two-Story Villa Exterior with A-101 plaque, black slat gate, hedge boundary & school van
 			auto_advance_time = 6.5
 			_fade_to_black_and_call(func():
-				cam_pivot.position = Vector3(600, 2.2, 8.0)
-				cam.rotation_degrees = Vector3(-10, 0, 0)
+				cam_pivot.position = Vector3(602.5, 2.4, 9.8) # Full view of modern villa matching Panel 1
+				cam.rotation_degrees = Vector3(-6, 0, 0)
 			)
 			if audio_van_horn: audio_van_horn.play()
 			
@@ -1946,14 +2668,16 @@ func _advance_beat() -> void:
 			_play_voice("res://audio/prologue_driver_call.mp3")
 			
 		15:
-			# Full 3D Sprinting sequence across the front yard to the van
+			# Panel 1: Front door opens, Arjun sprints across yard, through A-101 black slat gate into van
 			auto_advance_time = 5.5
 			front_door_mesh.rotation_degrees.y = 85.0
 			char_player_sprint.visible = true
-			_tween_cam(Vector3(603.5, 1.8, 3.5), Vector3(-6, -45, 0), 4.5)
+			char_player_sprint.position = Vector3(2.5, 0, 0.0)
+			char_player_sprint.rotation_degrees = Vector3(0, 0, 0)
+			_tween_cam(Vector3(601.8, 2.0, 6.2), Vector3(-6, -28, 0), 4.5)
 			_set_dialogue("PROTAGONIST RUNNING TO VAN", Color(0.35, 0.85, 0.95),
-				"\"अरे बाप रे! वैन तो आ भी गई! जल्दी बैग पकड़ो!\"\n— आप तेज़ी से दौड़ते हुए वैन में बैठ जाते हैं!",
-				"\"Arey baap re! Van to aa bhi gayi! Jaldi bag pakdo!\"\n— You sprint across the yard and hop into the van!")
+				"\"अरे बाप रे! वैन तो आ भी गई! जल्दी बैग पकड़ो!\"\n— आप गेट से दौड़ते हुए स्कूल वैन में बैठ जाते हैं!",
+				"\"Arey baap re! Van to aa bhi gayi! Jaldi bag pakdo!\"\n— You sprint through the A-101 gate and hop into the van!")
 			_play_voice("res://audio/prologue_player_hurry.mp3")
 			
 		# --- ACT 5: INDIAN SCHOOL VAN INTERIOR & WINDOW GAZING (SONG / BGM SCENE) ---
