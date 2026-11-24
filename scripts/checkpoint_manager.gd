@@ -26,7 +26,8 @@ var cards_vbox: VBoxContainer
 var mobile_controls_root: Control
 var dpad_node: Control
 var actions_node: Control
-var vehicle_controls_node: Control
+var veh_steer_node: Control
+var veh_drive_node: Control
 
 const CHAPTERS = [
 	{
@@ -130,12 +131,15 @@ func _ensure_controls_visibility() -> void:
 		var is_mobile = OS.has_feature("mobile") or OS.has_feature("android") or DisplayServer.is_touchscreen_available()
 		mobile_controls_root.visible = is_mobile or force_show_controls
 		
+	var is_veh = (control_mode == "vehicle")
 	if dpad_node:
-		dpad_node.visible = (control_mode == "adventure")
+		dpad_node.visible = not is_veh
 	if actions_node:
-		actions_node.visible = (control_mode == "adventure")
-	if vehicle_controls_node:
-		vehicle_controls_node.visible = (control_mode == "vehicle")
+		actions_node.visible = not is_veh
+	if veh_steer_node:
+		veh_steer_node.visible = is_veh
+	if veh_drive_node:
+		veh_drive_node.visible = is_veh
 
 func _input(event: InputEvent) -> void:
 	if is_menu_open:
@@ -808,34 +812,26 @@ func build_mobile_controls() -> void:
 	# ==============================================================
 	# --- Vehicle Controls (for Car Driving: Left Steer, Right Gas/Brake/Exit) ---
 	# ==============================================================
-	vehicle_controls_node = Control.new()
-	vehicle_controls_node.name = "VehicleControls"
-	vehicle_controls_node.anchors_preset = Control.PRESET_FULL_RECT
-	vehicle_controls_node.anchor_right = 1.0
-	vehicle_controls_node.anchor_bottom = 1.0
-	vehicle_controls_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vehicle_controls_node.visible = (control_mode == "vehicle")
-	mobile_controls_root.add_child(vehicle_controls_node)
-
-	# Left Cluster: Steering (PRESET_BOTTOM_LEFT)
+	# Left Cluster: Steering (PRESET_BOTTOM_LEFT on mobile_controls_root)
 	var veh_steer = Control.new()
 	veh_steer.name = "VehSteer"
 	veh_steer.anchors_preset = Control.PRESET_BOTTOM_LEFT
 	veh_steer.anchor_top = 1.0
 	veh_steer.anchor_bottom = 1.0
 	veh_steer.offset_left = 30
-	veh_steer.offset_top = -240
+	veh_steer.offset_top = -250
 	veh_steer.offset_right = 320
 	veh_steer.offset_bottom = -25
 	veh_steer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vehicle_controls_node.add_child(veh_steer)
+	mobile_controls_root.add_child(veh_steer)
+	veh_steer_node = veh_steer
 
 	var steer_bg = Color(0.12, 0.18, 0.30, 0.88)
 	var steer_border = Color(0.35, 0.75, 1.0, 0.95)
 
 	# Steer Left
 	var btn_steer_l = make_touch_btn.call(
-		"◀◀\nSTEER L", Vector2(115, 96), Vector2(0, 70), steer_bg, steer_border, 16,
+		"◀◀\nSTEER L", Vector2(115, 96), Vector2(0, 60), steer_bg, steer_border, 16,
 		func():
 			Input.action_press("move_left")
 			Input.action_press("ui_left")
@@ -851,7 +847,7 @@ func build_mobile_controls() -> void:
 
 	# Steer Right
 	var btn_steer_r = make_touch_btn.call(
-		"▶▶\nSTEER R", Vector2(115, 96), Vector2(130, 70), steer_bg, steer_border, 16,
+		"▶▶\nSTEER R", Vector2(115, 96), Vector2(130, 60), steer_bg, steer_border, 16,
 		func():
 			Input.action_press("move_right")
 			Input.action_press("ui_right")
@@ -868,14 +864,14 @@ func build_mobile_controls() -> void:
 	var steer_tip = Label.new()
 	steer_tip.text = "🏎️ CAR STEERING (मोड़ें)"
 	steer_tip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	steer_tip.position = Vector2(0, 24)
+	steer_tip.position = Vector2(0, 16)
 	steer_tip.size = Vector2(245, 30)
 	steer_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	steer_tip.add_theme_font_size_override("font_size", 13)
 	steer_tip.add_theme_color_override("font_color", Color(0.6, 0.85, 1.0, 0.9))
 	veh_steer.add_child(steer_tip)
 
-	# Right Cluster: Gas, Brake, Exit Car (PRESET_BOTTOM_RIGHT)
+	# Right Cluster: Gas, Brake, Exit Car (PRESET_BOTTOM_RIGHT on mobile_controls_root)
 	var veh_drive = Control.new()
 	veh_drive.name = "VehDrive"
 	veh_drive.anchors_preset = Control.PRESET_BOTTOM_RIGHT
@@ -888,7 +884,8 @@ func build_mobile_controls() -> void:
 	veh_drive.offset_right = -20
 	veh_drive.offset_bottom = -20
 	veh_drive.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vehicle_controls_node.add_child(veh_drive)
+	mobile_controls_root.add_child(veh_drive)
+	veh_drive_node = veh_drive
 
 	# Gas / Accel (Forward)
 	var btn_gas = make_touch_btn.call(
@@ -926,8 +923,8 @@ func build_mobile_controls() -> void:
 
 	# Exit Car button (High visibility, cleanly triggers car exit without re-entry bounce)
 	var btn_exit_car = make_touch_btn.call(
-		"🚪 EXIT CAR\n[उतरें]", Vector2(140, 64), Vector2(205, 30),
-		Color(0.48, 0.18, 0.12, 0.95), Color(1.0, 0.65, 0.35, 0.98), 14,
+		"🚪 EXIT CAR\n[उतरें]", Vector2(130, 56), Vector2(210, 36),
+		Color(0.52, 0.15, 0.12, 0.95), Color(1.0, 0.65, 0.35, 0.98), 14,
 		func():
 			Input.action_press("exit_car")
 			send_key.call(KEY_BACKSPACE, true),
@@ -939,7 +936,7 @@ func build_mobile_controls() -> void:
 
 	# Camera View Toggle in Car
 	var btn_veh_view = make_touch_btn.call(
-		"👁️ [V]\nCAM", Vector2(95, 56), Vector2(95, 50),
+		"👁️ [V]\nCAM", Vector2(95, 56), Vector2(95, 48),
 		Color(0.24, 0.16, 0.42, 0.88), Color(0.7, 0.5, 1.0, 0.95), 13,
 		func():
 			send_key.call(KEY_V, true),

@@ -161,6 +161,7 @@ var cycle_tilt: float = 0.0
 var can_dismount: bool = false
 var is_near_door: bool = false
 var is_near_car: bool = false
+var can_reenter_car: bool = false
 var is_near_police_door: bool = false
 var door_opened: bool = false
 var cutscene_active: bool = false
@@ -252,6 +253,7 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if not InputMap.has_action("exit_car"):
 		InputMap.add_action("exit_car")
+	CheckpointManager.set_control_mode("adventure")
 	
 	dialogues[0]["audio"] = stream_mummy_1
 	dialogues[1]["audio"] = stream_player_talk
@@ -461,7 +463,7 @@ func _input(event: InputEvent) -> void:
 			camera_rot_x = clamp(camera_rot_x, -deg_to_rad(75), deg_to_rad(75))
 			camera_pivot.rotation.x = camera_rot_x
 
-	if (event is InputEventKey and event.pressed and not event.echo) or event.is_action_pressed("interact") or event.is_action_pressed("flashlight"):
+	if (event is InputEventKey and event.pressed and not event.echo) or event.is_action_pressed("interact") or event.is_action_pressed("exit_car") or event.is_action_pressed("flashlight"):
 		if event is InputEventKey and event.keycode == KEY_M:
 			toggle_town_map()
 		elif (event is InputEventKey and event.keycode == KEY_V):
@@ -525,24 +527,22 @@ func handle_interaction() -> void:
 		var dist_to_police: float = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		
-		# If closer to car and within 4.8m, re-enter car (only when cooldown is done!)
-		if (is_near_car or dist_to_car < 4.8) and dist_to_car < dist_to_police:
-			if car_cooldown_timer <= 0.0:
-				enter_car()
+		# Only allow re-entering car if player stepped away (>3.8m) first and cooldown finished
+		if can_reenter_car and car_cooldown_timer <= 0.0 and (is_near_car or dist_to_car < 3.0) and dist_to_car < dist_to_police:
+			enter_car()
 			return
 		# If closer to police door and within 5.5m, enter police station!
 		elif is_near_police_door or dist_to_police < 5.5:
 			_on_start_police_pressed()
 			return
-		elif is_near_car or dist_to_car < 4.8:
-			if car_cooldown_timer <= 0.0:
-				enter_car()
+		elif can_reenter_car and car_cooldown_timer <= 0.0 and (is_near_car or dist_to_car < 3.0):
+			enter_car()
 			return
 		else:
 			if dist_to_police < 15.0:
 				show_subtitle("🚪 पुलिस थाने के मुख्य द्वार के पास जाकर [E] दबाएं", 2.0)
 			else:
-				show_subtitle("🚗 वापस गाड़ी में बैठने के लिए गाड़ी के पास जाएं, या थाने के द्वार पर जाएं", 2.0)
+				show_subtitle("🚪 पुलिस थाने के मुख्य द्वार की तरफ बढ़ें", 2.0)
 			return
 
 func dismount_bicycle() -> void:
@@ -714,7 +714,11 @@ func _physics_process(delta: float) -> void:
 		var dist_to_police = player.global_position.distance_to(Vector3(11.5, 0, -235.0))
 		var dist_to_car: float = player.global_position.distance_to(kripal_car.global_position) if kripal_car else 999.0
 		
-		if (is_near_car or dist_to_car < 4.5) and dist_to_car < dist_to_police:
+		# Player must walk away from the car (> 3.8m) to unlock re-entering
+		if dist_to_car > 3.8:
+			can_reenter_car = true
+		
+		if can_reenter_car and (is_near_car or dist_to_car < 3.0) and dist_to_car < dist_to_police:
 			is_near_car = true
 			if action_prompt:
 				action_prompt.visible = true
@@ -724,14 +728,16 @@ func _physics_process(delta: float) -> void:
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚪 [E] दबाकर थाने में प्रवेश करें (PRESS [E] TO ENTER POLICE STATION)"
-		elif is_near_car or dist_to_car < 4.5:
+		elif can_reenter_car and (is_near_car or dist_to_car < 3.0):
 			is_near_car = true
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚗 [E] / ACTION दबाकर वापस कार में बैठें (ENTER CAR)"
 		else:
-			if dist_to_car >= 4.5: is_near_car = false
-			if dist_to_police >= 5.5: is_near_police_door = false
+			if dist_to_car >= 3.0 or not can_reenter_car:
+				is_near_car = false
+			if dist_to_police >= 5.5:
+				is_near_police_door = false
 			if action_prompt:
 				action_prompt.visible = true
 				action_prompt.text = "🚶 पुलिस थाने के मुख्य द्वार की तरफ बढ़ें (WALK TOWARDS POLICE ENTRANCE)"
@@ -925,7 +931,9 @@ func _handle_car_driving(delta: float) -> void:
 
 func enter_car() -> void:
 	current_mode = PlayerMode.DRIVING_CAR
-	car_cooldown_timer = 1.0
+	car_cooldown_timer = 1.5
+	can_reenter_car = false
+	is_near_car = false
 	CheckpointManager.set_control_mode("vehicle")
 	if action_prompt: action_prompt.text = "🚗 [GAS] ACCEL | [BRAKE] REV | [STEER L/R] TURN | [EXIT CAR] LEAVE"
 	
@@ -979,7 +987,9 @@ func enter_car() -> void:
 
 func exit_car() -> void:
 	current_mode = PlayerMode.FOOT_POLICE
-	car_cooldown_timer = 1.2
+	car_cooldown_timer = 2.0
+	can_reenter_car = false
+	is_near_car = false
 	CheckpointManager.set_control_mode("adventure")
 	car_speed = 0.0
 	if kripal_car:
@@ -993,8 +1003,8 @@ func exit_car() -> void:
 	if camera: camera.make_current()
 	if visual_model: visual_model.visible = true
 	
-	# Place player safely beside car on the ground (using car local basis)
-	var exit_offset = kripal_car.transform.basis * Vector3(-2.2, 0.05, 0.0)
+	# Place player safely beside car on the ground (using car local basis, -3.2m to clear trigger)
+	var exit_offset = kripal_car.transform.basis * Vector3(-3.2, 0.05, 0.0)
 	player.global_position = kripal_car.global_position + exit_offset
 	player.global_position.y = 0.05
 	player.velocity = Vector3.ZERO
@@ -1254,6 +1264,8 @@ func _on_police_trigger_exited(body: Node3D) -> void:
 
 func _on_car_trigger_entered(body: Node3D) -> void:
 	if body == player:
+		if current_mode == PlayerMode.FOOT_POLICE and not can_reenter_car:
+			return
 		is_near_car = true
 
 func _on_car_trigger_exited(body: Node3D) -> void:
