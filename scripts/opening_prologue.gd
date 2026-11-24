@@ -1,19 +1,25 @@
 extends Node3D
 
 # ==============================================================================
-# CINEMATIC OPENING PROLOGUE — HORROR MISSION
+# CINEMATIC OPENING PROLOGUE — HORROR MISSION (DELUXE CINEMATIC EDITION)
 # ==============================================================================
-# Full Multi-Scene Cinematic Experience:
-# Act 1: Walking down the Pansemal street under the eerie Blood Sky (लाल आसमान),
-#        4 friends chatting and separating at the 3-Way crossroads.
-# Act 2: Dense 3D Forest map, misty path, terrifying pulsing light anomaly,
-#        Kripal's panic sprint to his house.
-# Act 3: Full House interior (Living Room with Papa watching TV, Kitchen with
-#        Mummy cooking chai, Upstairs bedroom with Protagonist waking up).
-# Act 4: Living neighborhood street with houses, trees in the breeze, school van
-#        arrival with horn, and full 3D running animation of Protagonist to the van.
-# Act 5: Detailed school van interior with driver & kids, window gazing cutscene
-#        with parallax scrolling morning street and dedicated Song/BGM slot.
+# Fully Directed Story Progression:
+# 1. Act 1: Walking together down Pansemal Road under Blood Sky (Smooth follow cam).
+#           They halt, camera cuts to FIRST-PERSON (FP) MODE looking directly
+#           at Sahil (holding cricket bat), Aashutosh, and Kripal with voice lines!
+#           Clear wide road for parting ways.
+# 2. Act 2: Realistic dense 3D forest map with swaying ancient trees, howling wind,
+#           pulsing eerie anomaly with dynamic light flares, Kripal's panic sprint.
+# 3. Act 3: Extended House Sequence with full environment & character time:
+#           - Protagonist peacefully asleep in bed under blanket, ceiling fan spinning, morning light.
+#           - Living room: Papa on sofa watching TV with remote, calling out.
+#           - Kitchen: Mummy at gas stove with boiling tea steam, calling with voice!
+#           - Bedroom: Protagonist sitting up, stretching, replying to parents.
+# 4. Act 4: Living neighborhood street, school van arrives with horn, driver calls,
+#           full 3D sprinting animation of Protagonist running to the van.
+# 5. Act 5: Indian School Van Interior with driver, kids, rexine seats, and window
+#           with metal safety bars. Cinematic 3/4 window gazing shot with parallax
+#           scrolling morning streets and dedicated song/BGM audio channel.
 # ==============================================================================
 
 var current_beat: int = -1
@@ -37,6 +43,7 @@ var skip_btn: Button
 var continue_btn: Button
 var fade_overlay: ColorRect
 var tap_advance_panel: Control
+var fp_crosshair: Label
 
 # Camera & World
 var cam: Camera3D
@@ -57,17 +64,17 @@ var audio_door_open: AudioStreamPlayer
 var audio_door_close: AudioStreamPlayer
 var audio_van_horn: AudioStreamPlayer
 var audio_van_engine: AudioStreamPlayer
+var audio_voice: AudioStreamPlayer
 var audio_bgm_song: AudioStreamPlayer
 
 # Sets
 var set_blood_road: Node3D
 var set_dense_forest: Node3D
-var set_kripal_house: Node3D
 var set_full_house: Node3D
 var set_neighborhood_street: Node3D
 var set_van_interior: Node3D
 
-# Characters & Interactive Objects
+# Characters & Objects
 var char_group_walk: Node3D
 var char_sahil_walk: Node3D
 var char_aashu_walk: Node3D
@@ -81,7 +88,8 @@ var forest_trees: Array = []
 
 var char_papa: Node3D
 var char_mummy: Node3D
-var char_player_bed: Node3D
+var char_player_sleeping: Node3D
+var ceiling_fan_blades: Node3D
 var tv_screen_mesh: CSGBox3D
 var tea_steam_mesh: MeshInstance3D
 
@@ -185,6 +193,17 @@ func _build_ui() -> void:
 	title_card_sub.add_theme_font_size_override("font_size", 16)
 	title_vbox.add_child(title_card_sub)
 	
+	# First-Person Crosshair indicator
+	fp_crosshair = Label.new()
+	fp_crosshair.text = "•"
+	fp_crosshair.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	fp_crosshair.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	fp_crosshair.set_anchors_preset(Control.PRESET_CENTER)
+	fp_crosshair.add_theme_color_override("font_color", Color(1, 1, 1, 0.4))
+	fp_crosshair.add_theme_font_size_override("font_size", 20)
+	fp_crosshair.visible = false
+	ui_root.add_child(fp_crosshair)
+	
 	# Skip Button
 	skip_btn = Button.new()
 	skip_btn.text = "SKIP ⏭️"
@@ -221,24 +240,22 @@ func _build_ui() -> void:
 
 # --- LIGHTING & ENVIRONMENTS ---
 func _setup_lighting_and_environments() -> void:
-	# Blood Sky Environment for Act 1 & 2
 	blood_sky_env = Environment.new()
 	blood_sky_env.background_mode = Environment.BG_COLOR
-	blood_sky_env.background_color = Color(0.28, 0.04, 0.04)
+	blood_sky_env.background_color = Color(0.32, 0.05, 0.05)
 	blood_sky_env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	blood_sky_env.ambient_light_color = Color(0.48, 0.14, 0.12)
-	blood_sky_env.ambient_light_energy = 0.8
+	blood_sky_env.ambient_light_color = Color(0.52, 0.16, 0.14)
+	blood_sky_env.ambient_light_energy = 0.85
 	blood_sky_env.fog_enabled = true
-	blood_sky_env.fog_light_color = Color(0.35, 0.08, 0.08)
+	blood_sky_env.fog_light_color = Color(0.38, 0.08, 0.08)
 	blood_sky_env.fog_density = 0.018
 	
-	# Morning Sky Environment for Act 3, 4, 5
 	morning_sky_env = Environment.new()
 	morning_sky_env.background_mode = Environment.BG_COLOR
 	morning_sky_env.background_color = Color(0.68, 0.84, 0.98)
 	morning_sky_env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	morning_sky_env.ambient_light_color = Color(0.92, 0.9, 0.85)
-	morning_sky_env.ambient_light_energy = 1.1
+	morning_sky_env.ambient_light_energy = 1.15
 	morning_sky_env.fog_enabled = true
 	morning_sky_env.fog_light_color = Color(0.85, 0.9, 0.95)
 	morning_sky_env.fog_density = 0.005
@@ -247,24 +264,21 @@ func _setup_lighting_and_environments() -> void:
 	world_env.environment = blood_sky_env
 	add_child(world_env)
 	
-	# Blood Sky Directional Light
 	blood_sky_light = DirectionalLight3D.new()
-	blood_sky_light.light_color = Color(0.95, 0.35, 0.25)
-	blood_sky_light.light_energy = 1.2
+	blood_sky_light.light_color = Color(0.98, 0.38, 0.28)
+	blood_sky_light.light_energy = 1.3
 	blood_sky_light.rotation_degrees = Vector3(-35, 45, 0)
 	blood_sky_light.shadow_enabled = true
 	add_child(blood_sky_light)
 	
-	# Morning Golden Sunlight (Initially hidden)
 	sun_light = DirectionalLight3D.new()
-	sun_light.light_color = Color(1.0, 0.94, 0.8)
+	sun_light.light_color = Color(1.0, 0.95, 0.8)
 	sun_light.light_energy = 1.4
 	sun_light.rotation_degrees = Vector3(-38, -40, 0)
 	sun_light.shadow_enabled = true
 	sun_light.visible = false
 	add_child(sun_light)
 	
-	# Camera Setup
 	cam_pivot = Node3D.new()
 	cam_pivot.name = "CameraPivot"
 	add_child(cam_pivot)
@@ -324,17 +338,25 @@ func _setup_audio() -> void:
 	audio_van_engine.volume_db = -6.0
 	audio_root.add_child(audio_van_engine)
 	
+	# Dedicated Voice Line Player
+	audio_voice = AudioStreamPlayer.new()
+	audio_voice.volume_db = 3.0
+	audio_root.add_child(audio_voice)
+	
 	# Dedicated Song / BGM slot
 	audio_bgm_song = AudioStreamPlayer.new()
 	audio_bgm_song.volume_db = -4.0
-	# Auto load prologue_bgm or prologue_song if user places it, or fallback to bhangarh_ambience
 	var song_stream = _load_audio("res://audio/prologue_song.mp3")
-	if not song_stream:
-		song_stream = _load_audio("res://audio/prologue_bgm.mp3")
-	if not song_stream:
-		song_stream = _load_audio("res://audio/bhangarh_ambience.wav")
+	if not song_stream: song_stream = _load_audio("res://audio/prologue_bgm.mp3")
+	if not song_stream: song_stream = _load_audio("res://audio/bhangarh_ambience.wav")
 	audio_bgm_song.stream = song_stream
 	audio_root.add_child(audio_bgm_song)
+
+func _play_voice(path: String) -> void:
+	var st = _load_audio(path)
+	if st and audio_voice:
+		audio_voice.stream = st
+		audio_voice.play()
 
 func _load_audio(path: String) -> AudioStream:
 	if ResourceLoader.exists(path):
@@ -361,7 +383,7 @@ func _build_all_3d_sets() -> void:
 	_build_act5_van_interior()
 
 # ------------------------------------------------------------------------------
-# ACT 1: BLOOD SKY ROAD (Four friends walking down the road together)
+# ACT 1: BLOOD SKY ROAD (Follow Camera Walk -> Stop & First-Person Mode -> Clean Road Parting)
 # ------------------------------------------------------------------------------
 func _build_act1_blood_sky_road() -> void:
 	set_blood_road = Node3D.new()
@@ -370,118 +392,122 @@ func _build_act1_blood_sky_road() -> void:
 	add_child(set_blood_road)
 	
 	var mat_road = _create_mat(Color(0.12, 0.12, 0.14), 0.9)
-	var mat_sidewalk = _create_mat(Color(0.25, 0.22, 0.2), 0.85)
-	var mat_wall = _create_mat(Color(0.5, 0.4, 0.35), 0.9)
+	var mat_sidewalk = _create_mat(Color(0.24, 0.22, 0.2), 0.85)
 	var mat_pole = _create_mat(Color(0.2, 0.2, 0.22), 0.5, 0.7)
 	var mat_glow = _create_mat(Color(1.0, 0.85, 0.4), 0.2, 0.0, Color(1.0, 0.8, 0.3), 3.0)
 	
-	# Main Road (60 meters long)
+	# Main Clear Asphalt Road (80 meters long)
 	var road = CSGBox3D.new()
-	road.size = Vector3(7.0, 0.1, 70.0)
-	road.position = Vector3(0, -0.05, 5.0)
+	road.size = Vector3(8.0, 0.1, 80.0)
+	road.position = Vector3(0, -0.05, 0.0)
 	road.material = mat_road
 	set_blood_road.add_child(road)
 	
-	# White lane dashes
-	for z in range(-25, 35, 6):
+	# Clean Yellow Lane Dashes
+	for z in range(-35, 38, 6):
 		var dash = CSGBox3D.new()
-		dash.size = Vector3(0.2, 0.11, 2.8)
+		dash.size = Vector3(0.22, 0.11, 2.8)
 		dash.position = Vector3(0, 0.01, z)
-		dash.material = _create_mat(Color(0.9, 0.85, 0.3))
+		dash.material = _create_mat(Color(0.9, 0.82, 0.25))
 		set_blood_road.add_child(dash)
 	
 	# Sidewalks
 	var sw_l = CSGBox3D.new()
-	sw_l.size = Vector3(2.5, 0.25, 70.0)
-	sw_l.position = Vector3(-4.75, 0.02, 5.0)
+	sw_l.size = Vector3(3.0, 0.25, 80.0)
+	sw_l.position = Vector3(-5.5, 0.02, 0.0)
 	sw_l.material = mat_sidewalk
 	set_blood_road.add_child(sw_l)
 	
 	var sw_r = CSGBox3D.new()
-	sw_r.size = Vector3(2.5, 0.25, 70.0)
-	sw_r.position = Vector3(4.75, 0.02, 5.0)
+	sw_r.size = Vector3(3.0, 0.25, 80.0)
+	sw_r.position = Vector3(5.5, 0.02, 0.0)
 	sw_r.material = mat_sidewalk
 	set_blood_road.add_child(sw_r)
 	
-	# Roadside Town Houses and Compound Walls
-	for z in [-18, -4, 10, 24]:
-		# Left house
-		var h_l = CSGBox3D.new()
-		h_l.size = Vector3(8.0, 5.5, 9.0)
-		h_l.position = Vector3(-10.5, 2.75, z)
-		h_l.material = _create_mat(Color(0.48 + randf() * 0.1, 0.38 + randf() * 0.1, 0.3))
-		set_blood_road.add_child(h_l)
-		
-		# Right house
-		var h_r = CSGBox3D.new()
-		h_r.size = Vector3(8.0, 5.5, 9.0)
-		h_r.position = Vector3(10.5, 2.75, z)
-		h_r.material = _create_mat(Color(0.42 + randf() * 0.1, 0.44 + randf() * 0.1, 0.38))
-		set_blood_road.add_child(h_r)
-	
-	# Streetlights casting pools of warm light
-	for z in [-15, 0, 15, 30]:
+	# Clean Streetlights along the road
+	for z in [-25, -10, 5, 20, 35]:
 		var pole = CSGCylinder3D.new()
 		pole.radius = 0.07
-		pole.height = 5.0
-		pole.position = Vector3(-4.0, 2.5, z)
+		pole.height = 5.2
+		pole.position = Vector3(-4.5, 2.6, z)
 		pole.material = mat_pole
 		set_blood_road.add_child(pole)
 		
 		var lamp = CSGSphere3D.new()
-		lamp.radius = 0.3
-		lamp.position = Vector3(-3.8, 4.9, z)
+		lamp.radius = 0.32
+		lamp.position = Vector3(-4.3, 5.1, z)
 		lamp.material = mat_glow
 		set_blood_road.add_child(lamp)
 		
 		var light = OmniLight3D.new()
-		light.position = Vector3(-3.8, 4.7, z)
-		light.omni_range = 11.0
-		light.light_energy = 1.8
+		light.position = Vector3(-4.3, 4.9, z)
+		light.omni_range = 13.0
+		light.light_energy = 2.0
 		light.light_color = Color(1.0, 0.85, 0.5)
 		light.shadow_enabled = true
 		set_blood_road.add_child(light)
 	
-	# 3-Way Crossroads Signboard at z = -22
+	# Clean 3-Way Branching Roads at crossroads (z = -25)
+	# Left road branching to Market / Sahil's house
+	var road_branch_l = CSGBox3D.new()
+	road_branch_l.size = Vector3(30.0, 0.1, 7.0)
+	road_branch_l.position = Vector3(-18.0, -0.05, -25.0)
+	road_branch_l.material = mat_road
+	set_blood_road.add_child(road_branch_l)
+	
+	# Right road branching to Town / Protagonist's house
+	var road_branch_r = CSGBox3D.new()
+	road_branch_r.size = Vector3(30.0, 0.1, 7.0)
+	road_branch_r.position = Vector3(18.0, -0.05, -25.0)
+	road_branch_r.material = mat_road
+	set_blood_road.add_child(road_branch_r)
+	
+	# Forest dirt road straight ahead (North)
+	var forest_entrance = CSGBox3D.new()
+	forest_entrance.size = Vector3(6.5, 0.1, 30.0)
+	forest_entrance.position = Vector3(0, -0.05, -45.0)
+	forest_entrance.material = _create_mat(Color(0.1, 0.08, 0.06))
+	set_blood_road.add_child(forest_entrance)
+	
+	# Signpost at crossroads
 	var sign_pole = CSGCylinder3D.new()
 	sign_pole.radius = 0.08
-	sign_pole.height = 3.2
-	sign_pole.position = Vector3(2.5, 1.6, -22.0)
+	sign_pole.height = 3.5
+	sign_pole.position = Vector3(3.5, 1.75, -25.0)
 	sign_pole.material = mat_pole
 	set_blood_road.add_child(sign_pole)
 	
 	var sign_board = Label3D.new()
-	sign_board.text = "⬅ MARKET / SAHIL  |  FOREST / KRIPAL ⬆  |  TOWN / HOME ➡"
+	sign_board.text = "⬅ SAHIL & AASHU (TOWN)  |  KRIPAL'S SHORTCUT (FOREST) ⬆  |  YOUR HOME ➡"
 	sign_board.font_size = 22
-	sign_board.modulate = Color(1.0, 0.9, 0.4)
-	sign_board.position = Vector3(2.5, 3.2, -22.0)
-	sign_board.rotation_degrees = Vector3(0, 0, 0)
+	sign_board.modulate = Color(1.0, 0.9, 0.35)
+	sign_board.position = Vector3(3.5, 3.4, -25.0)
 	set_blood_road.add_child(sign_board)
 	
-	# Group of 4 Friends walking together down the street
+	# Walking Group
 	char_group_walk = Node3D.new()
 	char_group_walk.name = "FriendsWalkingGroup"
-	char_group_walk.position = Vector3(0, 0, 22.0)
+	char_group_walk.position = Vector3(0, 0, 24.0)
 	set_blood_road.add_child(char_group_walk)
 	
-	char_sahil_walk = _build_rigged_human("Sahil", Color(0.2, 0.6, 0.3), Color(0.18, 0.18, 0.22), true) # cricket bat
-	char_sahil_walk.position = Vector3(-1.3, 0, 0)
+	char_sahil_walk = _build_rigged_human("Sahil", Color(0.2, 0.6, 0.3), Color(0.18, 0.18, 0.22), true) # Cricket bat
+	char_sahil_walk.position = Vector3(-1.4, 0, -1.0)
 	char_group_walk.add_child(char_sahil_walk)
 	
 	char_aashu_walk = _build_rigged_human("Aashutosh", Color(0.68, 0.42, 0.2), Color(0.22, 0.22, 0.25))
-	char_aashu_walk.position = Vector3(-0.4, 0, 0.3)
+	char_aashu_walk.position = Vector3(-0.4, 0, -0.5)
 	char_group_walk.add_child(char_aashu_walk)
 	
-	char_kripal_walk = _build_rigged_human("Kripal", Color(0.82, 0.25, 0.2), Color(0.18, 0.2, 0.3), false, true) # glasses
-	char_kripal_walk.position = Vector3(0.5, 0, -0.2)
+	char_kripal_walk = _build_rigged_human("Kripal", Color(0.82, 0.25, 0.2), Color(0.18, 0.2, 0.3), false, true) # Glasses
+	char_kripal_walk.position = Vector3(0.6, 0, -1.2)
 	char_group_walk.add_child(char_kripal_walk)
 	
 	char_player_walk = _build_rigged_human("Protagonist", Color(0.25, 0.45, 0.8), Color(0.15, 0.15, 0.18))
-	char_player_walk.position = Vector3(1.3, 0, 0.2)
+	char_player_walk.position = Vector3(1.4, 0, 0.0)
 	char_group_walk.add_child(char_player_walk)
 
 # ------------------------------------------------------------------------------
-# ACT 2: DENSE FOREST MAP & PULSING ANOMALY (पूरा घना जंगल का मैप)
+# ACT 2: DENSE FOREST MAP & PULSING ANOMALY (पूरा घना जंगल का 3D मैप)
 # ------------------------------------------------------------------------------
 func _build_act2_dense_forest() -> void:
 	set_dense_forest = Node3D.new()
@@ -489,27 +515,25 @@ func _build_act2_dense_forest() -> void:
 	set_dense_forest.position = Vector3(200, 0, 0)
 	add_child(set_dense_forest)
 	
-	# Massive forest floor (60m x 70m)
+	# 60m x 70m damp forest earth
 	var floor_mesh = CSGBox3D.new()
 	floor_mesh.size = Vector3(60.0, 0.2, 70.0)
 	floor_mesh.position = Vector3(0, -0.1, 0)
 	floor_mesh.material = _create_mat(Color(0.06, 0.05, 0.04), 0.95)
 	set_dense_forest.add_child(floor_mesh)
 	
-	# Winding dirt trail
+	# Narrow winding dirt trail
 	var trail = CSGBox3D.new()
-	trail.size = Vector3(4.5, 0.05, 70.0)
+	trail.size = Vector3(4.2, 0.05, 70.0)
 	trail.position = Vector3(0, 0.02, 0)
-	trail.material = _create_mat(Color(0.12, 0.09, 0.06), 0.95)
+	trail.material = _create_mat(Color(0.11, 0.09, 0.06), 0.95)
 	set_dense_forest.add_child(trail)
 	
-	# Dense clusters of trees (Over 35 tall detailed trees)
+	# Over 35 tall detailed forest trees
 	var tree_coords = []
 	for z in range(-30, 32, 4):
-		# Near trail edges
 		tree_coords.append(Vector3(-4.5 - randf() * 2.0, 0, z + randf_range(-1.0, 1.0)))
 		tree_coords.append(Vector3(4.5 + randf() * 2.0, 0, z + randf_range(-1.0, 1.0)))
-		# Deep in the woods
 		tree_coords.append(Vector3(-10.0 - randf() * 8.0, 0, z + randf_range(-2.0, 2.0)))
 		tree_coords.append(Vector3(10.0 + randf() * 8.0, 0, z + randf_range(-2.0, 2.0)))
 		tree_coords.append(Vector3(-18.0 - randf() * 5.0, 0, z + randf_range(-2.0, 2.0)))
@@ -521,51 +545,49 @@ func _build_act2_dense_forest() -> void:
 		set_dense_forest.add_child(tree)
 		forest_trees.append(tree)
 	
-	# Fallen mossy logs & rocky boulders
-	for i in range(10):
+	# Mossy logs
+	for i in range(8):
 		var log_mesh = CSGCylinder3D.new()
 		log_mesh.radius = 0.3
 		log_mesh.height = 4.0
 		log_mesh.rotation_degrees = Vector3(0, randf_range(-60, 60), 90)
-		log_mesh.position = Vector3(-6.0 if i % 2 == 0 else 6.0, 0.3, -25.0 + i * 5.5)
+		log_mesh.position = Vector3(-6.0 if i % 2 == 0 else 6.0, 0.3, -25.0 + i * 6.5)
 		log_mesh.material = _create_mat(Color(0.18, 0.14, 0.08), 0.9)
 		set_dense_forest.add_child(log_mesh)
 	
-	# Eerie Pulsing Light Anomaly deep inside the trees on the right (at z = -8)
+	# Pulsing Light Anomaly in deep woods (z = -8)
 	var anomaly_pivot = Node3D.new()
 	anomaly_pivot.position = Vector3(7.5, 2.4, -8.0)
 	set_dense_forest.add_child(anomaly_pivot)
 	
 	forest_anomaly_core = MeshInstance3D.new()
 	var s_mesh = SphereMesh.new()
-	s_mesh.radius = 0.6
-	s_mesh.height = 1.2
+	s_mesh.radius = 0.65
+	s_mesh.height = 1.3
 	forest_anomaly_core.mesh = s_mesh
 	forest_anomaly_core.material_override = _create_mat(Color(0.2, 0.8, 1.0), 0.1, 0.0, Color(0.3, 0.9, 1.0), 6.0)
 	anomaly_pivot.add_child(forest_anomaly_core)
 	
-	# Outer glowing ring around anomaly
 	var ring = CSGTorus3D.new()
-	ring.inner_radius = 0.8
-	ring.outer_radius = 1.0
+	ring.inner_radius = 0.85
+	ring.outer_radius = 1.05
 	ring.material = _create_mat(Color(0.7, 0.2, 1.0), 0.1, 0.0, Color(0.8, 0.3, 1.0), 4.5)
 	anomaly_pivot.add_child(ring)
 	
 	forest_anomaly_light = OmniLight3D.new()
 	forest_anomaly_light.light_color = Color(0.2, 0.75, 1.0)
 	forest_anomaly_light.light_energy = 4.0
-	forest_anomaly_light.omni_range = 24.0
+	forest_anomaly_light.omni_range = 25.0
 	forest_anomaly_light.shadow_enabled = true
 	anomaly_pivot.add_child(forest_anomaly_light)
 	
-	# Kripal inside the forest
 	char_kripal_forest = _build_rigged_human("KripalForest", Color(0.82, 0.25, 0.2), Color(0.18, 0.2, 0.3), false, true)
 	char_kripal_forest.position = Vector3(0, 0, 10.0)
 	char_kripal_forest.rotation_degrees = Vector3(0, 180, 0)
 	set_dense_forest.add_child(char_kripal_forest)
 
 # ------------------------------------------------------------------------------
-# ACT 3: FULL HOUSE INTERIOR (Living Room, Kitchen with Mummy, Upstairs Bedroom)
+# ACT 3: FULL HOUSE (Sleeping in Bed, Living Room with Papa, Kitchen with Mummy)
 # ------------------------------------------------------------------------------
 func _build_act3_full_house() -> void:
 	set_full_house = Node3D.new()
@@ -577,30 +599,29 @@ func _build_act3_full_house() -> void:
 	var mat_tile_floor = _create_mat(Color(0.82, 0.8, 0.76), 0.6)
 	var mat_kitchen_slab = _create_mat(Color(0.18, 0.18, 0.2), 0.3)
 	var mat_wood = _create_mat(Color(0.42, 0.25, 0.14), 0.7)
-	var mat_sofa = _create_mat(Color(0.3, 0.2, 0.4), 0.85) # Purple/Maroon Indian sofa
+	var mat_sofa = _create_mat(Color(0.32, 0.18, 0.38), 0.85) # Purple Indian sofa
 	
-	# Ground floor slab (16m wide x 12m deep)
+	# Ground floor slab
 	var floor_g = CSGBox3D.new()
 	floor_g.size = Vector3(16.0, 0.2, 12.0)
 	floor_g.position = Vector3(0, -0.1, 0)
 	floor_g.material = mat_tile_floor
 	set_full_house.add_child(floor_g)
 	
-	# Outer perimeter walls
+	# Walls
 	var wall_back = CSGBox3D.new()
-	wall_back.size = Vector3(16.0, 6.5, 0.3)
-	wall_back.position = Vector3(0, 3.25, -6.0)
+	wall_back.size = Vector3(16.0, 6.8, 0.3)
+	wall_back.position = Vector3(0, 3.4, -6.0)
 	wall_back.material = mat_wall_hall
 	set_full_house.add_child(wall_back)
 	
 	var wall_left = CSGBox3D.new()
-	wall_left.size = Vector3(0.3, 6.5, 12.0)
-	wall_left.position = Vector3(-8.0, 3.25, 0)
+	wall_left.size = Vector3(0.3, 6.8, 12.0)
+	wall_left.position = Vector3(-8.0, 3.4, 0)
 	wall_left.material = mat_wall_hall
 	set_full_house.add_child(wall_left)
 	
-	# --- ZONE 1: LIVING ROOM / HALL (Left half of ground floor) ---
-	# Sofa Set
+	# --- ZONE 1: LIVING ROOM / HALL ---
 	var sofa_main = CSGBox3D.new()
 	sofa_main.size = Vector3(3.2, 0.85, 1.1)
 	sofa_main.position = Vector3(-4.5, 0.42, 1.5)
@@ -613,21 +634,18 @@ func _build_act3_full_house() -> void:
 	sofa_back.material = mat_sofa
 	set_full_house.add_child(sofa_back)
 	
-	# Coffee Table
 	var table = CSGBox3D.new()
 	table.size = Vector3(1.8, 0.45, 0.9)
 	table.position = Vector3(-4.5, 0.22, 0.0)
 	table.material = mat_wood
 	set_full_house.add_child(table)
 	
-	# Newspaper & Cups on coffee table
 	var newspaper = CSGBox3D.new()
 	newspaper.size = Vector3(0.5, 0.02, 0.4)
 	newspaper.position = Vector3(-4.8, 0.46, 0.0)
 	newspaper.material = _create_mat(Color(0.9, 0.9, 0.88))
 	set_full_house.add_child(newspaper)
 	
-	# TV Unit against wall
 	var tv_cabinet = CSGBox3D.new()
 	tv_cabinet.size = Vector3(2.6, 0.7, 0.5)
 	tv_cabinet.position = Vector3(-4.5, 0.35, -4.5)
@@ -637,23 +655,22 @@ func _build_act3_full_house() -> void:
 	tv_screen_mesh = CSGBox3D.new()
 	tv_screen_mesh.size = Vector3(2.0, 1.2, 0.08)
 	tv_screen_mesh.position = Vector3(-4.5, 1.5, -4.5)
-	tv_screen_mesh.material = _create_mat(Color(0.2, 0.6, 0.9), 0.2, 0.0, Color(0.3, 0.7, 1.0), 2.5) # Glowing TV
+	tv_screen_mesh.material = _create_mat(Color(0.2, 0.6, 0.9), 0.2, 0.0, Color(0.3, 0.7, 1.0), 2.5)
 	set_full_house.add_child(tv_screen_mesh)
 	
-	# Papa NPC sitting on sofa watching TV
-	char_papa = _build_rigged_human("Papa", Color(0.85, 0.82, 0.75), Color(0.9, 0.9, 0.9), false, false, false, true) # Sitting pose
+	# Papa NPC sitting on sofa
+	char_papa = _build_rigged_human("Papa", Color(0.85, 0.82, 0.75), Color(0.9, 0.9, 0.9), false, false, false, true)
 	char_papa.position = Vector3(-4.5, 0.35, 1.5)
 	char_papa.rotation_degrees = Vector3(0, 180, 0)
 	set_full_house.add_child(char_papa)
 	
-	# --- ZONE 2: KITCHEN (Right half of ground floor) ---
+	# --- ZONE 2: KITCHEN ---
 	var kitchen_counter = CSGBox3D.new()
 	kitchen_counter.size = Vector3(4.0, 0.9, 1.2)
 	kitchen_counter.position = Vector3(4.5, 0.45, -4.5)
 	kitchen_counter.material = mat_kitchen_slab
 	set_full_house.add_child(kitchen_counter)
 	
-	# Gas stove & Chai pot
 	var stove = CSGBox3D.new()
 	stove.size = Vector3(1.2, 0.1, 0.6)
 	stove.position = Vector3(4.5, 0.95, -4.5)
@@ -667,7 +684,6 @@ func _build_act3_full_house() -> void:
 	chai_pot.material = _create_mat(Color(0.7, 0.7, 0.72), 0.2, 0.9)
 	set_full_house.add_child(chai_pot)
 	
-	# Steam puff over chai
 	tea_steam_mesh = MeshInstance3D.new()
 	var steam_s = SphereMesh.new()
 	steam_s.radius = 0.12
@@ -677,14 +693,12 @@ func _build_act3_full_house() -> void:
 	tea_steam_mesh.position = Vector3(4.5, 1.4, -4.5)
 	set_full_house.add_child(tea_steam_mesh)
 	
-	# Mummy NPC standing at stove
-	char_mummy = _build_rigged_human("Mummy", Color(0.85, 0.2, 0.35), Color(0.85, 0.2, 0.35), false, false, true) # Saree attire
+	char_mummy = _build_rigged_human("Mummy", Color(0.85, 0.2, 0.35), Color(0.85, 0.2, 0.35), false, false, true)
 	char_mummy.position = Vector3(4.5, 0, -3.2)
 	char_mummy.rotation_degrees = Vector3(0, 0, 0)
 	set_full_house.add_child(char_mummy)
 	
-	# --- ZONE 3: STAIRCASE & UPSTAIRS BEDROOM ---
-	# Stair steps
+	# --- ZONE 3: STAIRS & UPSTAIRS BEDROOM ---
 	for i in range(8):
 		var step = CSGBox3D.new()
 		step.size = Vector3(1.8, 0.35, 0.45)
@@ -692,14 +706,33 @@ func _build_act3_full_house() -> void:
 		step.material = mat_wood
 		set_full_house.add_child(step)
 	
-	# Upstairs floor slab
 	var floor_up = CSGBox3D.new()
 	floor_up.size = Vector3(9.0, 0.2, 7.0)
 	floor_up.position = Vector3(-2.5, 2.9, 2.5)
 	floor_up.material = mat_wood
 	set_full_house.add_child(floor_up)
 	
-	# Protagonist's Bed upstairs
+	# Ceiling Fan above bed
+	var fan_pivot = Node3D.new()
+	fan_pivot.position = Vector3(-4.8, 5.8, 3.2)
+	set_full_house.add_child(fan_pivot)
+	var fan_rod = CSGCylinder3D.new()
+	fan_rod.radius = 0.04
+	fan_rod.height = 0.8
+	fan_rod.position = Vector3(0, 0.4, 0)
+	fan_rod.material = _create_mat(Color(0.85, 0.85, 0.85))
+	fan_pivot.add_child(fan_rod)
+	ceiling_fan_blades = Node3D.new()
+	fan_pivot.add_child(ceiling_fan_blades)
+	for r in [0, 120, 240]:
+		var blade = CSGBox3D.new()
+		blade.size = Vector3(1.2, 0.02, 0.15)
+		blade.position = Vector3(0.6, 0, 0)
+		blade.rotation_degrees = Vector3(0, r, 0)
+		blade.material = _create_mat(Color(0.8, 0.8, 0.8))
+		ceiling_fan_blades.add_child(blade)
+	
+	# Bed with Blanket & Sleeping Protagonist
 	var bed_frame = CSGBox3D.new()
 	bed_frame.size = Vector3(2.2, 0.4, 3.2)
 	bed_frame.position = Vector3(-4.8, 3.2, 3.2)
@@ -709,7 +742,7 @@ func _build_act3_full_house() -> void:
 	var mattress = CSGBox3D.new()
 	mattress.size = Vector3(2.0, 0.35, 3.0)
 	mattress.position = Vector3(-4.8, 3.5, 3.2)
-	mattress.material = _create_mat(Color(0.2, 0.45, 0.8)) # Blue bedsheet
+	mattress.material = _create_mat(Color(0.2, 0.45, 0.8))
 	set_full_house.add_child(mattress)
 	
 	var pillow = CSGBox3D.new()
@@ -718,21 +751,27 @@ func _build_act3_full_house() -> void:
 	pillow.material = _create_mat(Color(0.95, 0.95, 0.95))
 	set_full_house.add_child(pillow)
 	
-	# Window with morning sun in bedroom
+	# Blanket covering sleeping protagonist
+	var blanket = CSGBox3D.new()
+	blanket.size = Vector3(1.8, 0.25, 2.2)
+	blanket.position = Vector3(-4.8, 3.8, 2.7)
+	blanket.material = _create_mat(Color(0.85, 0.3, 0.3)) # Red morning quilt
+	set_full_house.add_child(blanket)
+	
 	var bedroom_window = CSGBox3D.new()
 	bedroom_window.size = Vector3(2.4, 1.8, 0.2)
 	bedroom_window.position = Vector3(-4.8, 4.5, 5.9)
 	bedroom_window.material = _create_mat(Color(0.85, 0.95, 1.0, 0.5), 0.1, 0.0, Color(1.0, 0.96, 0.75), 3.0)
 	set_full_house.add_child(bedroom_window)
 	
-	# Protagonist sleeping / waking up on bed
-	char_player_bed = _build_rigged_human("ProtagonistBed", Color(0.9, 0.9, 0.9), Color(0.2, 0.35, 0.6))
-	char_player_bed.position = Vector3(-4.8, 3.7, 3.2)
-	char_player_bed.rotation_degrees = Vector3(-70, 0, 0) # Lying down, sits up
-	set_full_house.add_child(char_player_bed)
+	# Protagonist Sleeping on bed (horizontal pose)
+	char_player_sleeping = _build_rigged_human("ProtagonistSleeping", Color(0.9, 0.9, 0.9), Color(0.2, 0.35, 0.6))
+	char_player_sleeping.position = Vector3(-4.8, 3.7, 3.4)
+	char_player_sleeping.rotation_degrees = Vector3(-90, 0, 0) # Sleeping flat on back
+	set_full_house.add_child(char_player_sleeping)
 
 # ------------------------------------------------------------------------------
-# ACT 4: NEIGHBORHOOD MAP & SCHOOL VAN ARRIVAL (पूरा मैप, वैन, दौड़ते हुए जाना)
+# ACT 4: NEIGHBORHOOD MAP & SCHOOL VAN ARRIVAL
 # ------------------------------------------------------------------------------
 func _build_act4_neighborhood_van() -> void:
 	set_neighborhood_street = Node3D.new()
@@ -740,42 +779,36 @@ func _build_act4_neighborhood_van() -> void:
 	set_neighborhood_street.position = Vector3(600, 0, 0)
 	add_child(set_neighborhood_street)
 	
-	# Long residential street (70m x 25m)
 	var ground = CSGBox3D.new()
 	ground.size = Vector3(30.0, 0.2, 80.0)
 	ground.position = Vector3(0, -0.1, 0)
 	ground.material = _create_mat(Color(0.2, 0.2, 0.22), 0.9)
 	set_neighborhood_street.add_child(ground)
 	
-	# Protagonist's house front exterior (Right side)
 	var house_facade = CSGBox3D.new()
 	house_facade.size = Vector3(10.0, 6.0, 8.0)
 	house_facade.position = Vector3(10.0, 3.0, 0)
 	house_facade.material = _create_mat(Color(0.88, 0.84, 0.78))
 	set_neighborhood_street.add_child(house_facade)
 	
-	# Front Porch & Door
 	front_door_mesh = CSGBox3D.new()
 	front_door_mesh.size = Vector3(0.1, 2.5, 1.5)
 	front_door_mesh.position = Vector3(4.9, 1.25, 0)
 	front_door_mesh.material = _create_mat(Color(0.4, 0.25, 0.12))
 	set_neighborhood_street.add_child(front_door_mesh)
 	
-	# Compound wall with open gate
 	var c_wall = CSGBox3D.new()
 	c_wall.size = Vector3(0.25, 1.5, 18.0)
 	c_wall.position = Vector3(3.0, 0.75, 0)
 	c_wall.material = _create_mat(Color(0.65, 0.65, 0.65))
 	set_neighborhood_street.add_child(c_wall)
 	
-	# Gate opening
 	var gate_cut = CSGBox3D.new()
 	gate_cut.operation = CSGShape3D.OPERATION_SUBTRACTION
 	gate_cut.size = Vector3(0.5, 1.8, 3.0)
 	gate_cut.position = Vector3(3.0, 0.9, 0)
 	c_wall.add_child(gate_cut)
 	
-	# Other houses across the street
 	for z in [-20, -5, 12, 28]:
 		var opp_house = CSGBox3D.new()
 		opp_house.size = Vector3(9.0, 5.0, 10.0)
@@ -783,36 +816,24 @@ func _build_act4_neighborhood_van() -> void:
 		opp_house.material = _create_mat(Color(0.75 + randf()*0.1, 0.65 + randf()*0.1, 0.55))
 		set_neighborhood_street.add_child(opp_house)
 	
-	# Swaying Neem / Gulmohar trees along street
 	for z in [-26, -14, 2, 16, 28]:
-		var tree = _create_detailed_forest_tree(true) # morning tree
+		var tree = _create_detailed_forest_tree(true)
 		tree.position = Vector3(-4.0, 0, z)
 		set_neighborhood_street.add_child(tree)
 		street_trees.append(tree)
 	
-	# Overhead electric wires & concrete poles
-	for z in [-20, 0, 20]:
-		var pole = CSGCylinder3D.new()
-		pole.radius = 0.1
-		pole.height = 6.5
-		pole.position = Vector3(-3.5, 3.25, z)
-		pole.material = _create_mat(Color(0.35, 0.35, 0.38), 0.6)
-		set_neighborhood_street.add_child(pole)
-	
-	# School Van Exterior parked by front gate
 	school_van_exterior = _build_detailed_school_van()
 	school_van_exterior.position = Vector3(-0.5, 0, -2.5)
 	set_neighborhood_street.add_child(school_van_exterior)
 	
-	# Protagonist running figure
-	char_player_sprint = _build_rigged_human("ProtagonistSprint", Color(0.95, 0.95, 0.95), Color(0.18, 0.28, 0.55), false, false, false, false, true) # Uniform + Backpack
+	char_player_sprint = _build_rigged_human("ProtagonistSprint", Color(0.95, 0.95, 0.95), Color(0.18, 0.28, 0.55), false, false, false, false, true)
 	char_player_sprint.position = Vector3(4.5, 0, 0)
 	char_player_sprint.rotation_degrees = Vector3(0, -90, 0)
 	char_player_sprint.visible = false
 	set_neighborhood_street.add_child(char_player_sprint)
 
 # ------------------------------------------------------------------------------
-# ACT 5: SCHOOL VAN INTERIOR & WINDOW GAZING (वैन का इंटीरियर & खिड़की से देखना)
+# ACT 5: INDIAN SCHOOL VAN INTERIOR (Rexine Seats, Safety Bars, Window Gazing)
 # ------------------------------------------------------------------------------
 func _build_act5_van_interior() -> void:
 	set_van_interior = Node3D.new()
@@ -821,38 +842,47 @@ func _build_act5_van_interior() -> void:
 	add_child(set_van_interior)
 	
 	var mat_van_frame = _create_mat(Color(0.2, 0.2, 0.22), 0.7)
-	var mat_seat = _create_mat(Color(0.48, 0.22, 0.15), 0.7) # Indian van brown leatherette
-	var mat_glass = _create_mat(Color(0.7, 0.85, 0.95, 0.4), 0.1, 0.0)
+	var mat_seat = _create_mat(Color(0.48, 0.22, 0.15), 0.7) # Brown rexine seat
+	var mat_glass = _create_mat(Color(0.7, 0.85, 0.95, 0.35), 0.1, 0.0)
+	var mat_bar = _create_mat(Color(0.8, 0.8, 0.82), 0.2, 0.9) # Silver safety bars
 	
-	# Van cabin enclosure
+	# Van cabin shell
 	var cabin = CSGBox3D.new()
 	cabin.size = Vector3(2.8, 2.2, 4.8)
 	cabin.position = Vector3(0, 1.1, 0)
 	cabin.material = mat_van_frame
 	set_van_interior.add_child(cabin)
 	
-	# Cut out interior space
 	var c_hollow = CSGBox3D.new()
 	c_hollow.operation = CSGShape3D.OPERATION_SUBTRACTION
 	c_hollow.size = Vector3(2.5, 1.9, 4.5)
 	c_hollow.position = Vector3(0, 1.05, 0)
 	cabin.add_child(c_hollow)
 	
-	# Left passenger window cutout (Where Protagonist looks out)
+	# Window cutout where Protagonist gazes outside
 	var c_window = CSGBox3D.new()
 	c_window.operation = CSGShape3D.OPERATION_SUBTRACTION
 	c_window.size = Vector3(0.5, 1.1, 2.4)
 	c_window.position = Vector3(-1.3, 1.25, 0.2)
 	cabin.add_child(c_window)
 	
-	# Glass pane
 	var glass_pane = CSGBox3D.new()
 	glass_pane.size = Vector3(0.04, 1.08, 2.38)
 	glass_pane.position = Vector3(-1.26, 1.25, 0.2)
 	glass_pane.material = mat_glass
 	set_van_interior.add_child(glass_pane)
 	
-	# Driver seat and Steering Wheel in front
+	# --- 3 HORIZONTAL METAL SAFETY BARS ACROSS WINDOW ---
+	for i in range(3):
+		var bar = CSGCylinder3D.new()
+		bar.radius = 0.015
+		bar.height = 2.35
+		bar.rotation_degrees = Vector3(90, 0, 0)
+		bar.position = Vector3(-1.24, 0.95 + (i * 0.28), 0.2)
+		bar.material = mat_bar
+		set_van_interior.add_child(bar)
+	
+	# Driver seat & Steering wheel
 	var driver_seat = CSGBox3D.new()
 	driver_seat.size = Vector3(0.9, 0.5, 0.7)
 	driver_seat.position = Vector3(-0.5, 0.45, -1.5)
@@ -867,13 +897,12 @@ func _build_act5_van_interior() -> void:
 	wheel.material = _create_mat(Color(0.1, 0.1, 0.1))
 	set_van_interior.add_child(wheel)
 	
-	# Driver NPC in uniform
 	var driver_npc = _build_rigged_human("VanDriverNPC", Color(0.7, 0.6, 0.35), Color(0.2, 0.2, 0.25), false, false, false, true)
 	driver_npc.position = Vector3(-0.5, 0.45, -1.4)
 	driver_npc.rotation_degrees = Vector3(0, 180, 0)
 	set_van_interior.add_child(driver_npc)
 	
-	# Passenger seat row (Protagonist sitting by window)
+	# Passenger seat row where Protagonist sits
 	var p_seat = CSGBox3D.new()
 	p_seat.size = Vector3(1.1, 0.45, 0.8)
 	p_seat.position = Vector3(-0.6, 0.45, 0.3)
@@ -886,25 +915,22 @@ func _build_act5_van_interior() -> void:
 	p_seatback.material = mat_seat
 	set_van_interior.add_child(p_seatback)
 	
-	# Protagonist sitting by window, resting head, looking outside
 	char_player_window = _build_rigged_human("ProtagonistWindow", Color(0.95, 0.95, 0.95), Color(0.18, 0.28, 0.55), false, false, false, true, true)
 	char_player_window.position = Vector3(-0.7, 0.45, 0.35)
-	char_player_window.rotation_degrees = Vector3(0, 90, 0) # Facing out the window
+	char_player_window.rotation_degrees = Vector3(0, 90, 0) # Looking out through window bars
 	set_van_interior.add_child(char_player_window)
 	
-	# Other school student sitting in back
 	var kid_npc = _build_rigged_human("KidPassenger", Color(0.95, 0.95, 0.95), Color(0.18, 0.28, 0.55), false, false, false, true, true)
 	kid_npc.position = Vector3(0.5, 0.45, 1.4)
 	kid_npc.rotation_degrees = Vector3(0, 180, 0)
 	set_van_interior.add_child(kid_npc)
 	
-	# Moving Scenery outside window (Road, trees, shops scrolling for real motion effect)
+	# Moving Scenery outside window
 	van_scenery_scroll = Node3D.new()
 	van_scenery_scroll.name = "VanSceneryScroll"
 	van_scenery_scroll.position = Vector3(-8.0, 0, 0)
 	set_van_interior.add_child(van_scenery_scroll)
 	
-	# Road outside window
 	var out_road = CSGBox3D.new()
 	out_road.size = Vector3(8.0, 0.1, 60.0)
 	out_road.position = Vector3(2.0, -0.1, 0)
@@ -916,14 +942,13 @@ func _build_act5_van_interior() -> void:
 		t.position = Vector3(0, 0, -25.0 + (i * 5.0))
 		van_scenery_scroll.add_child(t)
 		
-		# Roadside shops / small houses passing by
 		var shop = CSGBox3D.new()
 		shop.size = Vector3(4.0, 3.5, 4.5)
 		shop.position = Vector3(-4.0, 1.75, -23.0 + (i * 6.5))
 		shop.material = _create_mat(Color(0.85, 0.75 + randf()*0.1, 0.6))
 		van_scenery_scroll.add_child(shop)
 
-# --- RIGGED HUMAN CHARACTER BUILDER ---
+# --- RIGGED HUMAN BUILDER ---
 func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_bat: bool = false, has_glasses: bool = false, is_female: bool = false, is_sitting: bool = false, has_backpack: bool = false) -> Node3D:
 	var root = Node3D.new()
 	root.name = c_name
@@ -938,7 +963,6 @@ func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_
 	body.name = "Body"
 	root.add_child(body)
 	
-	# Head & Hair
 	var head = CSGBox3D.new()
 	head.size = Vector3(0.34, 0.38, 0.34)
 	head.position = Vector3(0, 1.65, 0)
@@ -958,7 +982,6 @@ func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_
 		glasses.material = _create_mat(Color(0.08, 0.08, 0.08), 0.2, 0.8)
 		body.add_child(glasses)
 	
-	# Torso
 	var torso = CSGBox3D.new()
 	torso.size = Vector3(0.55, 0.65, 0.34)
 	torso.position = Vector3(0, 1.15, 0)
@@ -969,10 +992,9 @@ func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_
 		var bag = CSGBox3D.new()
 		bag.size = Vector3(0.42, 0.5, 0.24)
 		bag.position = Vector3(0, 1.15, -0.25)
-		bag.material = _create_mat(Color(0.15, 0.35, 0.75)) # Blue school backpack
+		bag.material = _create_mat(Color(0.15, 0.35, 0.75))
 		body.add_child(bag)
 	
-	# Limbs with dedicated pivots for walking/running rotation
 	var arm_l_pivot = Node3D.new()
 	arm_l_pivot.name = "ArmL_Pivot"
 	arm_l_pivot.position = Vector3(-0.35, 1.4, 0)
@@ -1123,14 +1145,12 @@ func _build_detailed_school_van() -> Node3D:
 
 # --- CUTSCENE FLOW & PROCEDURAL ANIMATIONS ---
 func _start_prologue() -> void:
-	if audio_ambience_night:
-		audio_ambience_night.play()
-	if audio_bgm_song:
-		audio_bgm_song.play()
+	if audio_ambience_night: audio_ambience_night.play()
+	if audio_bgm_song: audio_bgm_song.play()
 	
-	# Start camera looking at friends walking down the Blood Sky road
-	cam_pivot.position = Vector3(0, 1.8, 16.0)
-	cam.rotation_degrees = Vector3(-8, 0, 0)
+	# Start follow camera moving behind walking friends
+	cam_pivot.position = Vector3(0, 1.8, 29.0)
+	cam.rotation_degrees = Vector3(-6, 0, 0)
 	
 	var tw = create_tween()
 	tw.tween_property(fade_overlay, "color:a", 0.0, 1.5)
@@ -1139,56 +1159,56 @@ func _start_prologue() -> void:
 func _process(delta: float) -> void:
 	anim_time += delta
 	
-	# 1. Animate walking friends in Act 1
-	if current_beat in [0, 1, 2, 3] and char_group_walk:
+	# 1. Follow camera & walking in Beat 0
+	if current_beat == 0 and char_group_walk:
 		_animate_char_walk(char_sahil_walk, anim_time, 5.0)
 		_animate_char_walk(char_aashu_walk, anim_time + 0.3, 5.0)
 		_animate_char_walk(char_kripal_walk, anim_time + 0.6, 5.0)
 		_animate_char_walk(char_player_walk, anim_time + 0.9, 5.0)
 		
-		# Move group forward down the road
-		char_group_walk.position.z -= delta * 1.8
-		cam_pivot.position.z -= delta * 1.8
+		# Move forward down the road together
+		char_group_walk.position.z -= delta * 1.9
+		cam_pivot.position.z -= delta * 1.9
 	
-	# 2. Swaying trees in the morning / night wind (hawa ke jhoke)
+	# 2. Ceiling fan spinning in bedroom
+	if ceiling_fan_blades:
+		ceiling_fan_blades.rotation.y += delta * 6.0
+	
+	# 3. Swaying trees (Hawa ke jhoke)
 	var wind_sway = sin(anim_time * 2.2) * 0.04
-	for tr in street_trees:
-		tr.rotation.z = wind_sway
-	for ft in forest_trees:
-		ft.rotation.z = wind_sway * 0.7
+	for tr in street_trees: tr.rotation.z = wind_sway
+	for ft in forest_trees: ft.rotation.z = wind_sway * 0.7
 	
-	# 3. Animate forest anomaly pulsating light & flares
-	if current_beat in [5, 6, 7] and forest_anomaly_light:
+	# 4. Forest anomaly light & scale pulse
+	if current_beat in [6, 7] and forest_anomaly_light:
 		var p = (sin(anim_time * 7.0) + 1.0) * 0.5
 		forest_anomaly_light.light_energy = 3.0 + (p * 5.5)
-		if forest_anomaly_core:
-			forest_anomaly_core.scale = Vector3.ONE * (0.85 + p * 0.45)
+		if forest_anomaly_core: forest_anomaly_core.scale = Vector3.ONE * (0.85 + p * 0.45)
 	
-	# 4. TV Screen light flickering in living room
-	if current_beat in [9, 10, 11] and tv_screen_mesh:
+	# 5. TV screen flickering in living room
+	if current_beat in [10, 11] and tv_screen_mesh:
 		var tv_mat = tv_screen_mesh.material as StandardMaterial3D
 		if tv_mat:
 			var flick = sin(anim_time * 14.0) * 0.2 + 0.8
-			tv_mat.emission_energy_multiplier = 2.0 * flick
+			tv_mat.emission_energy_multiplier = 2.2 * flick
 	
-	# 5. Chai steam rising in kitchen
+	# 6. Chai steam rising
 	if tea_steam_mesh:
 		tea_steam_mesh.position.y = 1.35 + (fmod(anim_time * 0.6, 0.4))
 		tea_steam_mesh.scale = Vector3.ONE * (0.8 + fmod(anim_time * 0.8, 0.5))
 	
-	# 6. Sprinting Protagonist in Act 4
-	if current_beat == 14 and char_player_sprint and char_player_sprint.visible:
-		_animate_char_walk(char_player_sprint, anim_time, 12.0, true) # Fast sprint
+	# 7. Sprinting Protagonist in Act 4
+	if current_beat == 15 and char_player_sprint and char_player_sprint.visible:
+		_animate_char_walk(char_player_sprint, anim_time, 12.0, true)
 		char_player_sprint.position.x -= delta * 4.2
 		cam_pivot.position.x -= delta * 3.8
 	
-	# 7. Van scenery scrolling outside the window in Act 5 (Looking out window)
-	if current_beat in [16, 17, 18] and van_scenery_scroll:
+	# 8. Van scenery scrolling outside the window in Act 5
+	if current_beat in [17, 18, 19] and van_scenery_scroll:
 		van_scenery_scroll.position.z += delta * 14.0
 		if van_scenery_scroll.position.z > 22.0:
 			van_scenery_scroll.position.z = -8.0
 	
-	# Auto advance timer
 	if is_beat_active:
 		beat_timer += delta
 		if beat_timer >= auto_advance_time:
@@ -1239,53 +1259,88 @@ func _advance_beat() -> void:
 	is_beat_active = true
 	
 	match current_beat:
-		# --- ACT 1: WALKING DOWN ROAD UNDER BLOOD SKY (लाल आसमान) ---
+		# --- ACT 1: WALKING UNDER BLOOD SKY (FOLLOW CAM) -> HALT & FIRST-PERSON MODE ---
 		0:
-			auto_advance_time = 5.2
-			_show_title_card("रात 8:30 PM — लाल आसमान के नीचे", "THE BLOOD SKY ROAD — PANSEMAL")
-			_set_dialogue("SAHIL (WALKING ON ROAD)", Color(0.35, 0.85, 0.4),
-				"भाई सच में, आज गार्डन में क्रिकेट मैच खेलने में मज़ा आ गया! लेकिन अचानक ये आसमान कितना अजीब लाल हो गया है...",
-				"Bhai sach me, aaj garden me cricket match me maza aa gaya! Lekin achanak ye aasman kitna ajeeb laal ho gaya hai...")
-			_tween_cam(Vector3(0, 1.8, 16.0), Vector3(-6, -10, 0), 4.8)
+			# Walking together along the road with camera tracking alongside
+			auto_advance_time = 5.5
+			_show_title_card("रात 8:30 PM — लाल आसमान के साये में", "THE BLOOD SKY ROAD — PANSEMAL")
+			_set_dialogue("FRIENDS (WALKING HOME)", Color(0.9, 0.85, 0.4),
+				"मैच खत्म होने के बाद चारों दोस्त सड़क पर साथ-साथ बातें करते हुए आगे बढ़ रहे थे...",
+				"After playing cricket, the four friends walked together down the road under the eerie blood sky...")
+			_play_voice("res://audio/storm_sahil_warning.mp3")
 			
 		1:
-			auto_advance_time = 5.2
+			# Friends HALT. Camera cuts to FIRST-PERSON (FP) MODE looking directly at friends!
+			auto_advance_time = 5.5
 			_hide_title_card()
-			_set_dialogue("AASHUTOSH", Color(0.95, 0.65, 0.3),
-				"हाँ यार, मौसम अचानक बहुत अजीब लग रहा है जैसे कोई तूफ़ान आने वाला हो... और 8:30 भी बज गए, कल सुबह स्कूल है।",
-				"Haan yaar, mausam achanak bohot ajeeb lag raha hai jaise koi toofan aane wala ho... Aur 8:30 bhi baj gaye, kal subah school hai.")
-			_tween_cam(Vector3(-0.6, 1.7, 14.5), Vector3(-5, -25, 0), 4.8)
+			fp_crosshair.visible = true
+			
+			# Re-arrange friends in front of Player in FP view
+			char_player_walk.visible = false # Hide third person player model
+			char_sahil_walk.position = Vector3(-0.7, 0, -1.8)
+			char_sahil_walk.rotation_degrees = Vector3(0, 155, 0) # Facing player
+			char_aashu_walk.position = Vector3(0.8, 0, -1.9)
+			char_aashu_walk.rotation_degrees = Vector3(0, -155, 0) # Facing player
+			char_kripal_walk.position = Vector3(0.1, 0, -2.4)
+			char_kripal_walk.rotation_degrees = Vector3(0, 180, 0) # Facing player
+			
+			# FP Camera placed right at Player eye position
+			cam_pivot.position = char_group_walk.position + Vector3(0, 1.68, 0)
+			cam.rotation_degrees = Vector3(-4, -15, 0) # Looking at Sahil
+			
+			_set_dialogue("SAHIL (FIRST-PERSON VIEW)", Color(0.35, 0.85, 0.4),
+				"\"भाई सच में, आज गार्डन में क्रिकेट मैच में मज़ा आ गया! लेकिन अचानक ये आसमान कितना अजीब लाल हो गया है...\"",
+				"\"Bhai sach me, aaj cricket khelne me bohot maza aaya! Lekin achanak ye aasman kitna ajeeb laal ho gaya hai...\"")
+			_play_voice("res://audio/storm_sahil_warning.mp3")
 			
 		2:
-			auto_advance_time = 5.5
-			_set_dialogue("PROTAGONIST (YOU)", Color(0.4, 0.75, 1.0),
-				"कृपाल, तू अकेले जंगल वाले रास्ते से जाता है ना? वहाँ तो दिन में भी अँधेरा रहता है, तू मेन रोड से घूम के चला जा ना?",
-				"Kripal, tu akele jungle wale raste se jata hai na? Wahan to din me bhi andhera rehta hai, tu highway se ghoom ke chala ja na?")
-			_tween_cam(Vector3(0.6, 1.7, 13.0), Vector3(-6, 20, 0), 5.0)
+			# FP Camera glances towards Aashutosh
+			auto_advance_time = 5.2
+			_tween_cam(cam_pivot.position, Vector3(-4, 20, 0), 1.2)
+			_set_dialogue("AASHUTOSH", Color(0.95, 0.65, 0.3),
+				"\"हाँ यार, मौसम अचानक बहुत अजीब लग रहा है जैसे कोई तूफ़ान आने वाला हो... और 8:30 भी बज गए, कल सुबह स्कूल है।\"",
+				"\"Haan yaar, mausam achanak bohot ajeeb lag raha hai jaise koi toofan aane wala ho... Kal subah school hai.\"")
+			_play_voice("res://audio/storm_aashu_hurry.mp3")
 			
 		3:
-			auto_advance_time = 5.5
-			_set_dialogue("KRIPAL", Color(1.0, 0.35, 0.35),
-				"अरे भाई तुम सब इतना डरते क्यों हो? मैं तो बचपन से इसी शॉर्टकट से निकलता हूँ। कुछ नहीं होता! कल सुबह वैन में मिलते हैं!",
-				"Arrey bhai tum sab itna darte kyu ho? Main to bachpan se isi shortcut se nikalta hoon. Kuchh nahi hota! Kal subah van me milte hain!")
-			_tween_cam(Vector3(0.4, 1.65, 10.5), Vector3(-4, -40, 0), 5.0)
+			# You (Protagonist) speak in FP mode looking towards Kripal
+			auto_advance_time = 5.2
+			_tween_cam(cam_pivot.position, Vector3(-3, 2, 0), 1.0)
+			_set_dialogue("YOU (PROTAGONIST)", Color(0.4, 0.75, 1.0),
+				"\"कृपाल, तू अकेले जंगल वाले रास्ते से जाता है ना? वहाँ तो दिन में भी अँधेरा रहता है, तू मेन रोड से घूम के चला जा ना?\"",
+				"\"Kripal, tu akele jungle wale raste se jata hai na? Wahan bohot andhera rehta hai, main road se nikal ja na?\"")
+			_play_voice("res://audio/storm_player_go.mp3")
 			
 		4:
-			# Parting ways at the crossroads signpost
-			auto_advance_time = 4.5
-			_set_dialogue("CROSSROADS (तीराहा)", Color(0.85, 0.85, 0.9),
-				"चारों दोस्त तीराहे पर अलग हो गए... साहिल-आशुतोष बाएँ मुड़े, और कृपाल घने अंधेरे जंगल की तरफ चल पड़ा...",
-				"The four friends parted ways at the crossroads... Kripal took the dark path into the dense forest...")
+			# Kripal answers carefree
+			auto_advance_time = 5.2
+			_tween_cam(cam_pivot.position, Vector3(-4, 0, 0), 1.0)
+			_set_dialogue("KRIPAL", Color(1.0, 0.4, 0.4),
+				"\"अरे भाई तुम सब इतना डरते क्यों हो? मैं तो बचपन से इसी शॉर्टकट से निकलता हूँ। कुछ नहीं होता! कल सुबह वैन में मिलते हैं!\"",
+				"\"Arrey bhai tum sab itna darte kyu ho? Main to bachpan se isi shortcut se nikalta hoon. Kal subah van me milte hain!\"")
 			
-			var tw = create_tween().set_parallel(true)
-			tw.tween_property(char_sahil_walk, "position:x", -8.0, 4.0)
-			tw.tween_property(char_aashu_walk, "position:x", -7.0, 4.0)
-			tw.tween_property(char_player_walk, "position:x", 8.0, 4.0)
-			tw.tween_property(char_kripal_walk, "position:z", -12.0, 4.0)
-			_tween_cam(Vector3(0, 3.2, 8.0), Vector3(-20, 0, 0), 4.0)
-			
-		# --- ACT 2: DENSE FOREST & GLOWING ANOMALY (पूरा घना जंगल का मैप) ---
 		5:
+			# Parting ways on the clean, wide road
+			auto_advance_time = 4.8
+			fp_crosshair.visible = false
+			char_player_walk.visible = true
+			
+			_set_dialogue("CLEAR ROAD (तीराहे पर अलग होना)", Color(0.85, 0.85, 0.9),
+				"चारों दोस्त तीराहे पर अलग हो गए... साहिल-आशुतोष बाएँ मुड़े, और कृपाल घने अंधेरे जंगल की तरफ चल पड़ा...",
+				"The friends parted ways on the clear road... Kripal headed forward into the dark forest path...")
+			
+			# High clean camera shot showing roads
+			cam_pivot.position = Vector3(0, 3.8, -12.0)
+			cam.rotation_degrees = Vector3(-18, 0, 0)
+			
+			var tw_part = create_tween().set_parallel(true)
+			tw_part.tween_property(char_sahil_walk, "position:x", -10.0, 4.0)
+			tw_part.tween_property(char_aashu_walk, "position:x", -9.0, 4.0)
+			tw_part.tween_property(char_player_walk, "position:x", 10.0, 4.0)
+			tw_part.tween_property(char_kripal_walk, "position:z", -20.0, 4.0)
+			
+		# --- ACT 2: DENSE FOREST & GLOWING ANOMALY ---
+		6:
 			auto_advance_time = 5.2
 			_fade_to_black_and_call(func():
 				cam_pivot.position = Vector3(200, 1.8, 12.0)
@@ -1295,7 +1350,7 @@ func _advance_beat() -> void:
 				"रात का गहरा सन्नाटा... पेड़ों के बीच ठंडी हवा की सरसराहट... कृपाल अकेला जंगल के रास्ते पर चल रहा था...",
 				"The deep silence of the forest... cold wind rustling ancient trees... Kripal walks alone along the dark dirt trail...")
 			
-		6:
+		7:
 			auto_advance_time = 5.8
 			if audio_whisper: audio_whisper.play()
 			_set_dialogue("KRIPAL", Color(1.0, 0.4, 0.4),
@@ -1303,7 +1358,7 @@ func _advance_beat() -> void:
 				"Ye... ye jungle ke itne andar aisi ajeeb neeli roshni kahan se aa rahi hai...? Yahan to koi khamba bhi nahi hai...")
 			_tween_cam(Vector3(203.5, 1.9, 0.0), Vector3(-6, 45, 0), 5.2)
 			
-		7:
+		8:
 			auto_advance_time = 4.8
 			if audio_jumpscare: audio_jumpscare.play()
 			if audio_heartbeat: audio_heartbeat.play()
@@ -1311,13 +1366,12 @@ func _advance_beat() -> void:
 				"न-नहीं... ये क्या चीज़ है?!! ये तो मेरी तरफ बढ़ रही है!! मुझे भागना होगा!!",
 				"N-Nahi... Ye kya cheez hai?!! Ye to meri taraf badh rahi hai!! Mujhe bhagna hoga!!")
 			
-			# Camera shake
 			var tw_shk = create_tween()
 			for i in range(8):
 				tw_shk.tween_property(cam, "position", Vector3(randf_range(-0.18, 0.18), randf_range(-0.18, 0.18), 0), 0.05)
 			tw_shk.tween_property(cam, "position", Vector3.ZERO, 0.1)
 			
-		8:
+		9:
 			auto_advance_time = 4.5
 			_set_dialogue("KRIPAL'S PANIC SPRINT", Color(0.9, 0.8, 0.3),
 				"कृपाल बदहवास हालत में सरपट भागते हुए जंगल से बाहर निकला और अपने घर का दरवाजा धड़ाम से बंद कर लिया!",
@@ -1330,55 +1384,71 @@ func _advance_beat() -> void:
 				char_kripal_forest.visible = false
 			)
 			
-		# --- ACT 3: FULL HOUSE (Papa watching TV in Hall, Mummy cooking in Kitchen, Bedroom) ---
-		9:
-			auto_advance_time = 5.2
+		# --- ACT 3: FULL HOUSE (Sleeping in Bed, Living Room with Papa, Kitchen with Mummy) ---
+		10:
+			# 10A: SLEEPING IN BEDROOM FIRST (Dedicated time for environment & sleeping)
+			auto_advance_time = 5.5
 			if audio_ambience_night and audio_ambience_night.playing: audio_ambience_night.stop()
 			if audio_heartbeat and audio_heartbeat.playing: audio_heartbeat.stop()
 			if audio_ambience_morning: audio_ambience_morning.play()
 			
-			# Shift environment from Blood Sky to bright morning
 			world_env.environment = morning_sky_env
 			blood_sky_light.visible = false
 			sun_light.visible = true
 			
 			_fade_to_black_and_call(func():
-				cam_pivot.position = Vector3(395.5, 1.6, 2.8) # Living room view looking at Papa & TV
-				cam.rotation_degrees = Vector3(-8, -25, 0)
+				cam_pivot.position = Vector3(395.2, 4.4, 2.2) # Looking down at Protagonist sleeping in bed
+				cam.rotation_degrees = Vector3(-18, 25, 0)
 			)
 			
-			_show_title_card("अगली सुबह — 7:15 AM", "PROTAGONIST'S HOUSE — LIVING ROOM & KITCHEN")
+			_show_title_card("अगली सुबह — 7:15 AM", "THE NEXT MORNING — PROTAGONIST'S HOUSE")
+			_set_dialogue("BEDROOM (कमरे में सोते हुए)", Color(0.4, 0.75, 1.0),
+				"सुबह 7:15... कमरे में खिड़की से मीठी धूप छनकर आ रही है... पंखा घूम रहा है और आप गहरी नींद में सो रहे हैं...",
+				"7:15 AM... Golden morning sunlight filters through the window... ceiling fan spinning softly as you sleep peacefully...")
+			
+		11:
+			# 10B: PAPA IN LIVING ROOM (Watching TV with remote)
+			auto_advance_time = 5.2
+			_hide_title_card()
+			_fade_to_black_and_call(func():
+				cam_pivot.position = Vector3(395.5, 1.55, 2.8) # Living room view focusing on Papa on sofa
+				cam.rotation_degrees = Vector3(-8, -25, 0)
+			)
 			_set_dialogue("PAPA (LIVING ROOM MEIN TV DEKHTE HUE)", Color(1.0, 0.85, 0.35),
 				"अरे बेटा! 7:15 हो गए... उठ जाओ जल्दी! आज फिर स्कूल वैन के लिए दौड़ना पड़ेगा!",
 				"Arrey beta! 7:15 ho gaye... Uth jao jaldi! Aaj phir school van ke liye daudna padega!")
 			
-		10:
+		12:
+			# 10C: MUMMY IN KITCHEN (Boiling Chai at Stove)
 			auto_advance_time = 5.2
-			_hide_title_card()
-			# Pan camera to Kitchen looking at Mummy cooking chai
-			_tween_cam(Vector3(404.5, 1.5, -1.8), Vector3(-6, -110, 0), 4.8)
+			_tween_cam(Vector3(404.5, 1.5, -1.8), Vector3(-6, -110, 0), 2.5)
 			_set_dialogue("MUMMY (KITCHEN SE CHAI BANATE HUE)", Color(1.0, 0.45, 0.55),
 				"चाय बन गई है! पहले मुँह-हाथ धो लो और स्कूल यूनिफॉर्म पहनो! वैन किसी भी वक्त आती होगी!",
 				"Chai ban gayi hai! Pehle muh-haath dho lo aur school uniform pehno! Van kisi bhi waqt aati hogi!")
+			_play_voice("res://audio/mummy_line_1.mp3")
 			
-		11:
+		13:
+			# 10D: WAKING UP IN BEDROOM
 			auto_advance_time = 5.0
-			# Float camera upstairs into Protagonist's sunny bedroom
-			_tween_cam(Vector3(395.2, 4.4, 2.2), Vector3(-14, 35, 0), 4.5)
+			_fade_to_black_and_call(func():
+				cam_pivot.position = Vector3(395.2, 4.4, 2.2)
+				cam.rotation_degrees = Vector3(-14, 35, 0)
+			)
 			
-			# Protagonist sits up on bed
+			# Sitting up on bed
 			var tw_bed = create_tween()
-			tw_bed.tween_property(char_player_bed, "rotation_degrees:x", 0.0, 1.8)
+			tw_bed.tween_property(char_player_sleeping, "rotation_degrees:x", 0.0, 1.8)
 			
 			_set_dialogue("PROTAGONIST (BEDROOM MEIN UTH TE HUE)", Color(0.4, 0.75, 1.0),
 				"हाँ पापा, हाँ मम्मी! बस 5 मिनट... उठ रहा हूँ! चाय ला रहा हूँ नीचे...",
-				"Haan Papa, haan Mummy! Bas 5 minute... uth raha hoon! Chai la raha hoon neeche...")
+				"Haan Papa, haan Mummy! Bas 5 minute... uth raha hoon! Chai peeta hoon...")
+			_play_voice("res://audio/player_talk_mummy.mp3")
 			
-		# --- ACT 4: NEIGHBORHOOD MAP, VAN ARRIVAL & RUNNING ANIMATION ---
-		12:
+		# --- ACT 4: NEIGHBORHOOD MAP, VAN ARRIVAL & FULL 3D SPRINT ANIMATION ---
+		14:
 			auto_advance_time = 5.5
 			_fade_to_black_and_call(func():
-				cam_pivot.position = Vector3(600, 2.2, 8.0) # Street view outside house
+				cam_pivot.position = Vector3(600, 2.2, 8.0)
 				cam.rotation_degrees = Vector3(-10, 0, 0)
 			)
 			if audio_van_horn: audio_van_horn.play()
@@ -1387,61 +1457,54 @@ func _advance_beat() -> void:
 				"भाभी जी! जल्दी भेजो ना बच्चे को! 7:35 हो गए हैं, आगे कृपाल और बाकी बच्चों को भी लेना है... लेट हो रहा है!",
 				"Bhabhi ji! Jaldi bhejo na bachhe ko! 7:35 ho gaye hain, aage Kripal aur baki bachhon ko bhi lena hai... late ho raha hai!")
 			
-		13:
-			auto_advance_time = 4.8
-			_set_dialogue("PROTAGONIST", Color(0.4, 0.75, 1.0),
-				"अरे बाप रे! वैन तो आ भी गई! जुराबें कहाँ गईं... जल्दी बैग पकड़ो!",
-				"Arey baap re! Van to aa bhi gayi! Jurabein kahan gayin... jaldi bag pakdo!")
-			
-			# Front door swings open
-			var tw_door = create_tween()
-			tw_door.tween_property(front_door_mesh, "rotation_degrees:y", 85.0, 1.2)
-			
-		14:
+		15:
 			# Live 3D Sprinting sequence across the front yard to the van
-			auto_advance_time = 5.2
+			auto_advance_time = 5.5
+			front_door_mesh.rotation_degrees.y = 85.0
 			char_player_sprint.visible = true
 			_tween_cam(Vector3(603.5, 1.8, 3.5), Vector3(-6, -45, 0), 4.5)
 			_set_dialogue("PROTAGONIST RUNNING TO VAN", Color(0.35, 0.85, 0.95),
 				"\"गुड मॉर्निंग भैया! सॉरी आज थोड़ा लेट हो गया...\"\n— ड्राइवर: \"रोज़ का यही है तुम्हारा... चलो बैठो जल्दी, दरवाजा लगाओ!\"",
 				"\"Good morning bhaiya! Sorry aaj thoda late ho gaya...\"\n— Driver: \"Roz ka yahi naatak hai tumhara... chalo baitho jaldi, darwaja lagao!\"")
 			
-		# --- ACT 5: VAN INTERIOR & WINDOW GAZING SCENE (SONG / BGM SLOT) ---
-		15:
+		# --- ACT 5: INDIAN SCHOOL VAN INTERIOR & WINDOW GAZING (SONG / BGM SCENE) ---
+		16:
 			auto_advance_time = 5.5
 			if audio_door_close: audio_door_close.play()
 			if audio_van_engine: audio_van_engine.play()
 			
 			_fade_to_black_and_call(func():
-				cam_pivot.position = Vector3(800.8, 1.3, -0.6) # Inside van looking at driver & road ahead
+				cam_pivot.position = Vector3(800.8, 1.3, -0.6)
 				cam.rotation_degrees = Vector3(0, 180, 0)
 			)
 			_set_dialogue("INSIDE SCHOOL VAN (वैन चल पड़ी)", Color(1.0, 0.85, 0.3),
 				"वैन का दरवाजा बंद हुआ... इंजन की आवाज़ के साथ वैन सुबह की धूप में सड़कों पर आगे बढ़ी...",
 				"The van door slid shut... with the hum of the engine, the school van drove forward down the sunny streets...")
 			
-		16:
-			# The Iconic Window Gazing Shot (Dedicated Song / BGM Scene)
-			auto_advance_time = 6.5
-			_tween_cam(Vector3(799.3, 1.25, 0.35), Vector3(0, -90, 0), 4.5) # Looking right past Protagonist out the moving window
+		17:
+			# Cinematic 3/4 Window Gazing Shot with horizontal safety bars and scrolling street
+			auto_advance_time = 7.0
+			# Camera framed past Protagonist looking out window and safety rods
+			cam_pivot.position = Vector3(799.4, 1.25, 0.55)
+			cam.rotation_degrees = Vector3(-2, -95, 0)
 			
 			_set_dialogue("PROTAGONIST (LOOKING OUT THE WINDOW)", Color(0.4, 0.8, 1.0),
 				"खिड़की से बाहर सुबह की ठंडी हवा, पेड़ और घर पीछे छूट रहे हैं... और वैन कृपाल के घर की तरफ मुड़ रही है...",
-				"Looking out the window as morning breeze, trees and houses rush past... the van turns towards Kripal's street...")
+				"Looking out the window past the safety bars as morning breeze, trees and houses rush past... the van turns towards Kripal's house...")
 			
-		17:
-			auto_advance_time = 6.0
+		18:
+			auto_advance_time = 6.2
 			_set_dialogue("PROTAGONIST (मन में सोचते हुए)", Color(0.4, 0.75, 1.0),
 				"पर अजीब बात है... कल रात से कृपाल का फोन स्विच ऑफ क्यों आ रहा है...? क्या रात को सच में कुछ हुआ था...?",
 				"Par ajeeb baat hai... kal raat se Kripal ka phone switch off kyu aa raha hai...? Kya raat ko sach me kuchh hua tha...?")
 			
-		18:
+		19:
 			auto_advance_time = 5.2
 			_set_dialogue("VAN DRIVER", Color(1.0, 0.85, 0.2),
 				"देखते हैं आज कृपाल तैयार मिलता है या वो भी सोता ही मिलेगा...",
 				"Dekhte hain aaj Kripal taiyaar milta hai ya wo bhi sota hi milega...")
 			
-		19:
+		20:
 			# Final Suspense Chapter Card
 			auto_advance_time = 999.0
 			continue_btn.visible = true
