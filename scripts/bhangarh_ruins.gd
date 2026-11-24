@@ -87,6 +87,17 @@ func _ready():
 	hud_container.visible = false
 	objective_banner.visible = false
 	
+	# Attach user's terrifying crowned demon face to the 3D ghost entity
+	var demon_head = ghost_entity.get_node_or_null("DemonHead")
+	if demon_head:
+		var face_sprite = Sprite3D.new()
+		face_sprite.texture = load("res://textures/ghost_face_6_crown_demon.png")
+		face_sprite.pixel_size = 0.0022
+		face_sprite.position = Vector3(0.0, 0.04, -0.32)
+		face_sprite.shaded = false
+		face_sprite.double_sided = true
+		demon_head.add_child(face_sprite)
+	
 	blink_overlay.visible = true
 	blink_overlay.modulate.a = 1.0
 	
@@ -423,11 +434,14 @@ func execute_jumpscare():
 	lunge_tw.tween_property(ghost_entity, "position", kripal.position + Vector3(0.0, 1.2, 0.25), 0.22)
 
 	# 2D Screen Jumpscare face flashes and screams
+	var tex_crown = load("res://textures/ghost_face_6_crown_demon.png")
+	if tex_crown and ghost_face:
+		ghost_face.texture = tex_crown
 	jumpscare_overlay.visible = true
 	jumpscare_overlay.modulate.a = 1.0
-	ghost_face.scale = Vector2(0.8, 0.8)
+	ghost_face.scale = Vector2(0.85, 0.85)
 	var face_tw = create_tween()
-	face_tw.tween_property(ghost_face, "scale", Vector2(1.7, 1.7), 0.25).set_trans(Tween.TRANS_BACK)
+	face_tw.tween_property(ghost_face, "scale", Vector2(1.75, 1.75), 0.25).set_trans(Tween.TRANS_BACK)
 
 	# Bloodcurdling jumpscare scream
 	if scream_audio:

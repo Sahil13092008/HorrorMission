@@ -162,9 +162,14 @@ func trigger_chit_jumpscare():
 	interact_label.visible = false
 	popup_ui.visible = false
 	
-	# Activate Jumpscare Overlay
+	# Activate Jumpscare Overlay with horrifying user-provided faces
+	var tex_bloody = load("res://textures/ghost_face_2_bloody_red.png")
+	var tex_scream = load("res://textures/ghost_face_3_scream.png")
+	if tex_bloody and ghost_face:
+		ghost_face.texture = tex_bloody
+	
 	jumpscare_ui.visible = true
-	ghost_face.scale = Vector2(0.8, 0.8)
+	ghost_face.scale = Vector2(0.85, 0.85)
 	ghost_face.rotation = 0.0
 	trauma = 1.0
 	
@@ -185,16 +190,23 @@ func trigger_chit_jumpscare():
 		elapsed += dt
 		trauma = 1.0
 		
-		# Animate ghost face scale: lunges from 0.8 up to 1.55 in your face
-		var target_scale = lerp(0.9, 1.55, min(1.0, elapsed / 1.5)) + randf_range(-0.1, 0.1)
+		# Animate ghost face scale: lunges from 0.85 up to 1.65 in your face
+		var target_scale = lerp(0.9, 1.65, min(1.0, elapsed / 1.4)) + randf_range(-0.12, 0.12)
 		ghost_face.scale = Vector2(target_scale, target_scale)
-		ghost_face.rotation = randf_range(-0.08, 0.08)
+		ghost_face.rotation = randf_range(-0.1, 0.1)
+		
+		# Psychological flicker between bloody jagged smile and screaming void jaw
+		if tex_scream and tex_bloody:
+			if elapsed > 1.0 and elapsed < 2.5 and fmod(elapsed, 0.22) < 0.09:
+				ghost_face.texture = tex_scream
+			else:
+				ghost_face.texture = tex_bloody
 		
 		# Rapid strobe of red background and flashlight
 		if red_backdrop:
-			red_backdrop.color = Color(randf_range(0.4, 0.9), 0.02, 0.02, 0.9)
+			red_backdrop.color = Color(randf_range(0.4, 0.95), 0.02, 0.02, 0.92)
 			
-		if randf() > 0.4:
+		if randf() > 0.35:
 			flashlight.visible = !flashlight.visible
 			
 		await get_tree().create_timer(dt).timeout

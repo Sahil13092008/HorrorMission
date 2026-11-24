@@ -105,6 +105,7 @@ var street_trees: Array = []
 var char_player_window: Node3D
 var van_scenery_scroll: Node3D
 var van_fan_blades: Node3D
+var jumpscare_flash_rect: TextureRect
 
 func _ready() -> void:
 	# Enforce hiding mobile controls during prologue
@@ -239,6 +240,20 @@ func _build_ui() -> void:
 	continue_btn.visible = false
 	continue_btn.pressed.connect(_on_continue_pressed)
 	ui_root.add_child(continue_btn)
+	
+	# Jumpscare Horror Flash Overlay (Beat 8 Forest Anomaly)
+	jumpscare_flash_rect = TextureRect.new()
+	jumpscare_flash_rect.set_anchors_preset(Control.PRESET_CENTER)
+	jumpscare_flash_rect.offset_left = -260
+	jumpscare_flash_rect.offset_top = -260
+	jumpscare_flash_rect.offset_right = 260
+	jumpscare_flash_rect.offset_bottom = 260
+	jumpscare_flash_rect.pivot_offset = Vector2(260, 260)
+	jumpscare_flash_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	jumpscare_flash_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	jumpscare_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	jumpscare_flash_rect.visible = false
+	ui_root.add_child(jumpscare_flash_rect)
 	
 	# Fade Overlay
 	fade_overlay = ColorRect.new()
@@ -2653,6 +2668,19 @@ func _advance_beat() -> void:
 			auto_advance_time = 5.5
 			if audio_jumpscare: audio_jumpscare.play()
 			if audio_heartbeat: audio_heartbeat.play()
+			
+			# Flash terrifying ghost face on screen for 0.4s
+			if jumpscare_flash_rect:
+				var tex_ghost = load("res://textures/ghost_face_1_hollow.png")
+				if not tex_ghost: tex_ghost = load("res://textures/ghost_jumpscare.png")
+				jumpscare_flash_rect.texture = tex_ghost
+				jumpscare_flash_rect.visible = true
+				jumpscare_flash_rect.modulate.a = 0.95
+				jumpscare_flash_rect.scale = Vector2(0.9, 0.9)
+				var tw_fl = create_tween()
+				tw_fl.tween_property(jumpscare_flash_rect, "scale", Vector2(1.5, 1.5), 0.38)
+				tw_fl.parallel().tween_property(jumpscare_flash_rect, "modulate:a", 0.0, 0.38)
+				tw_fl.tween_callback(func(): jumpscare_flash_rect.visible = false)
 			
 			# Face camera on Kripal turning in sheer terror!
 			cam_pivot.position = Vector3(200, 1.6, 8.0)
