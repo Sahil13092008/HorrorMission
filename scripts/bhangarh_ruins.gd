@@ -437,6 +437,9 @@ func execute_jumpscare():
 	var tex_crown = load("res://textures/ghost_face_6_crown_demon.png")
 	if tex_crown and ghost_face:
 		ghost_face.texture = tex_crown
+	var backdrop = jumpscare_overlay.get_node_or_null("RedBackdrop")
+	if backdrop:
+		backdrop.color = Color(0, 0, 0, 1)
 	jumpscare_overlay.visible = true
 	jumpscare_overlay.modulate.a = 1.0
 	ghost_face.scale = Vector2(0.85, 0.85)

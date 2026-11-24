@@ -202,9 +202,9 @@ func trigger_chit_jumpscare():
 			else:
 				ghost_face.texture = tex_bloody
 		
-		# Rapid strobe of red background and flashlight
+		# Pure pitch black darkness behind ghost face
 		if red_backdrop:
-			red_backdrop.color = Color(randf_range(0.4, 0.95), 0.02, 0.02, 0.92)
+			red_backdrop.color = Color(0, 0, 0, 1)
 			
 		if randf() > 0.35:
 			flashlight.visible = !flashlight.visible
