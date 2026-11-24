@@ -429,8 +429,12 @@ func execute_jumpscare():
 	var face_tw = create_tween()
 	face_tw.tween_property(ghost_face, "scale", Vector2(1.7, 1.7), 0.25).set_trans(Tween.TRANS_BACK)
 
-	# Bloodcurdling scream
+	# Bloodcurdling jumpscare scream
 	if scream_audio:
+		var custom_st = load("res://audio/scary_jumpscare_impact.mp3")
+		if custom_st:
+			scream_audio.stream = custom_st
+		scream_audio.volume_db = 7.0
 		scream_audio.play()
 
 	# Flashlight violently flickers and turns off
