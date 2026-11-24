@@ -100,6 +100,7 @@ var street_trees: Array = []
 
 var char_player_window: Node3D
 var van_scenery_scroll: Node3D
+var van_fan_blades: Node3D
 
 func _ready() -> void:
 	# Enforce hiding mobile controls during prologue
@@ -832,7 +833,7 @@ func _build_act4_neighborhood_van() -> void:
 	set_neighborhood_street.add_child(char_player_sprint)
 
 # ------------------------------------------------------------------------------
-# ACT 5: INDIAN SCHOOL VAN INTERIOR (Rexine Seats, Safety Bars, Window Gazing)
+# ACT 5: INDIAN SCHOOL BUS INTERIOR (Matching User Reference Image)
 # ------------------------------------------------------------------------------
 func _build_act5_van_interior() -> void:
 	set_van_interior = Node3D.new()
@@ -840,110 +841,569 @@ func _build_act5_van_interior() -> void:
 	set_van_interior.position = Vector3(800, 0, 0)
 	add_child(set_van_interior)
 	
-	var mat_van_frame = _create_mat(Color(0.2, 0.2, 0.22), 0.7)
-	var mat_seat = _create_mat(Color(0.48, 0.22, 0.15), 0.7) # Brown rexine
-	var mat_glass = _create_mat(Color(0.7, 0.85, 0.95, 0.35), 0.1, 0.0)
-	var mat_bar = _create_mat(Color(0.8, 0.8, 0.82), 0.2, 0.9) # Silver safety bars
+	var mat_bus_yellow = _create_mat(Color(0.98, 0.76, 0.12), 0.55, 0.1)
+	var mat_dark_floor = _create_mat(Color(0.2, 0.22, 0.24), 0.8, 0.0)
+	var mat_aisle_mat = _create_mat(Color(0.34, 0.36, 0.4), 0.9, 0.0)
+	var mat_black_trim = _create_mat(Color(0.12, 0.13, 0.15), 0.7, 0.1)
+	var mat_seat_blue = _create_mat(Color(0.08, 0.35, 0.82), 0.65, 0.05)
+	var mat_seat_frame = _create_mat(Color(0.2, 0.22, 0.25), 0.7, 0.2)
+	var mat_glass = _create_mat(Color(0.72, 0.86, 0.96, 0.28), 0.1, 0.05)
+	var mat_red_sign = _create_mat(Color(0.85, 0.1, 0.1), 0.4, 0.0)
+	var mat_bar = _create_mat(Color(0.82, 0.82, 0.85), 0.2, 0.9)
+	var mat_green_fan = _create_mat(Color(0.12, 0.52, 0.22), 0.5, 0.1)
 	
-	var cabin = CSGBox3D.new()
-	cabin.size = Vector3(2.8, 2.2, 4.8)
-	cabin.position = Vector3(0, 1.1, 0)
-	cabin.material = mat_van_frame
-	set_van_interior.add_child(cabin)
+	var mat_ceiling_light = StandardMaterial3D.new()
+	mat_ceiling_light.albedo_color = Color(1.0, 1.0, 0.95)
+	mat_ceiling_light.emission_enabled = true
+	mat_ceiling_light.emission = Color(1.0, 1.0, 0.95)
+	mat_ceiling_light.emission_energy_multiplier = 2.2
 	
-	var c_hollow = CSGBox3D.new()
-	c_hollow.operation = CSGShape3D.OPERATION_SUBTRACTION
-	c_hollow.size = Vector3(2.5, 1.9, 4.5)
-	c_hollow.position = Vector3(0, 1.05, 0)
-	cabin.add_child(c_hollow)
+	var mat_screen = StandardMaterial3D.new()
+	mat_screen.albedo_color = Color(0.15, 0.65, 0.95)
+	mat_screen.emission_enabled = true
+	mat_screen.emission = Color(0.15, 0.65, 0.95)
+	mat_screen.emission_energy_multiplier = 2.5
+
+	# 1. FLOOR & AISLE RUNNER (Reference Image Panels)
+	var floor_base = CSGBox3D.new()
+	floor_base.size = Vector3(2.9, 0.1, 8.2)
+	floor_base.position = Vector3(0, -0.05, 0.5)
+	floor_base.material = mat_dark_floor
+	set_van_interior.add_child(floor_base)
 	
-	var c_window = CSGBox3D.new()
-	c_window.operation = CSGShape3D.OPERATION_SUBTRACTION
-	c_window.size = Vector3(0.5, 1.1, 2.4)
-	c_window.position = Vector3(-1.3, 1.25, 0.2)
-	cabin.add_child(c_window)
+	var aisle_runner = CSGBox3D.new()
+	aisle_runner.size = Vector3(0.76, 0.11, 8.0)
+	aisle_runner.position = Vector3(0, -0.045, 0.5)
+	aisle_runner.material = mat_aisle_mat
+	set_van_interior.add_child(aisle_runner)
+
+	# 2. YELLOW ROOF & RECESSED CEILING LIGHTS (Reference Top-Left & Bottom-Right)
+	var roof_slab = CSGBox3D.new()
+	roof_slab.size = Vector3(2.9, 0.1, 8.2)
+	roof_slab.position = Vector3(0, 2.35, 0.5)
+	roof_slab.material = mat_bus_yellow
+	set_van_interior.add_child(roof_slab)
 	
-	var glass_pane = CSGBox3D.new()
-	glass_pane.size = Vector3(0.04, 1.08, 2.38)
-	glass_pane.position = Vector3(-1.26, 1.25, 0.2)
-	glass_pane.material = mat_glass
-	set_van_interior.add_child(glass_pane)
+	for z_pos in [-1.5, 0.8, 3.0]:
+		var light_frame = CSGBox3D.new()
+		light_frame.size = Vector3(0.72, 0.03, 1.02)
+		light_frame.position = Vector3(0, 2.30, z_pos)
+		light_frame.material = mat_black_trim
+		set_van_interior.add_child(light_frame)
+		
+		var light_panel = CSGBox3D.new()
+		light_panel.size = Vector3(0.64, 0.04, 0.94)
+		light_panel.position = Vector3(0, 2.29, z_pos)
+		light_panel.material = mat_ceiling_light
+		set_van_interior.add_child(light_panel)
+		
+		var omni = OmniLight3D.new()
+		omni.position = Vector3(0, 2.15, z_pos)
+		omni.light_color = Color(1.0, 0.98, 0.92)
+		omni.omni_range = 4.2
+		omni.light_energy = 0.85
+		set_van_interior.add_child(omni)
+
+	# 3. SIDE WALLS & WINDOWS
+	# Left Wall (X = -1.45)
+	var left_low_wall = CSGBox3D.new()
+	left_low_wall.size = Vector3(0.08, 0.85, 8.0)
+	left_low_wall.position = Vector3(-1.41, 0.425, 0.5)
+	left_low_wall.material = mat_bus_yellow
+	set_van_interior.add_child(left_low_wall)
 	
-	# --- 3 HORIZONTAL METAL SAFETY BARS ---
+	var left_roof_rail = CSGBox3D.new()
+	left_roof_rail.size = Vector3(0.08, 0.45, 8.0)
+	left_roof_rail.position = Vector3(-1.41, 2.125, 0.5)
+	left_roof_rail.material = mat_bus_yellow
+	set_van_interior.add_child(left_roof_rail)
+	
+	var win_z_positions = [-1.6, 0.2, 1.8, 3.4]
+	for wz in win_z_positions:
+		var frame = CSGBox3D.new()
+		frame.size = Vector3(0.06, 0.95, 1.5)
+		frame.position = Vector3(-1.41, 1.35, wz)
+		frame.material = mat_black_trim
+		set_van_interior.add_child(frame)
+		
+		var glass = CSGBox3D.new()
+		glass.size = Vector3(0.03, 0.88, 1.44)
+		glass.position = Vector3(-1.41, 1.35, wz)
+		glass.material = mat_glass
+		set_van_interior.add_child(glass)
+	
+	for pz in [-2.5, -0.7, 1.0, 2.6, 4.3]:
+		var pillar = CSGBox3D.new()
+		pillar.size = Vector3(0.1, 1.05, 0.22)
+		pillar.position = Vector3(-1.41, 1.35, pz)
+		pillar.material = mat_bus_yellow
+		set_van_interior.add_child(pillar)
+		
+	# Red Emergency Exit plaque above side window (Reference Bottom-Left Panel)
+	var side_em_sign = CSGBox3D.new()
+	side_em_sign.size = Vector3(0.04, 0.16, 0.75)
+	side_em_sign.position = Vector3(-1.38, 2.05, 0.2)
+	side_em_sign.material = mat_red_sign
+	set_van_interior.add_child(side_em_sign)
+	
+	# Red Emergency Glass Breaker Box on left pillar
+	var em_hammer = CSGBox3D.new()
+	em_hammer.size = Vector3(0.04, 0.22, 0.12)
+	em_hammer.position = Vector3(-1.38, 1.45, -0.7)
+	em_hammer.material = mat_red_sign
+	set_van_interior.add_child(em_hammer)
+	
+	# Horizontal Safety Bars across protagonist's sliding window
 	for i in range(3):
 		var bar = CSGCylinder3D.new()
-		bar.radius = 0.015
-		bar.height = 2.35
+		bar.radius = 0.012
+		bar.height = 1.48
 		bar.rotation_degrees = Vector3(90, 0, 0)
-		bar.position = Vector3(-1.24, 0.95 + (i * 0.28), 0.2)
+		bar.position = Vector3(-1.38, 1.05 + (i * 0.22), 0.2)
 		bar.material = mat_bar
 		set_van_interior.add_child(bar)
+
+	# Right Wall (X = +1.45)
+	var right_low_wall = CSGBox3D.new()
+	right_low_wall.size = Vector3(0.08, 0.85, 8.0)
+	right_low_wall.position = Vector3(1.41, 0.425, 0.5)
+	right_low_wall.material = mat_bus_yellow
+	set_van_interior.add_child(right_low_wall)
 	
-	# Driver seat & Steering wheel
-	var driver_seat = CSGBox3D.new()
-	driver_seat.size = Vector3(0.9, 0.5, 0.7)
-	driver_seat.position = Vector3(-0.5, 0.45, -1.5)
-	driver_seat.material = mat_seat
-	set_van_interior.add_child(driver_seat)
+	var right_roof_rail = CSGBox3D.new()
+	right_roof_rail.size = Vector3(0.08, 0.45, 8.0)
+	right_roof_rail.position = Vector3(1.41, 2.125, 0.5)
+	right_roof_rail.material = mat_bus_yellow
+	set_van_interior.add_child(right_roof_rail)
+	
+	for wz in win_z_positions:
+		var frame_r = CSGBox3D.new()
+		frame_r.size = Vector3(0.06, 0.95, 1.5)
+		frame_r.position = Vector3(1.41, 1.35, wz)
+		frame_r.material = mat_black_trim
+		set_van_interior.add_child(frame_r)
+		
+		var glass_r = CSGBox3D.new()
+		glass_r.size = Vector3(0.03, 0.88, 1.44)
+		glass_r.position = Vector3(1.41, 1.35, wz)
+		glass_r.material = mat_glass
+		set_van_interior.add_child(glass_r)
+	
+	for pz in [-2.5, -0.7, 1.0, 2.6, 4.3]:
+		var pillar_r = CSGBox3D.new()
+		pillar_r.size = Vector3(0.1, 1.05, 0.22)
+		pillar_r.position = Vector3(1.41, 1.35, pz)
+		pillar_r.material = mat_bus_yellow
+		set_van_interior.add_child(pillar_r)
+
+	# 4. REAR WALL & LARGE REAR WINDOW WITH "EMERGENCY EXIT" SIGN (Reference Top-Left & Bottom-Right)
+	var rear_wall = CSGBox3D.new()
+	rear_wall.size = Vector3(2.9, 2.4, 0.08)
+	rear_wall.position = Vector3(0, 1.15, 4.55)
+	rear_wall.material = mat_bus_yellow
+	set_van_interior.add_child(rear_wall)
+	
+	var rear_win_frame = CSGBox3D.new()
+	rear_win_frame.size = Vector3(1.85, 0.88, 0.1)
+	rear_win_frame.position = Vector3(0, 1.4, 4.54)
+	rear_win_frame.material = mat_black_trim
+	set_van_interior.add_child(rear_win_frame)
+	
+	var rear_glass = CSGBox3D.new()
+	rear_glass.size = Vector3(1.77, 0.8, 0.04)
+	rear_glass.position = Vector3(0, 1.4, 4.54)
+	rear_glass.material = mat_glass
+	set_van_interior.add_child(rear_glass)
+	
+	var rear_em_sign = CSGBox3D.new()
+	rear_em_sign.size = Vector3(0.9, 0.22, 0.04)
+	rear_em_sign.position = Vector3(0, 1.98, 4.51)
+	rear_em_sign.material = mat_red_sign
+	set_van_interior.add_child(rear_em_sign)
+	
+	# 5. FRONT WINDSHIELD & DASHBOARD CONSOLE (Reference Top-Right Panel)
+	var front_bulkhead = CSGBox3D.new()
+	front_bulkhead.size = Vector3(2.9, 0.8, 0.1)
+	front_bulkhead.position = Vector3(0, 0.4, -3.5)
+	front_bulkhead.material = mat_bus_yellow
+	set_van_interior.add_child(front_bulkhead)
+	
+	var front_windshield_frame = CSGBox3D.new()
+	front_windshield_frame.size = Vector3(2.8, 1.3, 0.1)
+	front_windshield_frame.position = Vector3(0, 1.55, -3.5)
+	front_windshield_frame.material = mat_black_trim
+	set_van_interior.add_child(front_windshield_frame)
+	
+	var front_windshield_glass = CSGBox3D.new()
+	front_windshield_glass.size = Vector3(2.72, 1.22, 0.04)
+	front_windshield_glass.position = Vector3(0, 1.55, -3.5)
+	front_windshield_glass.material = mat_glass
+	set_van_interior.add_child(front_windshield_glass)
+	
+	var center_divider = CSGBox3D.new()
+	center_divider.size = Vector3(0.08, 1.25, 0.12)
+	center_divider.position = Vector3(0, 1.55, -3.5)
+	center_divider.material = mat_black_trim
+	set_van_interior.add_child(center_divider)
+	
+	var mirror = CSGBox3D.new()
+	mirror.size = Vector3(0.55, 0.18, 0.06)
+	mirror.position = Vector3(0, 2.05, -3.3)
+	mirror.material = mat_black_trim
+	set_van_interior.add_child(mirror)
+	
+	var dash_main = CSGBox3D.new()
+	dash_main.size = Vector3(2.5, 0.65, 0.65)
+	dash_main.position = Vector3(-0.15, 0.72, -3.1)
+	dash_main.material = mat_black_trim
+	set_van_interior.add_child(dash_main)
+	
+	var gauge_pod = CSGBox3D.new()
+	gauge_pod.size = Vector3(0.75, 0.32, 0.22)
+	gauge_pod.position = Vector3(-0.65, 1.0, -3.02)
+	gauge_pod.rotation_degrees = Vector3(-25, 0, 0)
+	gauge_pod.material = mat_black_trim
+	set_van_interior.add_child(gauge_pod)
+	
+	var btn_colors = [Color(0.9, 0.2, 0.2), Color(0.9, 0.5, 0.1), Color(0.15, 0.8, 0.2), Color(0.2, 0.4, 0.9), Color(0.95, 0.85, 0.1)]
+	for i in range(btn_colors.size()):
+		var btn = CSGBox3D.new()
+		btn.size = Vector3(0.04, 0.04, 0.04)
+		btn.position = Vector3(-0.15 + (i * 0.07), 0.95, -2.85)
+		btn.material = _create_mat(btn_colors[i], 0.4, 0.1)
+		set_van_interior.add_child(btn)
+		
+	var lcd_screen = CSGBox3D.new()
+	lcd_screen.size = Vector3(0.24, 0.16, 0.04)
+	lcd_screen.position = Vector3(0.35, 0.95, -2.85)
+	lcd_screen.material = mat_screen
+	set_van_interior.add_child(lcd_screen)
+	
+	var gear_console = CSGBox3D.new()
+	gear_console.size = Vector3(0.24, 0.35, 0.4)
+	gear_console.position = Vector3(-0.15, 0.2, -2.65)
+	gear_console.material = mat_black_trim
+	set_van_interior.add_child(gear_console)
+	
+	var gear_stick = CSGBox3D.new()
+	gear_stick.size = Vector3(0.04, 0.45, 0.04)
+	gear_stick.position = Vector3(-0.15, 0.45, -2.6)
+	gear_stick.rotation_degrees = Vector3(-12, 0, 0)
+	gear_stick.material = _create_mat(Color(0.2, 0.2, 0.22), 0.3, 0.7)
+	set_van_interior.add_child(gear_stick)
+	
+	var gear_knob = CSGSphere3D.new()
+	gear_knob.radius = 0.045
+	gear_knob.position = Vector3(-0.15, 0.68, -2.55)
+	gear_knob.material = mat_black_trim
+	set_van_interior.add_child(gear_knob)
+	
+	var steering_col = CSGCylinder3D.new()
+	steering_col.radius = 0.04
+	steering_col.height = 0.55
+	steering_col.rotation_degrees = Vector3(50, 0, 0)
+	steering_col.position = Vector3(-0.65, 0.75, -2.65)
+	steering_col.material = mat_black_trim
+	set_van_interior.add_child(steering_col)
 	
 	var wheel = CSGTorus3D.new()
-	wheel.inner_radius = 0.15
-	wheel.outer_radius = 0.22
-	wheel.rotation_degrees = Vector3(45, 0, 0)
-	wheel.position = Vector3(-0.5, 0.95, -1.9)
-	wheel.material = _create_mat(Color(0.1, 0.1, 0.1))
+	wheel.inner_radius = 0.17
+	wheel.outer_radius = 0.23
+	wheel.rotation_degrees = Vector3(50, 0, 0)
+	wheel.position = Vector3(-0.65, 0.98, -2.48)
+	wheel.material = mat_black_trim
 	set_van_interior.add_child(wheel)
 	
-	var driver_npc = _build_rigged_human("VanDriverNPC", Color(0.7, 0.6, 0.35), Color(0.2, 0.2, 0.25), false, false, false, true)
-	driver_npc.position = Vector3(-0.5, 0.45, -1.4)
+	# 6. ACCESSORIES (Vintage Green Fan & Red Fire Extinguisher)
+	# Vintage Green Mini Dashboard Fan (Reference Top-Right Panel)
+	var fan_bracket = CSGBox3D.new()
+	fan_bracket.size = Vector3(0.03, 0.16, 0.03)
+	fan_bracket.position = Vector3(0.78, 1.95, -3.25)
+	fan_bracket.material = mat_black_trim
+	set_van_interior.add_child(fan_bracket)
+	
+	var fan_cage = CSGTorus3D.new()
+	fan_cage.inner_radius = 0.15
+	fan_cage.outer_radius = 0.19
+	fan_cage.rotation_degrees = Vector3(90, 0, 0)
+	fan_cage.position = Vector3(0.78, 1.85, -3.22)
+	fan_cage.material = mat_green_fan
+	set_van_interior.add_child(fan_cage)
+	
+	var fan_hub = CSGCylinder3D.new()
+	fan_hub.radius = 0.05
+	fan_hub.height = 0.06
+	fan_hub.rotation_degrees = Vector3(90, 0, 0)
+	fan_hub.position = Vector3(0.78, 1.85, -3.22)
+	fan_hub.material = mat_green_fan
+	set_van_interior.add_child(fan_hub)
+	
+	van_fan_blades = Node3D.new()
+	van_fan_blades.name = "VanFanBlades"
+	van_fan_blades.position = Vector3(0.78, 1.85, -3.21)
+	set_van_interior.add_child(van_fan_blades)
+	
+	for i in range(4):
+		var blade = CSGBox3D.new()
+		blade.size = Vector3(0.045, 0.13, 0.01)
+		blade.position = Vector3(0, 0.07, 0)
+		blade.rotation_degrees = Vector3(0, 30, 0)
+		blade.material = mat_green_fan
+		var blade_pivot = Node3D.new()
+		blade_pivot.rotation_degrees.z = i * 90.0
+		blade_pivot.add_child(blade)
+		van_fan_blades.add_child(blade_pivot)
+		
+	# Red Fire Extinguisher on front-right A-pillar (Reference Top-Right Panel)
+	var ext_cylinder = CSGCylinder3D.new()
+	ext_cylinder.radius = 0.075
+	ext_cylinder.height = 0.44
+	ext_cylinder.position = Vector3(1.32, 1.45, -3.2)
+	ext_cylinder.material = mat_red_sign
+	set_van_interior.add_child(ext_cylinder)
+	
+	for by in [1.32, 1.58]:
+		var band = CSGTorus3D.new()
+		band.inner_radius = 0.075
+		band.outer_radius = 0.088
+		band.position = Vector3(1.32, by, -3.2)
+		band.material = mat_bar
+		set_van_interior.add_child(band)
+		
+	var ext_nozzle = CSGBox3D.new()
+	ext_nozzle.size = Vector3(0.04, 0.12, 0.04)
+	ext_nozzle.position = Vector3(1.32, 1.72, -3.2)
+	ext_nozzle.material = mat_black_trim
+	set_van_interior.add_child(ext_nozzle)
+
+	# 7. DRIVER IN KHAKI UNIFORM & BLUE PEAKED CAP (Reference Top-Right Panel)
+	var driver_seat = _create_bus_seat_unit(true, mat_seat_blue, mat_seat_frame)
+	driver_seat.position = Vector3(-0.65, 0, -2.45)
+	set_van_interior.add_child(driver_seat)
+	
+	var driver_npc = _build_rigged_human("VanDriverNPC", Color(0.78, 0.70, 0.52), Color(0.72, 0.64, 0.48), false, false, false, true)
+	driver_npc.position = Vector3(-0.65, 0.45, -2.4)
 	driver_npc.rotation_degrees = Vector3(0, 180, 0)
 	set_van_interior.add_child(driver_npc)
 	
-	# Passenger seat where Protagonist sits
-	var p_seat = CSGBox3D.new()
-	p_seat.size = Vector3(1.1, 0.45, 0.8)
-	p_seat.position = Vector3(-0.6, 0.45, 0.3)
-	p_seat.material = mat_seat
-	set_van_interior.add_child(p_seat)
+	var d_cap_crown = CSGBox3D.new()
+	d_cap_crown.size = Vector3(0.40, 0.16, 0.42)
+	d_cap_crown.position = Vector3(0, 1.88, 0.02)
+	d_cap_crown.material = _create_mat(Color(0.12, 0.32, 0.75))
+	driver_npc.get_node("Body").add_child(d_cap_crown)
 	
-	var p_seatback = CSGBox3D.new()
-	p_seatback.size = Vector3(1.1, 0.8, 0.18)
-	p_seatback.position = Vector3(-0.6, 0.95, -0.05)
-	p_seatback.material = mat_seat
-	set_van_interior.add_child(p_seatback)
+	var d_cap_brim = CSGBox3D.new()
+	d_cap_brim.size = Vector3(0.36, 0.04, 0.20)
+	d_cap_brim.position = Vector3(0, 1.82, 0.24)
+	d_cap_brim.material = mat_black_trim
+	driver_npc.get_node("Body").add_child(d_cap_brim)
 	
+	var d_arm_l = driver_npc.get_node_or_null("Body/ArmL_Pivot")
+	var d_arm_r = driver_npc.get_node_or_null("Body/ArmR_Pivot")
+	if d_arm_l:
+		d_arm_l.rotation_degrees = Vector3(-65, 20, 0)
+	if d_arm_r:
+		d_arm_r.rotation_degrees = Vector3(-65, -20, 0)
+
+	# 8. PASSENGER SEAT ROWS (Vivid Royal Blue Cushions with Beveled Tops)
+	var row_z = [-1.3, 0.2, 1.7, 3.1]
+	for rz in row_z:
+		var s_left = _create_bus_seat_unit(true, mat_seat_blue, mat_seat_frame)
+		s_left.position = Vector3(-0.88, 0, rz)
+		set_van_interior.add_child(s_left)
+		
+		var s_right = _create_bus_seat_unit(false, mat_seat_blue, mat_seat_frame)
+		s_right.position = Vector3(0.88, 0, rz)
+		set_van_interior.add_child(s_right)
+		
+	# Protagonist sitting on Row 2 Left Window Seat (Looking out through window)
 	char_player_window = _build_rigged_human("ProtagonistWindow", Color(0.95, 0.95, 0.95), Color(0.18, 0.28, 0.55), false, false, false, true, true)
-	char_player_window.position = Vector3(-0.7, 0.45, 0.35)
-	char_player_window.rotation_degrees = Vector3(0, 90, 0)
+	char_player_window.position = Vector3(-1.05, 0.45, 0.2)
+	char_player_window.rotation_degrees = Vector3(0, 80, 0)
 	set_van_interior.add_child(char_player_window)
 	
+	# School Kid Passenger sitting on Row 3 Right Seat
 	var kid_npc = _build_rigged_human("KidPassenger", Color(0.95, 0.95, 0.95), Color(0.18, 0.28, 0.55), false, false, false, true, true)
-	kid_npc.position = Vector3(0.5, 0.45, 1.4)
+	kid_npc.position = Vector3(0.88, 0.45, 1.7)
 	kid_npc.rotation_degrees = Vector3(0, 180, 0)
 	set_van_interior.add_child(kid_npc)
-	
-	# Moving Scenery outside window
+
+	# 9. SEAMLESS LOOPING EXTERIOR SCENERY (Front Windshield Road & Side Streets)
 	van_scenery_scroll = Node3D.new()
 	van_scenery_scroll.name = "VanSceneryScroll"
-	van_scenery_scroll.position = Vector3(-8.0, 0, 0)
+	van_scenery_scroll.position = Vector3(0, 0, 0)
 	set_van_interior.add_child(van_scenery_scroll)
 	
-	var out_road = CSGBox3D.new()
-	out_road.size = Vector3(8.0, 0.1, 60.0)
-	out_road.position = Vector3(2.0, -0.1, 0)
-	out_road.material = _create_mat(Color(0.2, 0.2, 0.22))
-	van_scenery_scroll.add_child(out_road)
+	_build_looping_scenery(van_scenery_scroll)
+
+func _create_bus_seat_unit(is_left: bool, mat_blue: Material, mat_frame: Material) -> Node3D:
+	var s_root = Node3D.new()
+	
+	var leg_front = CSGBox3D.new()
+	leg_front.size = Vector3(0.88, 0.38, 0.05)
+	leg_front.position = Vector3(0, 0.19, 0.18)
+	leg_front.material = mat_frame
+	s_root.add_child(leg_front)
+	
+	var leg_back = CSGBox3D.new()
+	leg_back.size = Vector3(0.88, 0.38, 0.05)
+	leg_back.position = Vector3(0, 0.19, -0.18)
+	leg_back.material = mat_frame
+	s_root.add_child(leg_back)
+	
+	var cushion = CSGBox3D.new()
+	cushion.size = Vector3(0.92, 0.16, 0.50)
+	cushion.position = Vector3(0, 0.44, 0)
+	cushion.material = mat_blue
+	s_root.add_child(cushion)
+	
+	var backrest = CSGBox3D.new()
+	backrest.size = Vector3(0.92, 0.58, 0.12)
+	backrest.position = Vector3(0, 0.77, -0.22)
+	backrest.material = mat_blue
+	s_root.add_child(backrest)
+	
+	var top_chamfer = CSGBox3D.new()
+	top_chamfer.size = Vector3(0.82, 0.10, 0.11)
+	top_chamfer.position = Vector3(0, 1.08, -0.22)
+	top_chamfer.material = mat_blue
+	s_root.add_child(top_chamfer)
+	
+	var handle = CSGBox3D.new()
+	handle.size = Vector3(0.04, 0.16, 0.06)
+	var handle_x = 0.44 if is_left else -0.44
+	handle.position = Vector3(handle_x, 1.10, -0.22)
+	handle.material = mat_frame
+	s_root.add_child(handle)
+	
+	return s_root
+
+func _build_looping_scenery(parent: Node3D) -> void:
+	var mat_road = _create_mat(Color(0.24, 0.25, 0.28), 0.85, 0.0)
+	var mat_yellow_line = _create_mat(Color(0.96, 0.82, 0.1), 0.5, 0.0)
+	var mat_sidewalk = _create_mat(Color(0.68, 0.69, 0.72), 0.9, 0.0)
+	var mat_curb = _create_mat(Color(0.5, 0.52, 0.55), 0.9, 0.0)
+	
+	var road = CSGBox3D.new()
+	road.size = Vector3(8.4, 0.1, 100.0)
+	road.position = Vector3(0, -0.1, -30.0)
+	road.material = mat_road
+	parent.add_child(road)
+	
+	for i in range(30):
+		var dash = CSGBox3D.new()
+		dash.size = Vector3(0.18, 0.02, 1.6)
+		dash.position = Vector3(0, -0.04, 18.0 - (i * 3.6))
+		dash.material = mat_yellow_line
+		parent.add_child(dash)
+		
+	for side in [-1, 1]:
+		var sidewalk = CSGBox3D.new()
+		sidewalk.size = Vector3(4.5, 0.2, 100.0)
+		sidewalk.position = Vector3(side * 6.5, -0.02, -30.0)
+		sidewalk.material = mat_sidewalk
+		parent.add_child(sidewalk)
+		
+		var curb = CSGBox3D.new()
+		curb.size = Vector3(0.25, 0.25, 100.0)
+		curb.position = Vector3(side * 4.3, 0.01, -30.0)
+		curb.material = mat_curb
+		parent.add_child(curb)
+		
+	var house_colors = [
+		Color(0.92, 0.84, 0.72),
+		Color(0.88, 0.75, 0.65),
+		Color(0.90, 0.88, 0.80),
+		Color(0.78, 0.82, 0.85)
+	]
 	
 	for i in range(12):
-		var t = _create_detailed_forest_tree(true)
-		t.position = Vector3(0, 0, -25.0 + (i * 5.0))
-		van_scenery_scroll.add_child(t)
+		var z_pos = 15.0 - (i * 8.0)
 		
-		var shop = CSGBox3D.new()
-		shop.size = Vector3(4.0, 3.5, 4.5)
-		shop.position = Vector3(-4.0, 1.75, -23.0 + (i * 6.5))
-		shop.material = _create_mat(Color(0.85, 0.75 + randf()*0.1, 0.6))
-		van_scenery_scroll.add_child(shop)
+		var tree_l = _create_blocky_tree()
+		tree_l.position = Vector3(-5.2, 0.0, z_pos)
+		parent.add_child(tree_l)
+		
+		var house_l = _create_blocky_house(house_colors[i % house_colors.size()])
+		house_l.position = Vector3(-9.5, 0.0, z_pos - 3.5)
+		house_l.rotation_degrees = Vector3(0, 90, 0)
+		parent.add_child(house_l)
+		
+		var tree_r = _create_blocky_tree()
+		tree_r.position = Vector3(5.2, 0.0, z_pos - 4.0)
+		parent.add_child(tree_r)
+		
+		var house_r = _create_blocky_house(house_colors[(i + 1) % house_colors.size()])
+		house_r.position = Vector3(9.5, 0.0, z_pos - 1.0)
+		house_r.rotation_degrees = Vector3(0, -90, 0)
+		parent.add_child(house_r)
+
+func _create_blocky_tree() -> Node3D:
+	var root = Node3D.new()
+	var mat_wood = _create_mat(Color(0.42, 0.26, 0.15))
+	var mat_leaf_1 = _create_mat(Color(0.2, 0.6, 0.22))
+	var mat_leaf_2 = _create_mat(Color(0.26, 0.68, 0.28))
+	var mat_leaf_3 = _create_mat(Color(0.3, 0.74, 0.32))
+	
+	var trunk = CSGBox3D.new()
+	trunk.size = Vector3(0.45, 2.4, 0.45)
+	trunk.position = Vector3(0, 1.2, 0)
+	trunk.material = mat_wood
+	root.add_child(trunk)
+	
+	var foliage_1 = CSGBox3D.new()
+	foliage_1.size = Vector3(2.2, 1.2, 2.2)
+	foliage_1.position = Vector3(0, 2.6, 0)
+	foliage_1.material = mat_leaf_1
+	root.add_child(foliage_1)
+	
+	var foliage_2 = CSGBox3D.new()
+	foliage_2.size = Vector3(1.7, 1.0, 1.7)
+	foliage_2.position = Vector3(0, 3.6, 0)
+	foliage_2.material = mat_leaf_2
+	root.add_child(foliage_2)
+	
+	var foliage_3 = CSGBox3D.new()
+	foliage_3.size = Vector3(1.1, 0.8, 1.1)
+	foliage_3.position = Vector3(0, 4.4, 0)
+	foliage_3.material = mat_leaf_3
+	root.add_child(foliage_3)
+	
+	return root
+
+func _create_blocky_house(wall_col: Color) -> Node3D:
+	var root = Node3D.new()
+	var mat_wall = _create_mat(wall_col)
+	var mat_roof = _create_mat(Color(0.65, 0.32, 0.22))
+	var mat_door = _create_mat(Color(0.35, 0.22, 0.12))
+	var mat_win = _create_mat(Color(0.72, 0.86, 0.95), 0.2, 0.2)
+	
+	var house_body = CSGBox3D.new()
+	house_body.size = Vector3(4.8, 3.2, 4.2)
+	house_body.position = Vector3(0, 1.6, 0)
+	house_body.material = mat_wall
+	root.add_child(house_body)
+	
+	var roof = CSGBox3D.new()
+	roof.size = Vector3(5.2, 0.8, 4.6)
+	roof.position = Vector3(0, 3.5, 0)
+	roof.material = mat_roof
+	root.add_child(roof)
+	
+	for wx in [-1.4, 1.4]:
+		var win = CSGBox3D.new()
+		win.size = Vector3(1.1, 0.9, 0.08)
+		win.position = Vector3(wx, 1.8, 2.14)
+		win.material = mat_win
+		root.add_child(win)
+		
+	var door = CSGBox3D.new()
+	door.size = Vector3(0.9, 1.8, 0.08)
+	door.position = Vector3(0, 0.9, 2.14)
+	door.material = mat_door
+	root.add_child(door)
+	
+	return root
 
 # --- RIGGED HUMAN BUILDER ---
 func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_bat: bool = false, has_glasses: bool = false, is_female: bool = false, is_sitting: bool = false, has_backpack: bool = false) -> Node3D:
@@ -1211,11 +1671,14 @@ func _process(delta: float) -> void:
 		char_player_sprint.position.x -= delta * 4.2
 		cam_pivot.position.x -= delta * 3.8
 	
-	# 10. Van scenery scrolling outside the window in Act 5
-	if current_beat in [17, 18, 19] and van_scenery_scroll:
-		van_scenery_scroll.position.z += delta * 14.0
-		if van_scenery_scroll.position.z > 22.0:
-			van_scenery_scroll.position.z = -8.0
+	# 10. Van scenery scrolling and dashboard fan rotation in Act 5
+	if current_beat in [16, 17, 18, 19, 20] and van_scenery_scroll:
+		van_scenery_scroll.position.z += delta * 16.0
+		if van_scenery_scroll.position.z >= 24.0:
+			van_scenery_scroll.position.z -= 24.0
+	
+	if van_fan_blades:
+		van_fan_blades.rotation_degrees.z += delta * 720.0
 	
 	if is_beat_active:
 		beat_timer += delta
@@ -1482,44 +1945,60 @@ func _advance_beat() -> void:
 			
 		# --- ACT 5: INDIAN SCHOOL VAN INTERIOR & WINDOW GAZING (SONG / BGM SCENE) ---
 		16:
-			auto_advance_time = 5.5
+			# Panel 1 & 4 View: Front-to-back aisle view showing blue seats, yellow roof, glowing LEDs, and rear Emergency Exit
+			auto_advance_time = 5.8
 			if audio_door_close: audio_door_close.play()
 			if audio_van_engine: audio_van_engine.play()
 			
 			_fade_to_black_and_call(func():
-				cam_pivot.position = Vector3(800.8, 1.3, -0.6)
-				cam.rotation_degrees = Vector3(0, 180, 0)
+				cam_pivot.position = Vector3(800.0, 1.48, -1.8)
+				cam.rotation_degrees = Vector3(-4, 180, 0)
 			)
-			_set_dialogue("INSIDE SCHOOL VAN (वैन चल पड़ी)", Color(1.0, 0.85, 0.3),
+			_set_dialogue("INSIDE SCHOOL BUS (वैन चल पड़ी)", Color(1.0, 0.85, 0.3),
 				"\"रोज़ का यही नाटक है तुम्हारा... चलो बैठो जल्दी, दरवाजा बंद करो!\"\n— वैन का दरवाजा बंद हुआ और वैन आगे बढ़ी...",
-				"\"Roz ka yahi naatak hai tumhara... chalo baitho jaldi, darwaja band karo!\"\n— The school van drove forward down the sunny streets...")
+				"\"Roz ka yahi naatak hai tumhara... chalo baitho jaldi, darwaja band karo!\"\n— The school bus drove forward down the sunny streets...")
 			_play_voice("res://audio/prologue_driver_inside.mp3")
 			
 		17:
-			# Cinematic 3/4 Window Gazing Shot with horizontal safety bars and scrolling street
-			auto_advance_time = 7.0
-			cam_pivot.position = Vector3(799.4, 1.25, 0.55)
-			cam.rotation_degrees = Vector3(-2, -95, 0)
+			# Panel 2 View: Driver over-the-shoulder looking forward through windshield down the road
+			auto_advance_time = 6.2
+			_tween_cam(Vector3(799.62, 1.48, -1.9), Vector3(-3, 0, 0), 1.2)
+			
+			_set_dialogue("SCHOOL BUS DRIVER (ON THE ROAD)", Color(1.0, 0.85, 0.2),
+				"\"चलो भाई सब लोग संभल के बैठो! वैन टाइम से पहुंचनी चाहिए आज!\"\n— सुबह की धूप में वैन सड़क पर आगे बढ़ती है...",
+				"\"Chalo bhai sab log sambhal ke baitho! Van time se pahunchni chahiye aaj!\"\n— The bus cruises down the sunny street under the bright morning sun...")
+			_play_voice("res://audio/prologue_driver_inside.mp3")
+			
+		18:
+			# Panel 3 View: Across the aisle looking at Protagonist seated by the window
+			auto_advance_time = 6.8
+			_tween_cam(Vector3(800.5, 1.35, -0.3), Vector3(-3, 130, 0), 1.2)
 			
 			_set_dialogue("PROTAGONIST (LOOKING OUT THE WINDOW)", Color(0.4, 0.8, 1.0),
-				"खिड़की की सेफ्टी रॉड्स के पार सुबह की ठंडी हवा, पेड़ और घर पीछे छूट रहे हैं... और वैन कृपाल के घर की तरफ मुड़ रही है...",
+				"खिड़की से बाहर सुबह की ठंडी हवा, पेड़ और घर पीछे छूट रहे हैं... और वैन कृपाल के घर की तरफ मुड़ रही है...",
 				"Looking out the window past the safety bars as morning breeze, trees and houses rush past... the van turns towards Kripal's house...")
 			_play_voice("res://audio/prologue_player_window.mp3")
 			
-		18:
-			auto_advance_time = 6.2
+		19:
+			# Cinematic 3/4 Window Gazing Close-Up
+			auto_advance_time = 6.5
+			_tween_cam(Vector3(799.35, 1.3, 0.55), Vector3(-2, -100, 0), 1.0)
+			
 			_set_dialogue("PROTAGONIST (मन में सोचते हुए)", Color(0.4, 0.75, 1.0),
-				"\"वैन अब कृपाल के घर की तरफ मुड़ रही है... पर कल रात से उसका फोन स्विच ऑफ क्यों आ रहा है...?\"",
-				"\"Van ab Kripal ke ghar ki taraf mud rahi hai... Par kal raat se uska phone switch off kyu aa raha hai...?\"")
+				"\"वैन अब कृपाल के घर की तरफ मुड़ रही है... पर कल रात से उसका फोन स्विच ऑफ क्यों आ रहा है...? क्या रात को सच में कुछ हुआ था...?\"",
+				"\"Van ab Kripal ke ghar ki taraf mud rahi hai... Par kal raat se uska phone switch off kyu aa raha hai...? Kya raat ko sach me kuchh hua tha...?\"")
 			_play_voice("res://audio/prologue_player_window.mp3")
 			
-		19:
+		20:
+			# Driver mentions Kripal as bus approaches
 			auto_advance_time = 5.2
+			_tween_cam(Vector3(799.8, 1.45, -1.6), Vector3(-2, -35, 0), 1.0)
+			
 			_set_dialogue("VAN DRIVER", Color(1.0, 0.85, 0.2),
 				"\"देखते हैं आज कृपाल तैयार मिलता है या वो भी सोता ही मिलेगा...\"",
 				"\"Dekhte hain aaj Kripal taiyaar milta hai ya wo bhi sota hi milega...\"")
 			
-		20:
+		21:
 			# Final Suspense Chapter Card
 			auto_advance_time = 999.0
 			continue_btn.visible = true
