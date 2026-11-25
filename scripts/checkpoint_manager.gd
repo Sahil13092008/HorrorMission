@@ -67,11 +67,19 @@ const CHAPTERS = [
 		"icon": "📞",
 		"id": "phone_call_convo",
 		"title": "2 Days Later (२ दिन बाद — 3-Way Phone Call)",
-		"sub": "तीनों दोस्त अपने-अपने कमरों से फ़ोन कॉन्फ्रेंस पर — भानगढ़ का फैसला",
+		"sub": "तीनों दोस्त अपने-अपने कमरों से फ़ोन कॉन्फ्रेंस पर — गैजेट्स पैकिंग",
 		"scene": "res://scenes/phone_call_convo.tscn"
 	},
 	{
 		"num": "6",
+		"icon": "🚲",
+		"id": "cycle_to_school",
+		"title": "Cycle to Boys School (साइकिल से बॉयज़ स्कूल)",
+		"sub": "गैजेट्स बैग में टांगकर साइकिल से बॉयज़ स्कूल पहुँचना व प्लान बनाना",
+		"scene": "res://scenes/cycle_to_school.tscn"
+	},
+	{
+		"num": "7",
 		"icon": "🏰",
 		"id": "bhangarh_ruins",
 		"title": "Bhangarh Ruins (भानगढ़ खंडहर — Chapter 2)",
@@ -148,8 +156,8 @@ func _ensure_controls_visibility() -> void:
 	var cur = get_tree().current_scene
 	var cur_path = cur.scene_file_path if cur else ""
 	
-	# Hide controls during phone call conference, prologue, or pure cutscenes
-	if cur_path in ["res://scenes/phone_call_convo.tscn", "res://scenes/cycle_ride.tscn", "res://scenes/opening_prologue.tscn"] or "prologue" in cur_path.to_lower():
+	# Hide controls during phone call conference, prologue, or custom scenes
+	if cur_path in ["res://scenes/phone_call_convo.tscn", "res://scenes/cycle_ride.tscn", "res://scenes/cycle_to_school.tscn", "res://scenes/opening_prologue.tscn"] or "prologue" in cur_path.to_lower():
 		mobile_controls_root.visible = false
 	else:
 		var is_mobile = OS.has_feature("mobile") or OS.has_feature("android") or DisplayServer.is_touchscreen_available()
