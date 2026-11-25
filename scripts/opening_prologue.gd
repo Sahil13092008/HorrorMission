@@ -107,6 +107,14 @@ var van_scenery_scroll: Node3D
 var van_fan_blades: Node3D
 var jumpscare_flash_rect: TextureRect
 
+var title_splash_root: Control
+var title_splash_bg: ColorRect
+var title_content: Control
+var title_blood_splatter: TextureRect
+var title_horror_label: Label
+var title_credits_label: Label
+var is_title_splash_active: bool = true
+
 func _ready() -> void:
 	# Enforce hiding mobile controls during prologue
 	_hide_external_controls()
@@ -261,6 +269,95 @@ func _build_ui() -> void:
 	fade_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	fade_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui_root.add_child(fade_overlay)
+	
+	# Opening Blood Title Splash Screen (THE HORROR MISSION + Credits)
+	title_splash_root = Control.new()
+	title_splash_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	title_splash_root.mouse_filter = Control.MOUSE_FILTER_PASS
+	ui_root.add_child(title_splash_root)
+	
+	title_splash_bg = ColorRect.new()
+	title_splash_bg.color = Color(0, 0, 0, 1)
+	title_splash_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	title_splash_bg.mouse_filter = Control.MOUSE_FILTER_PASS
+	title_splash_root.add_child(title_splash_bg)
+	
+	title_content = Control.new()
+	title_content.set_anchors_preset(Control.PRESET_CENTER)
+	title_content.offset_left = 0
+	title_content.offset_top = 0
+	title_content.offset_right = 0
+	title_content.offset_bottom = 0
+	title_content.pivot_offset = Vector2.ZERO
+	title_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_splash_root.add_child(title_content)
+	
+	# Blood Splatter Backdrop behind "THE HORROR MISSION"
+	title_blood_splatter = TextureRect.new()
+	var splatter_tex = _load_texture("res://textures/blood_title_splatter.png")
+	if splatter_tex:
+		title_blood_splatter.texture = splatter_tex
+	title_blood_splatter.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	title_blood_splatter.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	title_blood_splatter.offset_left = -450
+	title_blood_splatter.offset_top = -150
+	title_blood_splatter.offset_right = 450
+	title_blood_splatter.offset_bottom = 150
+	title_blood_splatter.pivot_offset = Vector2(450, 150)
+	title_blood_splatter.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_blood_splatter.modulate.a = 0.92
+	title_content.add_child(title_blood_splatter)
+	
+	# Blood Red Title Label: "THE HORROR MISSION"
+	title_horror_label = Label.new()
+	title_horror_label.text = "THE HORROR MISSION"
+	title_horror_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_horror_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title_horror_label.offset_left = -480
+	title_horror_label.offset_top = -75
+	title_horror_label.offset_right = 480
+	title_horror_label.offset_bottom = 15
+	title_horror_label.pivot_offset = Vector2(480, 45)
+	title_horror_label.add_theme_font_size_override("font_size", 48)
+	title_horror_label.add_theme_color_override("font_color", Color(0.92, 0.08, 0.08))
+	title_horror_label.add_theme_color_override("font_shadow_color", Color(0.22, 0.0, 0.0, 0.95))
+	title_horror_label.add_theme_constant_override("shadow_offset_x", 4)
+	title_horror_label.add_theme_constant_override("shadow_offset_y", 4)
+	title_horror_label.add_theme_color_override("font_outline_color", Color(0.38, 0.01, 0.01))
+	title_horror_label.add_theme_constant_override("outline_size", 5)
+	title_horror_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_content.add_child(title_horror_label)
+	
+	# Clean White Credits Subtitle: "Created By Sahil and Written By Aashutosh"
+	title_credits_label = Label.new()
+	title_credits_label.text = "Created By Sahil and Written By Aashutosh"
+	title_credits_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_credits_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title_credits_label.offset_left = -450
+	title_credits_label.offset_top = 25
+	title_credits_label.offset_right = 450
+	title_credits_label.offset_bottom = 70
+	title_credits_label.add_theme_font_size_override("font_size", 20)
+	title_credits_label.add_theme_color_override("font_color", Color(0.96, 0.96, 0.96, 0.95))
+	title_credits_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
+	title_credits_label.add_theme_constant_override("shadow_offset_x", 2)
+	title_credits_label.add_theme_constant_override("shadow_offset_y", 2)
+	title_credits_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_content.add_child(title_credits_label)
+	
+	# Tap to Skip Hint
+	var tap_hint = Label.new()
+	tap_hint.text = "• TAP ANYWHERE TO CONTINUE •"
+	tap_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tap_hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	tap_hint.offset_left = -300
+	tap_hint.offset_top = 110
+	tap_hint.offset_right = 300
+	tap_hint.offset_bottom = 140
+	tap_hint.add_theme_font_size_override("font_size", 12)
+	tap_hint.add_theme_color_override("font_color", Color(0.75, 0.75, 0.75, 0.35))
+	tap_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_content.add_child(tap_hint)
 
 # --- LIGHTING & ENVIRONMENTS ---
 func _setup_lighting_and_environments() -> void:
@@ -391,6 +488,17 @@ func _play_voice(path: String) -> void:
 func _load_audio(path: String) -> AudioStream:
 	if ResourceLoader.exists(path):
 		return load(path) as AudioStream
+	return null
+
+func _load_texture(path: String) -> Texture2D:
+	if ResourceLoader.exists(path):
+		var res = load(path)
+		if res is Texture2D:
+			return res
+	if FileAccess.file_exists(path):
+		var img = Image.load_from_file(path)
+		if img:
+			return ImageTexture.create_from_image(img)
 	return null
 
 func _create_mat(col: Color, roughness: float = 0.8, metallic: float = 0.0, emission: Color = Color.BLACK, emission_eng: float = 0.0) -> StandardMaterial3D:
@@ -2386,16 +2494,69 @@ func _build_detailed_school_van() -> Node3D:
 
 # --- CUTSCENE FLOW & PROCEDURAL ANIMATIONS ---
 func _start_prologue() -> void:
-	if audio_ambience_night: audio_ambience_night.play()
-	if audio_bgm_song: audio_bgm_song.play()
+	# Keep normal letterbox and skip hidden until splash completes
+	letterbox_top.visible = false
+	letterbox_bottom.visible = false
+	skip_btn.visible = false
+	fade_overlay.color.a = 0.0
 	
-	# Start follow camera tracking walking friends
+	# Start camera looking at dark start position
 	cam_pivot.position = Vector3(0, 1.8, 30.0)
 	cam.rotation_degrees = Vector3(-6, 0, 0)
 	
+	# Animate Blood Title Screen
+	title_splash_root.visible = true
+	title_content.modulate.a = 0.0
+	title_content.scale = Vector2(0.85, 0.85)
+	title_credits_label.modulate.a = 0.0
+	
+	if audio_heartbeat: audio_heartbeat.play()
+	
+	var tw = create_tween().set_parallel(true)
+	tw.tween_property(title_content, "modulate:a", 1.0, 0.55).set_trans(Tween.TRANS_QUAD)
+	tw.tween_property(title_content, "scale", Vector2(1.05, 1.05), 0.45).set_trans(Tween.TRANS_BACK)
+	
+	# Subtle screen shudder for visceral impact
+	var tw_shk = create_tween()
+	for i in range(5):
+		tw_shk.tween_property(title_content, "position", Vector2(randf_range(-3, 3), randf_range(-3, 3)), 0.04)
+	tw_shk.tween_property(title_content, "position", Vector2.ZERO, 0.06)
+	
+	await tw.finished
+	var tw_settle = create_tween()
+	tw_settle.tween_property(title_content, "scale", Vector2(1.0, 1.0), 0.25)
+	
+	# Smoothly reveal white credits
+	var tw_cred = create_tween()
+	tw_cred.tween_interval(0.25)
+	tw_cred.tween_property(title_credits_label, "modulate:a", 1.0, 0.8).set_trans(Tween.TRANS_QUAD)
+	
+	# Blood breathing pulse animation
+	var tw_pulse = create_tween().set_loops(3)
+	tw_pulse.tween_property(title_horror_label, "scale", Vector2(1.025, 1.025), 0.85).set_trans(Tween.TRANS_SINE)
+	tw_pulse.tween_property(title_horror_label, "scale", Vector2(1.0, 1.0), 0.85).set_trans(Tween.TRANS_SINE)
+	
+	# Hold for 4.2 seconds then dismiss (or player can tap to dismiss earlier)
+	await get_tree().create_timer(4.2).timeout
+	_dismiss_title_splash()
+
+func _dismiss_title_splash() -> void:
+	if not is_title_splash_active: return
+	is_title_splash_active = false
+	
 	var tw = create_tween()
-	tw.tween_property(fade_overlay, "color:a", 0.0, 1.5)
-	tw.tween_callback(func(): _advance_beat())
+	tw.tween_property(title_splash_root, "modulate:a", 0.0, 1.2).set_trans(Tween.TRANS_QUAD)
+	tw.tween_callback(func():
+		title_splash_root.visible = false
+		letterbox_top.visible = true
+		letterbox_bottom.visible = true
+		skip_btn.visible = true
+		
+		if audio_ambience_night: audio_ambience_night.play()
+		if audio_bgm_song: audio_bgm_song.play()
+		
+		_advance_beat()
+	)
 
 func _process(delta: float) -> void:
 	anim_time += delta
@@ -2523,6 +2684,11 @@ func _animate_char_walk(c: Node3D, t: float, spd: float, is_sprint: bool = false
 	if r_arm: r_arm.rotation.x = angle * 0.85
 
 func _input(event: InputEvent) -> void:
+	if is_title_splash_active:
+		if (event is InputEventMouseButton and event.pressed) or (event is InputEventScreenTouch and event.pressed) or (event is InputEventKey and event.pressed):
+			_dismiss_title_splash()
+			return
+	
 	# Only Keyboard Enter / Space for optional PC debugging skip, no touch screen tapping interference!
 	if event is InputEventKey and event.pressed and event.keycode in [KEY_SPACE, KEY_ENTER]:
 		_advance_beat()
