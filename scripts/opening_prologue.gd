@@ -282,15 +282,17 @@ func _build_ui() -> void:
 	title_splash_bg.mouse_filter = Control.MOUSE_FILTER_PASS
 	title_splash_root.add_child(title_splash_bg)
 	
+	# CenterContainer guarantees exact center positioning on ALL resolutions and mobile screens!
+	var center_container = CenterContainer.new()
+	center_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_splash_root.add_child(center_container)
+	
 	title_content = Control.new()
-	title_content.set_anchors_preset(Control.PRESET_CENTER)
-	title_content.offset_left = 0
-	title_content.offset_top = 0
-	title_content.offset_right = 0
-	title_content.offset_bottom = 0
-	title_content.pivot_offset = Vector2.ZERO
+	title_content.custom_minimum_size = Vector2(920, 320)
+	title_content.pivot_offset = Vector2(460, 160)
 	title_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	title_splash_root.add_child(title_content)
+	center_container.add_child(title_content)
 	
 	# Blood Splatter Backdrop behind "THE HORROR MISSION"
 	title_blood_splatter = TextureRect.new()
@@ -299,25 +301,21 @@ func _build_ui() -> void:
 		title_blood_splatter.texture = splatter_tex
 	title_blood_splatter.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	title_blood_splatter.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	title_blood_splatter.offset_left = -450
-	title_blood_splatter.offset_top = -150
-	title_blood_splatter.offset_right = 450
-	title_blood_splatter.offset_bottom = 150
-	title_blood_splatter.pivot_offset = Vector2(450, 150)
+	title_blood_splatter.position = Vector2(10, 20)
+	title_blood_splatter.size = Vector2(900, 250)
+	title_blood_splatter.pivot_offset = Vector2(450, 125)
 	title_blood_splatter.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	title_blood_splatter.modulate.a = 0.92
+	title_blood_splatter.modulate.a = 0.0 # Starts hidden, fades in with blood
 	title_content.add_child(title_blood_splatter)
 	
-	# Blood Red Title Label: "THE HORROR MISSION"
+	# Blood Red Title Label: "THE HORROR MISSION" (Letter-by-letter reveal)
 	title_horror_label = Label.new()
 	title_horror_label.text = "THE HORROR MISSION"
 	title_horror_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_horror_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	title_horror_label.offset_left = -480
-	title_horror_label.offset_top = -75
-	title_horror_label.offset_right = 480
-	title_horror_label.offset_bottom = 15
-	title_horror_label.pivot_offset = Vector2(480, 45)
+	title_horror_label.position = Vector2(10, 60)
+	title_horror_label.size = Vector2(900, 75)
+	title_horror_label.pivot_offset = Vector2(450, 37)
 	title_horror_label.add_theme_font_size_override("font_size", 48)
 	title_horror_label.add_theme_color_override("font_color", Color(0.92, 0.08, 0.08))
 	title_horror_label.add_theme_color_override("font_shadow_color", Color(0.22, 0.0, 0.0, 0.95))
@@ -326,23 +324,24 @@ func _build_ui() -> void:
 	title_horror_label.add_theme_color_override("font_outline_color", Color(0.38, 0.01, 0.01))
 	title_horror_label.add_theme_constant_override("outline_size", 5)
 	title_horror_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_horror_label.visible_characters = 0
 	title_content.add_child(title_horror_label)
 	
-	# Clean White Credits Subtitle: "Created By Sahil and Written By Aashutosh"
+	# Clean White Credits Subtitle: "Created By Sahil and Written By Aashutosh" (Letter-by-letter reveal)
 	title_credits_label = Label.new()
 	title_credits_label.text = "Created By Sahil and Written By Aashutosh"
 	title_credits_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_credits_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	title_credits_label.offset_left = -450
-	title_credits_label.offset_top = 25
-	title_credits_label.offset_right = 450
-	title_credits_label.offset_bottom = 70
+	title_credits_label.position = Vector2(10, 160)
+	title_credits_label.size = Vector2(900, 45)
+	title_credits_label.pivot_offset = Vector2(450, 22)
 	title_credits_label.add_theme_font_size_override("font_size", 20)
 	title_credits_label.add_theme_color_override("font_color", Color(0.96, 0.96, 0.96, 0.95))
 	title_credits_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
 	title_credits_label.add_theme_constant_override("shadow_offset_x", 2)
 	title_credits_label.add_theme_constant_override("shadow_offset_y", 2)
 	title_credits_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_credits_label.visible_characters = 0
 	title_content.add_child(title_credits_label)
 	
 	# Tap to Skip Hint
@@ -350,10 +349,8 @@ func _build_ui() -> void:
 	tap_hint.text = "• TAP ANYWHERE TO CONTINUE •"
 	tap_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tap_hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	tap_hint.offset_left = -300
-	tap_hint.offset_top = 110
-	tap_hint.offset_right = 300
-	tap_hint.offset_bottom = 140
+	tap_hint.position = Vector2(10, 235)
+	tap_hint.size = Vector2(900, 30)
 	tap_hint.add_theme_font_size_override("font_size", 12)
 	tap_hint.add_theme_color_override("font_color", Color(0.75, 0.75, 0.75, 0.35))
 	tap_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -2504,48 +2501,68 @@ func _start_prologue() -> void:
 	cam_pivot.position = Vector3(0, 1.8, 30.0)
 	cam.rotation_degrees = Vector3(-6, 0, 0)
 	
-	# Animate Blood Title Screen
+	# Initial state: Pure pitch black screen, hidden splatter, 0 letters
 	title_splash_root.visible = true
-	title_content.modulate.a = 0.0
-	title_content.scale = Vector2(0.85, 0.85)
-	title_credits_label.modulate.a = 0.0
+	title_splash_root.modulate.a = 1.0
+	title_content.modulate.a = 1.0
+	title_blood_splatter.modulate.a = 0.0
+	title_horror_label.visible_characters = 0
+	title_credits_label.visible_characters = 0
+	
+	# Brief suspense pause in pitch black
+	await get_tree().create_timer(0.4).timeout
+	if not is_title_splash_active: return
 	
 	if audio_heartbeat: audio_heartbeat.play()
 	
-	var tw = create_tween().set_parallel(true)
-	tw.tween_property(title_content, "modulate:a", 1.0, 0.55).set_trans(Tween.TRANS_QUAD)
-	tw.tween_property(title_content, "scale", Vector2(1.05, 1.05), 0.45).set_trans(Tween.TRANS_BACK)
+	# Blood splatter fades in behind the text
+	var tw_splat = create_tween()
+	tw_splat.tween_property(title_blood_splatter, "modulate:a", 0.95, 0.6)
 	
-	# Subtle screen shudder for visceral impact
+	# 1. Letter-by-letter Typewriter animation for "THE HORROR MISSION"
+	var title_len = title_horror_label.text.length()
+	var tw_type1 = create_tween()
+	tw_type1.tween_property(title_horror_label, "visible_characters", title_len, 1.3).set_trans(Tween.TRANS_LINEAR)
+	
+	await tw_type1.finished
+	if not is_title_splash_active: return
+	
+	# Visceral shudder on title completion (subtle rotation shake, never moving position from center!)
 	var tw_shk = create_tween()
-	for i in range(5):
-		tw_shk.tween_property(title_content, "position", Vector2(randf_range(-3, 3), randf_range(-3, 3)), 0.04)
-	tw_shk.tween_property(title_content, "position", Vector2.ZERO, 0.06)
+	for i in range(4):
+		tw_shk.tween_property(title_content, "rotation_degrees", randf_range(-1.2, 1.2), 0.04)
+	tw_shk.tween_property(title_content, "rotation_degrees", 0.0, 0.05)
 	
-	await tw.finished
-	var tw_settle = create_tween()
-	tw_settle.tween_property(title_content, "scale", Vector2(1.0, 1.0), 0.25)
+	await get_tree().create_timer(0.35).timeout
+	if not is_title_splash_active: return
 	
-	# Smoothly reveal white credits
-	var tw_cred = create_tween()
-	tw_cred.tween_interval(0.25)
-	tw_cred.tween_property(title_credits_label, "modulate:a", 1.0, 0.8).set_trans(Tween.TRANS_QUAD)
+	# 2. Letter-by-letter Typewriter animation for "Created By Sahil and Written By Aashutosh"
+	var cred_len = title_credits_label.text.length()
+	var tw_type2 = create_tween()
+	tw_type2.tween_property(title_credits_label, "visible_characters", cred_len, 1.5).set_trans(Tween.TRANS_LINEAR)
 	
-	# Blood breathing pulse animation
+	await tw_type2.finished
+	if not is_title_splash_active: return
+	
+	# 3. Subtle breathing blood-red pulse
 	var tw_pulse = create_tween().set_loops(3)
-	tw_pulse.tween_property(title_horror_label, "scale", Vector2(1.025, 1.025), 0.85).set_trans(Tween.TRANS_SINE)
+	tw_pulse.tween_property(title_horror_label, "scale", Vector2(1.03, 1.03), 0.85).set_trans(Tween.TRANS_SINE)
 	tw_pulse.tween_property(title_horror_label, "scale", Vector2(1.0, 1.0), 0.85).set_trans(Tween.TRANS_SINE)
 	
-	# Hold for 4.2 seconds then dismiss (or player can tap to dismiss earlier)
-	await get_tree().create_timer(4.2).timeout
+	# Hold for 3.8 seconds then smoothly dismiss into game (or player taps to dismiss immediately)
+	await get_tree().create_timer(3.8).timeout
 	_dismiss_title_splash()
 
 func _dismiss_title_splash() -> void:
 	if not is_title_splash_active: return
 	is_title_splash_active = false
 	
+	# Ensure all letters are shown when fading out
+	if title_horror_label: title_horror_label.visible_characters = -1
+	if title_credits_label: title_credits_label.visible_characters = -1
+	
 	var tw = create_tween()
-	tw.tween_property(title_splash_root, "modulate:a", 0.0, 1.2).set_trans(Tween.TRANS_QUAD)
+	tw.tween_property(title_splash_root, "modulate:a", 0.0, 1.1).set_trans(Tween.TRANS_QUAD)
 	tw.tween_callback(func():
 		title_splash_root.visible = false
 		letterbox_top.visible = true
