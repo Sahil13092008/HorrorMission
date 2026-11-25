@@ -21,6 +21,30 @@ const TURN2_CORNER_X: float = -70.0                     # Turn 2: School Corner 
 const SCHOOL_GATE_Z: float = -85.0                      # Grand School Main Gate
 const GROUND_MEETING_POS: Vector3 = Vector3(-70.0, 0.0, -135.0) # Friends waiting on the big ground!
 
+# Seamless overlapping corridors for smooth sliding navigation without any gaps or sudden teleports
+const CORRIDORS: Array[Rect2] = [
+	# 1. Road 1 (Home Neighborhood Street): X in [-4.8, 4.8], Z in [-8.0, 68.0]
+	Rect2(-4.8, -8.0, 9.6, 76.0),
+	
+	# 2. Turn 1 Chowk (Wide intersection): X in [-12.0, 6.0], Z in [-14.0, 4.0]
+	Rect2(-12.0, -14.0, 18.0, 18.0),
+	
+	# 3. Road 2 (Market Connecting Road): X in [-74.0, 2.0], Z in [-11.0, 1.0]
+	Rect2(-74.0, -11.0, 76.0, 12.0),
+	
+	# 4. Turn 2 Corner (Wide school turn): X in [-78.0, -61.0], Z in [-14.0, 4.0]
+	Rect2(-78.0, -14.0, 17.0, 18.0),
+	
+	# 5. Road 3 (School Boulevard): X in [-75.5, -64.5], Z in [-88.0, 1.0]
+	Rect2(-75.5, -88.0, 11.0, 89.0),
+	
+	# 6. School Gate Entrance: X in [-76.0, -64.0], Z in [-90.0, -82.0]
+	Rect2(-76.0, -90.0, 12.0, 8.0),
+	
+	# 7. Massive Outside Sports Ground: X in [-118.0, -22.0], Z in [-175.0, -84.0]
+	Rect2(-118.0, -175.0, 96.0, 91.0)
+]
+
 var player_pos: Vector3 = START_POS
 var player_velocity: Vector3 = Vector3.ZERO
 var rider_heading: float = 0.0 # 0 rad = -Z (North), PI/2 = -X (West), -PI/2 = +X (East), PI = +Z (South)
@@ -240,6 +264,13 @@ func _build_town_streets_with_turns() -> void:
 	road_root = Node3D.new()
 	road_root.name = "RoadRoot"
 	add_child(road_root)
+	
+	# Solid base town ground under the entire city map so there is never empty void
+	var base_ground = CSGBox3D.new()
+	base_ground.size = Vector3(350.0, 0.1, 350.0)
+	base_ground.position = Vector3(-60.0, -0.16, -60.0)
+	base_ground.material = _create_mat(Color(0.20, 0.18, 0.16), 0.95)
+	road_root.add_child(base_ground)
 	
 	var mat_road = _create_mat(Color(0.14, 0.14, 0.16), 0.9)
 	var mat_sidewalk = _create_mat(Color(0.28, 0.26, 0.24), 0.85)
@@ -1305,22 +1336,24 @@ func _physics_process(delta: float) -> void:
 		player_velocity = player_velocity.move_toward(Vector3.ZERO, ACCEL * 0.8 * delta)
 		if audio_cycle and audio_cycle.playing: audio_cycle.stop()
 		
-	player_pos += player_velocity * delta
+	# Smooth sliding collision along track corridors - ZERO glitching, snapping or jumping!
+	var move_delta = player_velocity * delta
+	var target_pos = player_pos + move_delta
 	
-	# Clamp boundaries based on route zone
-	if player_pos.z > TURN1_CHOWK_Z:
-		# Road 1: Home Street
-		player_pos.x = clamp(player_pos.x, -4.5, 4.5)
-	elif player_pos.z <= TURN1_CHOWK_Z and player_pos.z >= (TURN1_CHOWK_Z - 12.0) and player_pos.x > TURN2_CORNER_X:
-		# Road 2: Market Connecting Street
-		player_pos.z = clamp(player_pos.z, -10.0, 0.0)
-	elif player_pos.x <= (TURN2_CORNER_X + 6.0) and player_pos.z > SCHOOL_GATE_Z:
-		# Road 3: School Boulevard
-		player_pos.x = clamp(player_pos.x, TURN2_CORNER_X - 4.5, TURN2_CORNER_X + 4.5)
+	if _is_pos_inside_corridors(target_pos.x, target_pos.z):
+		player_pos = target_pos
 	else:
-		# Outside Big Playground: Massive 90m x 90m freedom!
-		player_pos.x = clamp(player_pos.x, TURN2_CORNER_X - 44.0, TURN2_CORNER_X + 44.0)
-		player_pos.z = clamp(player_pos.z, -170.0, SCHOOL_GATE_Z)
+		# Attempt sliding along X axis
+		if _is_pos_inside_corridors(target_pos.x, player_pos.z):
+			player_pos.x = target_pos.x
+			player_velocity.z = 0.0
+		# Attempt sliding along Z axis
+		elif _is_pos_inside_corridors(player_pos.x, target_pos.z):
+			player_pos.z = target_pos.z
+			player_velocity.x = 0.0
+		else:
+			# Firm collision stop against wall/barrier
+			player_velocity = Vector3.ZERO
 		
 	if player_root:
 		player_root.position = player_pos
@@ -1347,36 +1380,45 @@ func _physics_process(delta: float) -> void:
 	_update_nav_hud()
 	
 	# Trigger Arrival when reaching Sahil and Aashutosh on the outside ground!
-	if player_pos.distance_to(GROUND_MEETING_POS) <= 5.5 and not is_arrived:
+	if player_pos.distance_to(GROUND_MEETING_POS) <= 6.0 and not is_arrived:
 		_trigger_school_arrival()
+
+func _is_pos_inside_corridors(px: float, pz: float) -> bool:
+	for corr in CORRIDORS:
+		if px >= corr.position.x and px <= (corr.position.x + corr.size.x) and \
+		   pz >= corr.position.y and pz <= (corr.position.y + corr.size.y):
+			return true
+	return false
 
 func _update_nav_hud() -> void:
 	if not dist_label or not banner_label: return
 	
-	if player_pos.z > (TURN1_CHOWK_Z + 8.0):
-		var d = int(player_pos.z - TURN1_CHOWK_Z)
+	if player_pos.z > 5.0:
+		var d = max(0, int(player_pos.z - (-5.0)))
 		banner_label.text = "🚲 RIDE DOWN STREET ➔ CHOWK AHEAD [सीधे चौराहे की तरफ जाएँ]"
 		dist_label.text = "📍 %d M TO CHOWK" % d
-	elif player_pos.z <= (TURN1_CHOWK_Z + 8.0) and player_pos.x > -12.0:
-		banner_label.text = "↰ TURN LEFT AT CHOWK INTO MARKET ROAD [चौराहे से बाएँ मुड़ें]"
+	elif player_pos.z <= 5.0 and player_pos.x > -15.0:
+		banner_label.text = "↰ TURN LEFT AT CHOWK ➔ MARKET ROAD [चौराहे से बाएँ मुड़ें]"
 		dist_label.text = "📍 ↰ TURN LEFT"
-	elif player_pos.x <= -12.0 and player_pos.x > (TURN2_CORNER_X + 10.0):
-		var d2 = int(abs(player_pos.x - TURN2_CORNER_X))
-		banner_label.text = "🚲 MARKET ROAD ➔ TURN RIGHT AT CORNER [सीधे जाकर दाएँ मुड़ें]"
+	elif player_pos.x <= -15.0 and player_pos.x > -58.0:
+		var d2 = max(0, int(abs(player_pos.x - (-70.0))))
+		banner_label.text = "🚲 MARKET ROAD ➔ TURN RIGHT AT CORNER [बाज़ार रोड से आगे दाएँ मुड़ें]"
 		dist_label.text = "📍 %d M TO SCHOOL TURN" % d2
-	elif player_pos.x <= (TURN2_CORNER_X + 10.0) and player_pos.z > (SCHOOL_GATE_Z + 5.0):
-		var dg = int(abs(player_pos.z - SCHOOL_GATE_Z))
+	elif player_pos.x <= -58.0 and player_pos.z > -80.0:
+		var dg = max(0, int(abs(player_pos.z - (-85.0))))
 		banner_label.text = "↱ TURN RIGHT ➔ HEAD TOWARDS SCHOOL GATE [स्कूल गेट की तरफ]"
 		dist_label.text = "📍 SCHOOL GATE: %d M" % dg
 	else:
-		var df = int(player_pos.distance_to(GROUND_MEETING_POS))
+		var df = max(0, int(player_pos.distance_to(GROUND_MEETING_POS)))
 		banner_label.text = "🏟️ OUTSIDE GROUND: MEET SAHIL & AASHUTOSH [मैदान में दोस्तों से मिलें]"
 		dist_label.text = "📍 FRIENDS: %d M" % df
 
 # --- ARRIVAL ON OUTSIDE BIG GROUND (WITH HINDI VOICE ACTING) ---
 func _trigger_school_arrival() -> void:
+	if is_arrived: return
 	is_arrived = true
 	cutscene_active = true
+	player_velocity = Vector3.ZERO
 	
 	if audio_cycle and audio_cycle.playing:
 		audio_cycle.stop()
@@ -1385,11 +1427,15 @@ func _trigger_school_arrival() -> void:
 		touch_hud.visible = false
 		
 	var target_stop = GROUND_MEETING_POS + Vector3(0.0, 0.0, 2.4)
+	player_pos = target_stop
+	
 	var tw_stop = create_tween()
 	tw_stop.tween_property(player_root, "position", target_stop, 1.4).set_trans(Tween.TRANS_QUAD)
+	tw_stop.parallel().tween_property(player_root, "rotation:y", 0.0, 1.4)
 	
 	var tw_cam = create_tween()
 	tw_cam.parallel().tween_property(cam_pivot, "position", target_stop, 1.4)
+	tw_cam.parallel().tween_property(cam_pivot, "rotation:y", 0.0, 1.4)
 	tw_cam.parallel().tween_property(cam, "position", Vector3(0.0, 1.65, 3.8), 1.4)
 	tw_cam.parallel().tween_property(cam, "rotation_degrees", Vector3(-4.0, 0.0, 0.0), 1.4)
 	
@@ -1447,7 +1493,8 @@ func _finish_arrival_scene() -> void:
 
 func _on_skip_pressed() -> void:
 	if is_arrived: return
-	player_pos = GROUND_MEETING_POS + Vector3(0.0, 0.0, 3.0)
+	player_pos = GROUND_MEETING_POS + Vector3(0.0, 0.0, 2.8)
+	rider_heading = 0.0
 	_trigger_school_arrival()
 
 func _on_proceed_to_bhangarh_pressed() -> void:
