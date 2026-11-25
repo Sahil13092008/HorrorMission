@@ -163,10 +163,17 @@ func trigger_chit_jumpscare():
 	popup_ui.visible = false
 	
 	# Activate Jumpscare Overlay with horrifying user-provided faces
-	var tex_bloody = load("res://textures/ghost_face_2_bloody_red.png")
-	var tex_scream = load("res://textures/ghost_face_3_scream.png")
-	if tex_bloody and ghost_face:
-		ghost_face.texture = tex_bloody
+	var all_faces = [
+		load("res://textures/ghost_face_1_hollow.png"),
+		load("res://textures/ghost_face_2_bloody_red.png"),
+		load("res://textures/ghost_face_3_scream.png"),
+		load("res://textures/ghost_face_4_cat_teeth.png"),
+		load("res://textures/ghost_face_5_tear.png"),
+		load("res://textures/ghost_face_6_crown_demon.png")
+	]
+	var initial_face = all_faces[randi() % all_faces.size()]
+	if initial_face and ghost_face:
+		ghost_face.texture = initial_face
 	
 	jumpscare_ui.visible = true
 	ghost_face.scale = Vector2(0.85, 0.85)
@@ -195,12 +202,17 @@ func trigger_chit_jumpscare():
 		ghost_face.scale = Vector2(target_scale, target_scale)
 		ghost_face.rotation = randf_range(-0.1, 0.1)
 		
-		# Psychological flicker between bloody jagged smile and screaming void jaw
-		if tex_scream and tex_bloody:
-			if elapsed > 1.0 and elapsed < 2.5 and fmod(elapsed, 0.22) < 0.09:
-				ghost_face.texture = tex_scream
+		# Rapid psychological glitch flicker across all 6 horrifying user expressions
+		if ghost_face and all_faces.size() > 0:
+			if elapsed > 0.8 and elapsed < 3.2 and fmod(elapsed, 0.18) < 0.08:
+				ghost_face.texture = all_faces[randi() % all_faces.size()]
+			elif elapsed >= 3.2:
+				# Climax terrifying lunge: lock onto Face 6 (Crown Demon) or Face 2 (Bloody Red)
+				ghost_face.texture = all_faces[5] if all_faces[5] else initial_face
+			elif fmod(elapsed, 0.3) < 0.12:
+				ghost_face.texture = all_faces[1] if all_faces[1] else initial_face
 			else:
-				ghost_face.texture = tex_bloody
+				ghost_face.texture = initial_face
 		
 		# Pure pitch black darkness behind ghost face
 		if red_backdrop:
