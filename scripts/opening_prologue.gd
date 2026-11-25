@@ -760,18 +760,22 @@ func _build_act1_blood_sky_road() -> void:
 	
 	char_sahil_walk = _build_rigged_human("Sahil", Color(0.85, 0.85, 0.85), Color(0.40, 0.44, 0.48), true) # Sahil: Plaid checked shirt, faded grey denim, Kalawa/Kara & bat
 	char_sahil_walk.position = Vector3(-1.4, 0, -1.0)
+	char_sahil_walk.rotation_degrees = Vector3(0, 180, 0) # Facing -Z (walking forward down the road)
 	char_group_walk.add_child(char_sahil_walk)
 	
 	char_aashu_walk = _build_rigged_human("Aashutosh", Color(0.46, 0.36, 0.24), Color(0.18, 0.24, 0.35)) # Aashutosh: Olive-brown shirt, white undershirt, wavy hair & indigo blue jeans
 	char_aashu_walk.position = Vector3(-0.4, 0, -0.5)
+	char_aashu_walk.rotation_degrees = Vector3(0, 180, 0) # Facing -Z (walking forward down the road)
 	char_group_walk.add_child(char_aashu_walk)
 	
 	char_kripal_walk = _build_rigged_human("Kripal", Color(0.82, 0.25, 0.2), Color(0.18, 0.2, 0.3), false, true) # Glasses
 	char_kripal_walk.position = Vector3(0.6, 0, -1.2)
+	char_kripal_walk.rotation_degrees = Vector3(0, 180, 0) # Facing -Z (walking forward down the road)
 	char_group_walk.add_child(char_kripal_walk)
 	
 	char_player_walk = _build_rigged_human("Protagonist", Color(0.25, 0.45, 0.8), Color(0.15, 0.15, 0.18))
 	char_player_walk.position = Vector3(1.4, 0, 0.0)
+	char_player_walk.rotation_degrees = Vector3(0, 180, 0) # Facing -Z (walking forward down the road)
 	char_group_walk.add_child(char_player_walk)
 
 # ------------------------------------------------------------------------------
@@ -2881,16 +2885,17 @@ func _process(delta: float) -> void:
 		
 		# Kripal walks straight forward down the center road towards the dark forest shortcut!
 		char_kripal_walk.position.z -= delta * 2.8
+		char_kripal_walk.rotation_degrees.y = 180.0
 		
 		# Sahil & Aashutosh turn left and walk into town side road
 		char_sahil_walk.position.x -= delta * 2.2
-		char_sahil_walk.rotation_degrees.y = -85.0
+		char_sahil_walk.rotation_degrees.y = -90.0
 		char_aashu_walk.position.x -= delta * 2.0
-		char_aashu_walk.rotation_degrees.y = -85.0
+		char_aashu_walk.rotation_degrees.y = -90.0
 		
 		# Protagonist turns right towards home
 		char_player_walk.position.x += delta * 2.2
-		char_player_walk.rotation_degrees.y = 85.0
+		char_player_walk.rotation_degrees.y = 90.0
 		
 		# Camera slowly dollies forward following Kripal down the road
 		cam_pivot.position.z -= delta * 0.9
@@ -2974,14 +2979,29 @@ func _process(delta: float) -> void:
 func _animate_char_walk(c: Node3D, t: float, spd: float, is_sprint: bool = false) -> void:
 	if not c: return
 	var angle = sin(t * spd) * (0.65 if is_sprint else 0.35)
+	var body = c.get_node_or_null("Body")
 	var l_leg = c.get_node_or_null("Body/LegL_Pivot")
 	var r_leg = c.get_node_or_null("Body/LegR_Pivot")
 	var l_arm = c.get_node_or_null("Body/ArmL_Pivot")
 	var r_arm = c.get_node_or_null("Body/ArmR_Pivot")
+	if body: body.position.y = abs(sin(t * spd)) * (0.055 if is_sprint else 0.028)
 	if l_leg: l_leg.rotation.x = angle
 	if r_leg: r_leg.rotation.x = -angle
 	if l_arm: l_arm.rotation.x = -angle * 0.85
 	if r_arm: r_arm.rotation.x = angle * 0.85
+
+func _reset_char_pose(c: Node3D) -> void:
+	if not c: return
+	var body = c.get_node_or_null("Body")
+	var l_leg = c.get_node_or_null("Body/LegL_Pivot")
+	var r_leg = c.get_node_or_null("Body/LegR_Pivot")
+	var l_arm = c.get_node_or_null("Body/ArmL_Pivot")
+	var r_arm = c.get_node_or_null("Body/ArmR_Pivot")
+	if body: body.position.y = 0.0
+	if l_leg: l_leg.rotation.x = 0.0
+	if r_leg: r_leg.rotation.x = 0.0
+	if l_arm: l_arm.rotation.x = 0.0
+	if r_arm: r_arm.rotation.x = 0.0
 
 func _input(event: InputEvent) -> void:
 	if is_title_splash_active:
@@ -3040,11 +3060,15 @@ func _advance_beat() -> void:
 			
 			char_player_walk.visible = false # Hide third person body
 			char_sahil_walk.position = Vector3(-0.7, 0, -1.8)
-			char_sahil_walk.rotation_degrees = Vector3(0, 155, 0)
+			char_sahil_walk.rotation_degrees = Vector3(0, 20, 0) # Turned around facing Protagonist!
 			char_aashu_walk.position = Vector3(0.8, 0, -1.9)
-			char_aashu_walk.rotation_degrees = Vector3(0, -155, 0)
+			char_aashu_walk.rotation_degrees = Vector3(0, -22, 0) # Turned around facing Protagonist!
 			char_kripal_walk.position = Vector3(0.1, 0, -2.4)
-			char_kripal_walk.rotation_degrees = Vector3(0, 180, 0)
+			char_kripal_walk.rotation_degrees = Vector3(0, 0, 0) # Turned around facing Protagonist!
+			
+			_reset_char_pose(char_sahil_walk)
+			_reset_char_pose(char_aashu_walk)
+			_reset_char_pose(char_kripal_walk)
 			
 			cam_pivot.position = char_group_walk.position + Vector3(0, 1.68, 0)
 			cam.rotation_degrees = Vector3(-4, -15, 0) # Focus on Sahil
@@ -3094,13 +3118,13 @@ func _advance_beat() -> void:
 			# Position group right at the crossroads (Z = -20.0) facing -Z down the clear road!
 			char_group_walk.position = Vector3(0, 0, -20.0)
 			char_sahil_walk.position = Vector3(-1.0, 0, 0.2)
-			char_sahil_walk.rotation_degrees = Vector3(0, 0, 0)
+			char_sahil_walk.rotation_degrees = Vector3(0, -90, 0) # Facing left towards town road (-X)
 			char_aashu_walk.position = Vector3(-0.3, 0, 0.5)
-			char_aashu_walk.rotation_degrees = Vector3(0, 0, 0)
+			char_aashu_walk.rotation_degrees = Vector3(0, -90, 0) # Facing left towards town road (-X)
 			char_player_walk.position = Vector3(1.2, 0, 0.4)
-			char_player_walk.rotation_degrees = Vector3(0, 0, 0)
+			char_player_walk.rotation_degrees = Vector3(0, 90, 0) # Facing right towards home (+X)
 			char_kripal_walk.position = Vector3(0.0, 0, -0.8)
-			char_kripal_walk.rotation_degrees = Vector3(0, 0, 0)
+			char_kripal_walk.rotation_degrees = Vector3(0, 180, 0) # Facing straight forward into forest (-Z)
 			
 			# Camera framing clear road directly behind the group looking down the road, matching user photo!
 			cam_pivot.position = Vector3(0, 2.3, -15.5)
