@@ -66,6 +66,7 @@ var audio_van_horn: AudioStreamPlayer
 var audio_van_engine: AudioStreamPlayer
 var audio_voice: AudioStreamPlayer
 var audio_bgm_song: AudioStreamPlayer
+var audio_title_voice: AudioStreamPlayer
 
 # Sets
 var set_blood_road: Node3D
@@ -475,6 +476,12 @@ func _setup_audio() -> void:
 			audio_bgm_song.play()
 	)
 	audio_root.add_child(audio_bgm_song)
+	
+	# Dedicated Title Screen Voice Player
+	audio_title_voice = AudioStreamPlayer.new()
+	audio_title_voice.volume_db = 4.0
+	audio_title_voice.stream = _load_audio("res://audio/title_voice.wav")
+	audio_root.add_child(audio_title_voice)
 
 func _play_voice(path: String) -> void:
 	var st = _load_audio(path)
@@ -2514,15 +2521,16 @@ func _start_prologue() -> void:
 	if not is_title_splash_active: return
 	
 	if audio_heartbeat: audio_heartbeat.play()
+	if audio_title_voice: audio_title_voice.play()
 	
 	# Blood splatter fades in behind the text
 	var tw_splat = create_tween()
 	tw_splat.tween_property(title_blood_splatter, "modulate:a", 0.95, 0.6)
 	
-	# 1. Letter-by-letter Typewriter animation for "THE HORROR MISSION"
+	# 1. Letter-by-letter Typewriter animation for "THE HORROR MISSION" (synced with title speech ~2.2s)
 	var title_len = title_horror_label.text.length()
 	var tw_type1 = create_tween()
-	tw_type1.tween_property(title_horror_label, "visible_characters", title_len, 1.3).set_trans(Tween.TRANS_LINEAR)
+	tw_type1.tween_property(title_horror_label, "visible_characters", title_len, 2.2).set_trans(Tween.TRANS_LINEAR)
 	
 	await tw_type1.finished
 	if not is_title_splash_active: return
@@ -2533,29 +2541,38 @@ func _start_prologue() -> void:
 		tw_shk.tween_property(title_content, "rotation_degrees", randf_range(-1.2, 1.2), 0.04)
 	tw_shk.tween_property(title_content, "rotation_degrees", 0.0, 0.05)
 	
-	await get_tree().create_timer(0.35).timeout
+	await get_tree().create_timer(0.4).timeout
 	if not is_title_splash_active: return
 	
-	# 2. Letter-by-letter Typewriter animation for "Created By Sahil and Written By Aashutosh"
+	# 2. Letter-by-letter Typewriter animation for "Created By Sahil and Written By Aashutosh" (synced with credits speech ~2.4s)
 	var cred_len = title_credits_label.text.length()
 	var tw_type2 = create_tween()
-	tw_type2.tween_property(title_credits_label, "visible_characters", cred_len, 1.5).set_trans(Tween.TRANS_LINEAR)
+	tw_type2.tween_property(title_credits_label, "visible_characters", cred_len, 2.4).set_trans(Tween.TRANS_LINEAR)
 	
 	await tw_type2.finished
 	if not is_title_splash_active: return
 	
 	# 3. Subtle breathing blood-red pulse
-	var tw_pulse = create_tween().set_loops(3)
-	tw_pulse.tween_property(title_horror_label, "scale", Vector2(1.03, 1.03), 0.85).set_trans(Tween.TRANS_SINE)
-	tw_pulse.tween_property(title_horror_label, "scale", Vector2(1.0, 1.0), 0.85).set_trans(Tween.TRANS_SINE)
+	var tw_pulse = create_tween().set_loops(2)
+	tw_pulse.tween_property(title_horror_label, "scale", Vector2(1.03, 1.03), 0.8).set_trans(Tween.TRANS_SINE)
+	tw_pulse.tween_property(title_horror_label, "scale", Vector2(1.0, 1.0), 0.8).set_trans(Tween.TRANS_SINE)
 	
-	# Hold for 3.8 seconds then smoothly dismiss into game (or player taps to dismiss immediately)
-	await get_tree().create_timer(3.8).timeout
+	# Hold for 1.8 seconds (voice completes cleanly) then smoothly dismiss into game
+	await get_tree().create_timer(1.8).timeout
 	_dismiss_title_splash()
 
 func _dismiss_title_splash() -> void:
 	if not is_title_splash_active: return
 	is_title_splash_active = false
+	
+	# Smoothly fade out title voice if still playing or if dismissed early by player tap
+	if audio_title_voice and audio_title_voice.playing:
+		var tw_vox = create_tween()
+		tw_vox.tween_property(audio_title_voice, "volume_db", -30.0, 0.8)
+		tw_vox.tween_callback(func():
+			if is_instance_valid(audio_title_voice):
+				audio_title_voice.stop()
+		)
 	
 	# Ensure all letters are shown when fading out
 	if title_horror_label: title_horror_label.visible_characters = -1
