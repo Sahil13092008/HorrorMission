@@ -12,6 +12,9 @@
 [ext_resource type="Texture2D" uid="uid://bspcdmkmuhodv" path="res://textures/kripal_bodycam.png" id="10_bodycam"]
 [ext_resource type="AudioStream" uid="uid://b5emd1i5d1yia" path="res://audio/door_creak.wav" id="11_door_creak"]
 [ext_resource type="AudioStream" uid="uid://b46l3eklxe0kb" path="res://audio/radar_ping.wav" id="12_radar_ping"]
+[ext_resource type="Texture2D" uid="uid://cglwe3516l38q" path="res://textures/tex_sahil_shirt.png" id="13_sahil_shirt"]
+[ext_resource type="Texture2D" uid="uid://eis6vyvwgbiv" path="res://textures/face_sahil_decal.png" id="14_sahil_face"]
+[ext_resource type="Texture2D" uid="uid://bedswgkiolexk" path="res://textures/face_aashutosh_decal.png" id="15_aashu_face"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.45, 0.6, 0.8, 1)
@@ -250,20 +253,41 @@ albedo_color = Color(0.68, 0.44, 0.40, 1)
 roughness = 0.7
 
 [sub_resource type="StandardMaterial3D" id="Mat_Sahil_Jacket"]
-albedo_color = Color(0.14, 0.16, 0.19, 1)
+albedo_color = Color(0.96, 0.96, 0.96, 1)
+albedo_texture = ExtResource("13_sahil_shirt")
+uv1_scale = Vector3(2.5, 2.5, 2.5)
 roughness = 0.65
 
 [sub_resource type="StandardMaterial3D" id="Mat_Sahil_Cargo"]
-albedo_color = Color(0.22, 0.24, 0.27, 1)
-roughness = 0.75
+albedo_color = Color(0.40, 0.44, 0.48, 1)
+roughness = 0.8
 
 [sub_resource type="StandardMaterial3D" id="Mat_Aashu_Hoodie"]
-albedo_color = Color(0.58, 0.13, 0.16, 1)
-roughness = 0.75
+albedo_color = Color(0.46, 0.36, 0.24, 1)
+roughness = 0.70
 
 [sub_resource type="StandardMaterial3D" id="Mat_Aashu_Jeans"]
-albedo_color = Color(0.20, 0.30, 0.46, 1)
-roughness = 0.8
+albedo_color = Color(0.18, 0.24, 0.35, 1)
+roughness = 0.82
+
+[sub_resource type="StandardMaterial3D" id="Mat_Kalawa"]
+albedo_color = Color(0.95, 0.45, 0.08, 1)
+roughness = 0.60
+
+[sub_resource type="StandardMaterial3D" id="Mat_Kara_Silver"]
+albedo_color = Color(0.85, 0.88, 0.92, 1)
+metallic = 0.85
+roughness = 0.25
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil_FaceDecal"]
+transparency = 1
+albedo_texture = ExtResource("14_sahil_face")
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Mat_Aashu_FaceDecal"]
+transparency = 1
+albedo_texture = ExtResource("15_aashu_face")
+roughness = 0.55
 
 [sub_resource type="StandardMaterial3D" id="Mat_Kripal_Coat"]
 albedo_color = Color(0.44, 0.40, 0.28, 1)
@@ -717,6 +741,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
 size = Vector3(0.26, 0.28, 0.26)
 material = SubResource("Mat_Skin")
 
+[node name="FaceDecal" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.133)
+size = Vector3(0.24, 0.25, 0.005)
+material = SubResource("Mat_Sahil_FaceDecal")
+
 [node name="Jaw" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
 size = Vector3(0.22, 0.11, 0.22)
@@ -903,6 +932,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.60, 0)
 size = Vector3(0.075, 0.10, 0.09)
 material = SubResource("Mat_Skin")
 
+[node name="KalawaThread" type="CSGCylinder3D" parent="Characters/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.66, 0)
+radius = 0.058
+height = 0.025
+material = SubResource("Mat_Kalawa")
+
+[node name="SilverKara" type="CSGCylinder3D" parent="Characters/Sahil/ArmsNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.685, 0)
+radius = 0.060
+height = 0.018
+material = SubResource("Mat_Kara_Silver")
+
 [node name="LegsNode" type="Node3D" parent="Characters/Sahil"]
 
 [node name="LegL_Thigh" type="CSGBox3D" parent="Characters/Sahil/LegsNode"]
@@ -970,6 +1011,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
 [node name="HeadBase" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
 size = Vector3(0.26, 0.28, 0.26)
 material = SubResource("Mat_Skin")
+
+[node name="FaceDecal" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.133)
+size = Vector3(0.24, 0.25, 0.005)
+material = SubResource("Mat_Aashu_FaceDecal")
 
 [node name="Jaw" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
@@ -1066,20 +1112,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0.12)
 size = Vector3(0.24, 0.045, 0.055)
 material = SubResource("Mat_Hair_Brown")
 
-[node name="HeadphonesBand" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 0)
-size = Vector3(0.32, 0.028, 0.10)
-material = SubResource("Mat_Boots_Black")
+[node name="HairSweep" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(0.966, -0.259, 0, 0.259, 0.966, 0, 0, 0, 1, 0.05, 0.175, 0.02)
+size = Vector3(0.31, 0.08, 0.28)
+material = SubResource("Mat_Hair_Brown")
 
-[node name="HeadphoneCupL" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.155, 0, 0)
-size = Vector3(0.045, 0.10, 0.10)
-material = SubResource("Mat_Boots_Black")
-
-[node name="HeadphoneCupR" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.155, 0, 0)
-size = Vector3(0.045, 0.10, 0.10)
-material = SubResource("Mat_Boots_Black")
+[node name="HairSideSweep" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
+transform = Transform3D(0.985, 0.174, 0, -0.174, 0.985, 0, 0, 0, 1, -0.12, 0.13, 0.08)
+size = Vector3(0.08, 0.14, 0.18)
+material = SubResource("Mat_Hair_Brown")
 
 [node name="Neck" type="CSGCylinder3D" parent="Characters/Aashutosh"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.30, 0)
@@ -1099,6 +1140,11 @@ material = SubResource("Mat_Aashu_Hoodie")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33, 0.015)
 size = Vector3(0.24, 0.065, 0.22)
 material = SubResource("Mat_Aashu_Hoodie")
+
+[node name="Undershirt" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0.126)
+size = Vector3(0.10, 0.14, 0.01)
+material = SubResource("Mat_Eye_White")
 
 [node name="ZipperLine" type="CSGBox3D" parent="Characters/Aashutosh/TorsoNode"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0.127)

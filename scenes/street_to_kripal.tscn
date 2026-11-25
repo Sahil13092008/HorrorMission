@@ -24,6 +24,9 @@
 [ext_resource type="AudioStream" path="res://audio/storm_sahil_warning.mp3" id="18_sahil_warning"]
 [ext_resource type="AudioStream" path="res://audio/storm_aashu_hurry.mp3" id="19_aashu_hurry"]
 [ext_resource type="AudioStream" path="res://audio/storm_player_go.mp3" id="20_player_go"]
+[ext_resource type="Texture2D" uid="uid://cglwe3516l38q" path="res://textures/tex_sahil_shirt.png" id="24_sahil_shirt"]
+[ext_resource type="Texture2D" uid="uid://eis6vyvwgbiv" path="res://textures/face_sahil_decal.png" id="25_sahil_face"]
+[ext_resource type="Texture2D" uid="uid://bedswgkiolexk" path="res://textures/face_aashutosh_decal.png" id="26_aashu_face"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat_Street"]
 sky_top_color = Color(0.04, 0.05, 0.12, 1)
@@ -249,12 +252,28 @@ emission = Color(0.25, 0.95, 0.45, 1)
 emission_energy_multiplier = 2.5
 
 [sub_resource type="StandardMaterial3D" id="Mat_Companion_Sahil"]
-albedo_color = Color(0.48, 0.28, 0.16, 1)
-roughness = 0.7
+albedo_color = Color(0.96, 0.96, 0.96, 1)
+albedo_texture = ExtResource("24_sahil_shirt")
+uv1_scale = Vector3(2.5, 2.5, 2.5)
+roughness = 0.65
 
 [sub_resource type="StandardMaterial3D" id="Mat_Companion_Aashu"]
-albedo_color = Color(0.85, 0.42, 0.15, 1)
-roughness = 0.7
+albedo_color = Color(0.46, 0.36, 0.24, 1)
+roughness = 0.70
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil_Jeans"]
+albedo_color = Color(0.40, 0.44, 0.48, 1)
+roughness = 0.80
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil_FaceDecal"]
+transparency = 1
+albedo_texture = ExtResource("25_sahil_face")
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Mat_Aashu_FaceDecal"]
+transparency = 1
+albedo_texture = ExtResource("26_aashu_face")
+roughness = 0.55
 
 [sub_resource type="StandardMaterial3D" id="Mat_Jeans"]
 albedo_color = Color(0.18, 0.24, 0.35, 1)
@@ -3563,6 +3582,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
 size = Vector3(0.26, 0.28, 0.26)
 material = SubResource("Mat_Skin")
 
+[node name="FaceDecal" type="CSGBox3D" parent="Companions/SahilCompanion/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.133)
+size = Vector3(0.24, 0.25, 0.005)
+material = SubResource("Mat_Sahil_FaceDecal")
+
 [node name="Jaw" type="CSGBox3D" parent="Companions/SahilCompanion/VisualModel/HeadNode"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
 size = Vector3(0.22, 0.11, 0.22)
@@ -3902,6 +3926,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
 [node name="HeadBase" type="CSGBox3D" parent="Companions/AashutoshCompanion/VisualModel/HeadNode"]
 size = Vector3(0.26, 0.28, 0.26)
 material = SubResource("Mat_Skin")
+
+[node name="FaceDecal" type="CSGBox3D" parent="Companions/AashutoshCompanion/VisualModel/HeadNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.133)
+size = Vector3(0.24, 0.25, 0.005)
+material = SubResource("Mat_Aashu_FaceDecal")
 
 [node name="Jaw" type="CSGBox3D" parent="Companions/AashutoshCompanion/VisualModel/HeadNode"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
