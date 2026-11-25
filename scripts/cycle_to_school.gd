@@ -3,9 +3,12 @@ extends Node3D
 # ==============================================================
 # CYCLE_TO_SCHOOL.GD
 # Playable Bicycle Ride from Home to Boys School (बॉयज़ स्कूल)
-# Protagonist rides with backpack strapped to his back, arrives
-# at Boys School, meets Sahil and Aashutosh, and finalizes the
-# plan for Bhangarh Ruins!
+# Features:
+# - Protagonist rides with 3D backpack strapped to his back
+# - Huge, sprawling School Playground & Assembly Ground (मैदान)
+# - Cricket pitch, flag mast, stadium floodlight towers, running track
+# - Full Hindi voice acting for all school arrival dialogues!
+# - Smooth transition into Chapter 2 (Bhangarh Ruins)
 # ==============================================================
 
 # --- STATE & PHYSICS CONSTANTS ---
@@ -13,9 +16,10 @@ const CYCLE_SPEED: float = 9.5
 const SPRINT_CYCLE_SPEED: float = 14.5
 const ACCEL: float = 18.0
 const TURN_SPEED: float = 2.2
-const SCHOOL_GATE_Z: float = -92.0
+const SCHOOL_GATE_Z: float = -22.0
+const SCHOOL_PORTICO_Z: float = -94.0
 
-var player_pos: Vector3 = Vector3(0.0, 0.0, 20.0)
+var player_pos: Vector3 = Vector3(0.0, 0.0, 30.0)
 var player_velocity: Vector3 = Vector3.ZERO
 var rider_heading: float = 0.0 # Facing towards -Z
 var cycle_tilt: float = 0.0
@@ -61,11 +65,16 @@ var rider_arm_r: Node3D
 var comp_sahil: Node3D
 var comp_aashu: Node3D
 
-# Audio Players
+# Audio Players & Streams
 var audio_ambience: AudioStreamPlayer
 var audio_cycle: AudioStreamPlayer
 var audio_bell: AudioStreamPlayer
 var audio_voice: AudioStreamPlayer
+
+var stream_sahil_arr: AudioStream
+var stream_player_arr: AudioStream
+var stream_aashu_arr: AudioStream
+var stream_sahil_pln: AudioStream
 
 # UI Nodes
 var ui_root: CanvasLayer
@@ -84,24 +93,28 @@ var proceed_btn: Button
 # Dialogues at Boys School
 var arrival_dialogues = [
 	{
-		"speaker": "🧢 साहिल (SAHIL) — [बॉयज़ स्कूल गेट पर]",
+		"speaker": "🧢 साहिल (SAHIL) — [बॉयज़ स्कूल ग्राउंड पर]",
 		"color": Color(1.0, 0.85, 0.3),
-		"text": "\"अरे आ गया भाई! सब गैजेट्स और जरूरी सामान ले आया ना बैग में?\""
+		"text": "\"अरे आ गया भाई! सब गैजेट्स और जरूरी सामान ले आया ना बैग में?\"",
+		"audio": null
 	},
 	{
 		"speaker": "🎒 तू (YOU / खिलाड़ी) — [साइकिल से उतरते हुए]",
 		"color": Color(0.35, 0.95, 1.0),
-		"text": "\"हाँ भाई! टॉर्च, ईएमएफ डिटेक्टर, वॉकी-टॉकी और भानगढ़ के सारे नोट्स बैग में पैक हैं! तुम दोनों बताओ, क्या तैयारी है?\""
+		"text": "\"हाँ भाई! टॉर्च, ईएमएफ डिटेक्टर, वॉकी-टॉकी और भानगढ़ के सारे नोट्स बैग में पैक हैं! तुम दोनों बताओ, क्या तैयारी है?\"",
+		"audio": null
 	},
 	{
 		"speaker": "👓 आशुतोष (AASHUTOSH) — [बैग दिखाते हुए]",
 		"color": Color(0.45, 0.8, 1.0),
-		"text": "\"मैंने सारा भानगढ़ का नक्शा, थर्मल सेंसर्स और एक्स्ट्रा बैटरियाँ पैक कर ली हैं। भानगढ़ के पुराने मुख्य द्वार के पास एक गुप्त रास्ता है, हमें वहीं से अंदर दाखिल होना होगा!\""
+		"text": "\"मैंने सारा भानगढ़ का नक्शा, थर्मल सेंसर्स और एक्स्ट्रा बैटरियाँ पैक कर ली हैं। भानगढ़ के पुराने मुख्य द्वार के पास एक गुप्त रास्ता है, हमें वहीं से अंदर दाखिल होना होगा!\"",
+		"audio": null
 	},
 	{
 		"speaker": "🧢 साहिल (SAHIL)",
 		"color": Color(1.0, 0.85, 0.3),
-		"text": "\"बिल्कुल सही! आज रात हमें किसी भी हाल में भानगढ़ खंडहर के अंदर जाकर कृपाल को तलाशना होगा! चलो, सीधे भानगढ़ के लिए निकलते हैं!\""
+		"text": "\"बिल्कुल सही! आज रात हमें किसी भी हाल में भानगढ़ खंडहर के अंदर जाकर कृपाल को तलाशना होगा! चलो, सीधे भानगढ़ के लिए निकलते हैं!\"",
+		"audio": null
 	}
 ]
 
@@ -163,8 +176,19 @@ func _setup_audio() -> void:
 	a_root.add_child(audio_bell)
 	
 	audio_voice = AudioStreamPlayer.new()
-	audio_voice.volume_db = 4.0
+	audio_voice.volume_db = 5.0
 	a_root.add_child(audio_voice)
+	
+	# Load high-quality Hindi voice files for arrival dialogues
+	stream_sahil_arr = _load_audio_safe("res://audio/school_sahil_arrival.mp3")
+	stream_player_arr = _load_audio_safe("res://audio/school_player_arrival.mp3")
+	stream_aashu_arr = _load_audio_safe("res://audio/school_aashu_arrival.mp3")
+	stream_sahil_pln = _load_audio_safe("res://audio/school_sahil_plan.mp3")
+	
+	arrival_dialogues[0]["audio"] = stream_sahil_arr
+	arrival_dialogues[1]["audio"] = stream_player_arr
+	arrival_dialogues[2]["audio"] = stream_aashu_arr
+	arrival_dialogues[3]["audio"] = stream_sahil_pln
 
 # --- ENVIRONMENT & LIGHTING ---
 func _setup_lighting_and_sky() -> void:
@@ -172,11 +196,11 @@ func _setup_lighting_and_sky() -> void:
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color(0.12, 0.10, 0.18) # Deep evening twilight
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.55, 0.42, 0.38)
-	env.ambient_light_energy = 0.85
+	env.ambient_light_color = Color(0.58, 0.45, 0.40)
+	env.ambient_light_energy = 0.90
 	env.fog_enabled = true
 	env.fog_light_color = Color(0.24, 0.16, 0.22)
-	env.fog_density = 0.012
+	env.fog_density = 0.009
 	
 	world_env = WorldEnvironment.new()
 	world_env.environment = env
@@ -185,7 +209,7 @@ func _setup_lighting_and_sky() -> void:
 	# Warm evening low sun
 	sun_light = DirectionalLight3D.new()
 	sun_light.light_color = Color(1.0, 0.72, 0.45)
-	sun_light.light_energy = 1.1
+	sun_light.light_energy = 1.2
 	sun_light.rotation_degrees = Vector3(-25.0, 45.0, 0.0)
 	sun_light.shadow_enabled = true
 	add_child(sun_light)
@@ -213,7 +237,7 @@ func _create_mat(col: Color, roughness: float = 0.8, metallic: float = 0.0, emis
 		m.emission_energy_multiplier = emission_eng
 	return m
 
-# --- STREET ENVIRONMENT ---
+# --- STREET ENVIRONMENT (From Z = 35m down to Z = -22m) ---
 func _build_street_environment() -> void:
 	road_root = Node3D.new()
 	road_root.name = "RoadRoot"
@@ -227,15 +251,15 @@ func _build_street_environment() -> void:
 	var mat_hedge = _create_mat(Color(0.12, 0.32, 0.14), 0.9)
 	var mat_wall = _create_mat(Color(0.42, 0.40, 0.38), 0.85)
 	
-	# Main Asphalt Road (Z from 35 down to -105 = 140m long, width = 8.6m)
+	# Main Town Street Road (Leading up to School Gate)
 	var road = CSGBox3D.new()
-	road.size = Vector3(8.6, 0.1, 140.0)
-	road.position = Vector3(0.0, -0.05, -35.0)
+	road.size = Vector3(8.6, 0.1, 60.0)
+	road.position = Vector3(0.0, -0.05, 5.0)
 	road.material = mat_road
 	road_root.add_child(road)
 	
 	# Yellow centerline dashes
-	for z in range(-90, 32, 6):
+	for z in range(-20, 32, 6):
 		var dash = CSGBox3D.new()
 		dash.size = Vector3(0.24, 0.11, 2.6)
 		dash.position = Vector3(0.0, 0.01, float(z))
@@ -244,71 +268,57 @@ func _build_street_environment() -> void:
 	
 	# Sidewalks (Left and Right)
 	var sw_l = CSGBox3D.new()
-	sw_l.size = Vector3(3.2, 0.22, 140.0)
-	sw_l.position = Vector3(-5.9, 0.02, -35.0)
+	sw_l.size = Vector3(3.2, 0.22, 60.0)
+	sw_l.position = Vector3(-5.9, 0.02, 5.0)
 	sw_l.material = mat_sidewalk
 	road_root.add_child(sw_l)
 	
 	var sw_r = CSGBox3D.new()
-	sw_r.size = Vector3(3.2, 0.22, 140.0)
-	sw_r.position = Vector3(5.9, 0.02, -35.0)
+	sw_r.size = Vector3(3.2, 0.22, 60.0)
+	sw_r.position = Vector3(5.9, 0.02, 5.0)
 	sw_r.material = mat_sidewalk
 	road_root.add_child(sw_r)
 	
-	# Street Lamp Posts & Warm OmniLights along sidewalk every 18m
-	for z_lamp in range(-80, 30, 18):
-		var side = -1 if (z_lamp % 36 == 0) else 1
-		var pole_x = side * 5.2
-		
-		var pole = CSGBox3D.new()
-		pole.size = Vector3(0.14, 5.2, 0.14)
-		pole.position = Vector3(pole_x, 2.6, float(z_lamp))
-		pole.material = mat_pole
-		road_root.add_child(pole)
-		
-		var arm = CSGBox3D.new()
-		arm.size = Vector3(1.2, 0.10, 0.10)
-		arm.position = Vector3(pole_x + (-side * 0.5), 5.15, float(z_lamp))
-		arm.material = mat_pole
-		road_root.add_child(arm)
-		
-		var bulb = CSGSphere3D.new()
-		bulb.radius = 0.18
-		bulb.position = Vector3(pole_x + (-side * 0.95), 5.0, float(z_lamp))
-		bulb.material = mat_bulb
-		road_root.add_child(bulb)
-		
-		var lamp_light = OmniLight3D.new()
-		lamp_light.position = Vector3(pole_x + (-side * 0.95), 4.8, float(z_lamp))
-		lamp_light.light_color = Color(1.0, 0.88, 0.65)
-		lamp_light.light_energy = 2.4
-		lamp_light.omni_range = 14.0
-		road_root.add_child(lamp_light)
-		
-		# Trees & Green Hedges along edges
-		var tree_trunk = CSGCylinder3D.new()
-		tree_trunk.radius = 0.22
-		tree_trunk.height = 3.2
-		tree_trunk.position = Vector3(side * 8.2, 1.6, float(z_lamp) + 4.0)
-		tree_trunk.material = _create_mat(Color(0.28, 0.18, 0.10), 0.9)
-		road_root.add_child(tree_trunk)
-		
-		var foliage = CSGSphere3D.new()
-		foliage.radius = 1.4
-		foliage.position = Vector3(side * 8.2, 3.8, float(z_lamp) + 4.0)
-		foliage.material = mat_hedge
-		road_root.add_child(foliage)
-		
-		# Neighborhood boundary walls
-		var wall = CSGBox3D.new()
-		wall.size = Vector3(0.3, 1.6, 12.0)
-		wall.position = Vector3(side * 8.5, 0.8, float(z_lamp))
-		wall.material = mat_wall
-		road_root.add_child(wall)
+	# Street Lamp Posts along sidewalk
+	for z_lamp in [24, 6, -12]:
+		for side in [-1, 1]:
+			var pole_x = side * 5.2
+			var pole = CSGBox3D.new()
+			pole.size = Vector3(0.14, 5.2, 0.14)
+			pole.position = Vector3(pole_x, 2.6, float(z_lamp))
+			pole.material = mat_pole
+			road_root.add_child(pole)
+			
+			var bulb = CSGSphere3D.new()
+			bulb.radius = 0.18
+			bulb.position = Vector3(pole_x + (-side * 0.95), 5.0, float(z_lamp))
+			bulb.material = mat_bulb
+			road_root.add_child(bulb)
+			
+			var lamp_light = OmniLight3D.new()
+			lamp_light.position = Vector3(pole_x + (-side * 0.95), 4.8, float(z_lamp))
+			lamp_light.light_color = Color(1.0, 0.88, 0.65)
+			lamp_light.light_energy = 2.4
+			lamp_light.omni_range = 14.0
+			road_root.add_child(lamp_light)
+			
+			# Trees along roadside
+			var tree_trunk = CSGCylinder3D.new()
+			tree_trunk.radius = 0.22
+			tree_trunk.height = 3.2
+			tree_trunk.position = Vector3(side * 8.2, 1.6, float(z_lamp) + 2.0)
+			tree_trunk.material = _create_mat(Color(0.28, 0.18, 0.10), 0.9)
+			road_root.add_child(tree_trunk)
+			
+			var foliage = CSGSphere3D.new()
+			foliage.radius = 1.4
+			foliage.position = Vector3(side * 8.2, 3.8, float(z_lamp) + 2.0)
+			foliage.material = mat_hedge
+			road_root.add_child(foliage)
 	
-	# Roadside Direction Signboard at Z = -25m
+	# Direction Signboard outside school gate
 	var sign_root = Node3D.new()
-	sign_root.position = Vector3(4.8, 0, -25.0)
+	sign_root.position = Vector3(4.8, 0, -10.0)
 	road_root.add_child(sign_root)
 	
 	var sign_pole = CSGBox3D.new()
@@ -318,144 +328,294 @@ func _build_street_environment() -> void:
 	sign_root.add_child(sign_pole)
 	
 	var sign_board = CSGBox3D.new()
-	sign_board.size = Vector3(0.06, 0.95, 2.4)
+	sign_board.size = Vector3(0.06, 0.95, 2.6)
 	sign_board.position = Vector3(-0.02, 2.3, 0)
-	sign_board.material = _create_mat(Color(0.08, 0.42, 0.22), 0.5) # Green highway board
+	sign_board.material = _create_mat(Color(0.08, 0.42, 0.22), 0.5)
 	sign_root.add_child(sign_board)
 	
 	var sign_lbl = Label3D.new()
-	sign_lbl.text = "🏫 शासकीय उत्कृष्ट बालक उच्चतर माध्यमिक विद्यालय ➔\n[GOVT. BOYS HIGHER SECONDARY SCHOOL — 70M]"
-	sign_lbl.font_size = 28
+	sign_lbl.text = "🏫 शासकीय उत्कृष्ट बालक उच्चतर माध्यमिक विद्यालय ➔\n[GOVT. BOYS HIGHER SECONDARY SCHOOL — MAIN ENTRANCE]"
+	sign_lbl.font_size = 26
 	sign_lbl.modulate = Color(1.0, 1.0, 1.0)
 	sign_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sign_lbl.position = Vector3(-0.06, 2.3, 0)
 	sign_lbl.rotation_degrees = Vector3(0, -90, 0)
 	sign_root.add_child(sign_lbl)
 
-# --- BOYS SCHOOL BUILDING & GATES (Z = -95m) ---
+# --- BOYS SCHOOL: MASSIVE PLAYGROUND & CAMPUS (मैदान) ---
 func _build_boys_school() -> void:
 	school_root = Node3D.new()
 	school_root.name = "SchoolRoot"
-	school_root.position = Vector3(0, 0, SCHOOL_GATE_Z)
 	add_child(school_root)
 	
-	var mat_brick = _create_mat(Color(0.68, 0.28, 0.22), 0.8) # Classic Indian red brick school
-	var mat_stone_cream = _create_mat(Color(0.92, 0.88, 0.80), 0.65) # Cream stone arches
-	var mat_iron_gate = _create_mat(Color(0.12, 0.12, 0.14), 0.4, 0.8) # Black iron gate
+	var mat_brick = _create_mat(Color(0.68, 0.28, 0.22), 0.8) # Red brick school
+	var mat_stone_cream = _create_mat(Color(0.92, 0.88, 0.80), 0.65)
+	var mat_iron_gate = _create_mat(Color(0.12, 0.12, 0.14), 0.4, 0.8)
 	var mat_glass_win = _create_mat(Color(0.15, 0.22, 0.35), 0.2, 0.6)
-	var mat_gold_arch = _create_mat(Color(0.95, 0.82, 0.25), 0.4, 0.7)
+	var mat_clay_ground = _create_mat(Color(0.50, 0.38, 0.26), 0.95) # Sports ground clay/soil
+	var mat_turf = _create_mat(Color(0.20, 0.42, 0.16), 0.9) # Green lawn grass
+	var mat_track = _create_mat(Color(0.62, 0.28, 0.20), 0.95) # Reddish running track
+	var mat_pitch = _create_mat(Color(0.70, 0.60, 0.45), 0.9) # Light clay cricket pitch
+	var mat_paved_road = _create_mat(Color(0.22, 0.22, 0.24), 0.85)
+	var mat_floodlight_pole = _create_mat(Color(0.35, 0.38, 0.42), 0.3, 0.8)
+	var mat_flood_bulb = _create_mat(Color(1.0, 1.0, 0.9), 0.1, 0.0, Color(1.0, 0.98, 0.85), 4.0)
 	
-	# Courtyard Pavement inside school
-	var court = CSGBox3D.new()
-	court.size = Vector3(32.0, 0.12, 35.0)
-	court.position = Vector3(0, -0.05, -17.5)
-	court.material = _create_mat(Color(0.32, 0.32, 0.34))
-	school_root.add_child(court)
+	# --------------------------------------------------------------------------
+	# 1. GRAND SCHOOL ENTRANCE GATE (At Z = SCHOOL_GATE_Z = -22.0)
+	# --------------------------------------------------------------------------
+	var gate_center_z = SCHOOL_GATE_Z
 	
-	# Grand Entrance Gate Pillars (Left & Right)
 	var pillar_l = CSGBox3D.new()
-	pillar_l.size = Vector3(1.3, 4.8, 1.3)
-	pillar_l.position = Vector3(-4.6, 2.4, 0)
+	pillar_l.size = Vector3(1.4, 5.2, 1.4)
+	pillar_l.position = Vector3(-5.2, 2.6, gate_center_z)
 	pillar_l.material = mat_stone_cream
 	school_root.add_child(pillar_l)
 	
 	var pillar_r = CSGBox3D.new()
-	pillar_r.size = Vector3(1.3, 4.8, 1.3)
-	pillar_r.position = Vector3(4.6, 2.4, 0)
+	pillar_r.size = Vector3(1.4, 5.2, 1.4)
+	pillar_r.position = Vector3(5.2, 2.6, gate_center_z)
 	pillar_r.material = mat_stone_cream
 	school_root.add_child(pillar_r)
 	
 	# Arch Header Beam over gate
 	var arch_beam = CSGBox3D.new()
-	arch_beam.size = Vector3(10.5, 1.1, 0.9)
-	arch_beam.position = Vector3(0, 4.8, 0)
+	arch_beam.size = Vector3(12.0, 1.2, 1.0)
+	arch_beam.position = Vector3(0, 5.2, gate_center_z)
 	arch_beam.material = mat_stone_cream
 	school_root.add_child(arch_beam)
 	
 	# Prominent School Nameplate
 	var name_board = CSGBox3D.new()
-	name_board.size = Vector3(9.2, 0.75, 0.12)
-	name_board.position = Vector3(0, 4.8, 0.48)
-	name_board.material = _create_mat(Color(0.12, 0.18, 0.45), 0.5) # Deep navy school plaque
+	name_board.size = Vector3(10.5, 0.85, 0.14)
+	name_board.position = Vector3(0, 5.2, gate_center_z + 0.52)
+	name_board.material = _create_mat(Color(0.10, 0.16, 0.42), 0.5)
 	school_root.add_child(name_board)
 	
 	var name_lbl = Label3D.new()
 	name_lbl.text = "🏫 शासकीय उत्कृष्ट बालक उच्चतर माध्यमिक विद्यालय — पानसेमल\n[GOVT. EXCELLENCE BOYS HIGHER SECONDARY SCHOOL]"
 	name_lbl.font_size = 32
-	name_lbl.modulate = Color(1.0, 0.92, 0.4) # Golden letters
+	name_lbl.modulate = Color(1.0, 0.92, 0.35)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_lbl.position = Vector3(0, 4.8, 0.56)
+	name_lbl.position = Vector3(0, 5.2, gate_center_z + 0.60)
 	school_root.add_child(name_lbl)
 	
-	# Wrought Iron School Gates (Open on sides)
+	# Wrought Iron School Gates (Swung wide open)
 	var gate_l = CSGBox3D.new()
-	gate_l.size = Vector3(3.2, 3.2, 0.08)
-	gate_l.position = Vector3(-3.2, 1.6, -1.2)
-	gate_l.rotation_degrees = Vector3(0, 45, 0) # Swung open
+	gate_l.size = Vector3(3.6, 3.6, 0.08)
+	gate_l.position = Vector3(-3.8, 1.8, gate_center_z - 1.4)
+	gate_l.rotation_degrees = Vector3(0, 55, 0)
 	gate_l.material = mat_iron_gate
 	school_root.add_child(gate_l)
 	
 	var gate_r = CSGBox3D.new()
-	gate_r.size = Vector3(3.2, 3.2, 0.08)
-	gate_r.position = Vector3(3.2, 1.6, -1.2)
-	gate_r.rotation_degrees = Vector3(0, -45, 0) # Swung open
+	gate_r.size = Vector3(3.6, 3.6, 0.08)
+	gate_r.position = Vector3(3.8, 1.8, gate_center_z - 1.4)
+	gate_r.rotation_degrees = Vector3(0, -55, 0)
 	gate_r.material = mat_iron_gate
 	school_root.add_child(gate_r)
 	
-	# Main 2-Story School Building Facade
+	# --------------------------------------------------------------------------
+	# 2. ENORMOUS PLAYGROUND & CAMPUS GROUND (85m WIDE X 85m LONG!)
+	# --------------------------------------------------------------------------
+	# Ground Base spans from Z = -22m to Z = -107m (Length: 85m, Width: 85m)
+	var ground_center_z = -64.5
+	var ground_length = 85.0
+	var ground_width = 85.0
+	
+	# Large Sports Soil/Clay Ground Base
+	var play_ground = CSGBox3D.new()
+	play_ground.size = Vector3(ground_width, 0.12, ground_length)
+	play_ground.position = Vector3(0, -0.05, ground_center_z)
+	play_ground.material = mat_clay_ground
+	school_root.add_child(play_ground)
+	
+	# Green Grass Turf Borders on edges
+	var turf_l = CSGBox3D.new()
+	turf_l.size = Vector3(14.0, 0.14, ground_length)
+	turf_l.position = Vector3(-35.5, -0.04, ground_center_z)
+	turf_l.material = mat_turf
+	school_root.add_child(turf_l)
+	
+	var turf_r = CSGBox3D.new()
+	turf_r.size = Vector3(14.0, 0.14, ground_length)
+	turf_r.position = Vector3(35.5, -0.04, ground_center_z)
+	turf_r.material = mat_turf
+	school_root.add_child(turf_r)
+	
+	# Running Track Perimeter (Red clay border around sports ground)
+	var track_border = CSGBox3D.new()
+	track_border.size = Vector3(56.0, 0.13, 76.0)
+	track_border.position = Vector3(0, -0.045, ground_center_z)
+	track_border.material = mat_track
+	school_root.add_child(track_border)
+	
+	# Inner Sports Soil Field
+	var inner_field = CSGBox3D.new()
+	inner_field.size = Vector3(48.0, 0.14, 68.0)
+	inner_field.position = Vector3(0, -0.04, ground_center_z)
+	inner_field.material = mat_clay_ground
+	school_root.add_child(inner_field)
+	
+	# --------------------------------------------------------------------------
+	# 3. CRICKET PITCH (On Left Side of Ground)
+	# --------------------------------------------------------------------------
+	var cricket_pitch = CSGBox3D.new()
+	cricket_pitch.size = Vector3(3.6, 0.15, 22.0)
+	cricket_pitch.position = Vector3(-16.0, -0.03, -60.0)
+	cricket_pitch.material = mat_pitch
+	school_root.add_child(cricket_pitch)
+	
+	# Wooden Wickets/Stumps on both ends of pitch
+	for pz in [-70.0, -50.0]:
+		for wx in [-0.15, 0.0, 0.15]:
+			var stump = CSGCylinder3D.new()
+			stump.radius = 0.025
+			stump.height = 0.75
+			stump.position = Vector3(-16.0 + wx, 0.38, pz)
+			stump.material = _create_mat(Color(0.85, 0.72, 0.45), 0.7)
+			school_root.add_child(stump)
+	
+	# --------------------------------------------------------------------------
+	# 4. CENTRAL ASSEMBLY ISLAND WITH INDIAN NATIONAL FLAG MAST
+	# --------------------------------------------------------------------------
+	var flag_circle = CSGCylinder3D.new()
+	flag_circle.radius = 3.6
+	flag_circle.height = 0.22
+	flag_circle.position = Vector3(0, 0.06, -58.0)
+	flag_circle.material = mat_stone_cream
+	school_root.add_child(flag_circle)
+	
+	# 9-meter Flag Mast Pole
+	var flag_pole = CSGCylinder3D.new()
+	flag_pole.radius = 0.06
+	flag_pole.height = 9.2
+	flag_pole.position = Vector3(0, 4.6, -58.0)
+	flag_pole.material = _create_mat(Color(0.85, 0.85, 0.88), 0.2, 0.9)
+	school_root.add_child(flag_pole)
+	
+	# Indian Tiranga Flag (Saffron, White, Green)
+	var flag_saffron = CSGBox3D.new()
+	flag_saffron.size = Vector3(0.04, 0.35, 1.2)
+	flag_saffron.position = Vector3(0.02, 8.8, -57.4)
+	flag_saffron.material = _create_mat(Color(1.0, 0.55, 0.1), 0.6) # Saffron
+	school_root.add_child(flag_saffron)
+	
+	var flag_white = CSGBox3D.new()
+	flag_white.size = Vector3(0.04, 0.35, 1.2)
+	flag_white.position = Vector3(0.02, 8.45, -57.4)
+	flag_white.material = _create_mat(Color(0.98, 0.98, 0.98), 0.6) # White
+	school_root.add_child(flag_white)
+	
+	var flag_green = CSGBox3D.new()
+	flag_green.size = Vector3(0.04, 0.35, 1.2)
+	flag_green.position = Vector3(0.02, 8.1, -57.4)
+	flag_green.material = _create_mat(Color(0.1, 0.65, 0.2), 0.6) # India Green
+	school_root.add_child(flag_green)
+	
+	# --------------------------------------------------------------------------
+	# 5. WIDE CENTRAL PAVED DRIVEWAY (Leading from Gate to School Building)
+	# --------------------------------------------------------------------------
+	var driveway = CSGBox3D.new()
+	driveway.size = Vector3(8.0, 0.14, 75.0)
+	driveway.position = Vector3(0, -0.03, -60.0)
+	driveway.material = mat_paved_road
+	school_root.add_child(driveway)
+	
+	# --------------------------------------------------------------------------
+	# 6. TALL STADIUM FLOODLIGHT TOWERS (On 4 corners of the Ground)
+	# --------------------------------------------------------------------------
+	var flood_coords = [
+		Vector3(-36.0, 0, -28.0),
+		Vector3(36.0, 0, -28.0),
+		Vector3(-36.0, 0, -90.0),
+		Vector3(36.0, 0, -90.0)
+	]
+	for fc in flood_coords:
+		var ft_pole = CSGBox3D.new()
+		ft_pole.size = Vector3(0.35, 12.0, 0.35)
+		ft_pole.position = fc + Vector3(0, 6.0, 0)
+		ft_pole.material = mat_floodlight_pole
+		school_root.add_child(ft_pole)
+		
+		# Floodlight Head Bar with glowing lamps
+		var ft_bar = CSGBox3D.new()
+		ft_bar.size = Vector3(2.4, 0.6, 0.6)
+		ft_bar.position = fc + Vector3(0, 12.0, 0)
+		ft_bar.material = mat_flood_bulb
+		school_root.add_child(ft_bar)
+		
+		var flood_light = OmniLight3D.new()
+		flood_light.position = fc + Vector3(0, 11.5, 0)
+		flood_light.light_color = Color(1.0, 0.95, 0.85)
+		flood_light.light_energy = 3.2
+		flood_light.omni_range = 28.0
+		school_root.add_child(flood_light)
+	
+	# --------------------------------------------------------------------------
+	# 7. GRAND 2-STORY BOYS SCHOOL BUILDING FACADE (At Z = -104.0)
+	# --------------------------------------------------------------------------
+	var school_bldg_z = -104.0
+	
 	var main_bldg = CSGBox3D.new()
-	main_bldg.size = Vector3(28.0, 9.2, 12.0)
-	main_bldg.position = Vector3(0, 4.6, -22.0)
+	main_bldg.size = Vector3(44.0, 11.0, 16.0)
+	main_bldg.position = Vector3(0, 5.5, school_bldg_z)
 	main_bldg.material = mat_brick
 	school_root.add_child(main_bldg)
 	
-	# Central Entrance Portico with Colonial Pillars
+	# Central Grand Portico Entrance with Pillars (At Z = SCHOOL_PORTICO_Z = -94.0)
 	var portico = CSGBox3D.new()
-	portico.size = Vector3(10.0, 7.5, 4.5)
-	portico.position = Vector3(0, 3.75, -15.5)
+	portico.size = Vector3(14.0, 8.5, 6.0)
+	portico.position = Vector3(0, 4.25, -96.0)
 	portico.material = mat_stone_cream
 	school_root.add_child(portico)
 	
+	# Portico Entrance Steps & Platform
+	var steps = CSGBox3D.new()
+	steps.size = Vector3(16.0, 0.45, 4.0)
+	steps.position = Vector3(0, 0.22, -93.0)
+	steps.material = mat_stone_cream
+	school_root.add_child(steps)
+	
 	# Classroom Windows grid on facade
-	for wx in [-10.5, -6.5, 6.5, 10.5]:
-		for wy in [2.5, 6.2]:
+	for wx in [-18.0, -12.0, -6.0, 6.0, 12.0, 18.0]:
+		for wy in [3.0, 7.5]:
 			var win = CSGBox3D.new()
-			win.size = Vector3(2.4, 2.0, 0.15)
-			win.position = Vector3(wx, wy, -15.8)
+			win.size = Vector3(2.6, 2.2, 0.15)
+			win.position = Vector3(wx, wy, school_bldg_z + 8.1)
 			win.material = mat_glass_win
 			school_root.add_child(win)
 	
 	# School Clock on pediment
 	var clock = CSGCylinder3D.new()
-	clock.radius = 0.65
+	clock.radius = 0.85
 	clock.height = 0.15
-	clock.position = Vector3(0, 6.8, -13.2)
+	clock.position = Vector3(0, 8.2, -92.9)
 	clock.rotation_degrees = Vector3(90, 0, 0)
-	clock.material = _create_mat(Color(0.95, 0.95, 0.95), 0.3)
+	clock.material = _create_mat(Color(0.96, 0.96, 0.96), 0.3)
 	school_root.add_child(clock)
 	
 	# Warm Entrance Portico Floodlight
 	var portico_light = OmniLight3D.new()
-	portico_light.position = Vector3(0, 4.2, -13.0)
+	portico_light.position = Vector3(0, 5.2, -93.0)
 	portico_light.light_color = Color(1.0, 0.92, 0.72)
-	portico_light.light_energy = 3.5
-	portico_light.omni_range = 18.0
+	portico_light.light_energy = 3.8
+	portico_light.omni_range = 22.0
 	school_root.add_child(portico_light)
 	
-	# Vertical Golden Waypoint Beacon Beam (Guides the player directly from home to school!)
+	# Vertical Golden Waypoint Beacon Beam (Guides the player across the vast ground!)
 	beacon_beam = CSGCylinder3D.new()
-	beacon_beam.radius = 0.75
-	beacon_beam.height = 50.0
-	beacon_beam.position = Vector3(0, 25.0, -2.0)
+	beacon_beam.radius = 0.85
+	beacon_beam.height = 60.0
+	beacon_beam.position = Vector3(0, 30.0, SCHOOL_PORTICO_Z)
 	beacon_beam.material = _create_mat(Color(1.0, 0.85, 0.25, 0.35), 0.1, 0.0, Color(1.0, 0.8, 0.2), 3.0)
 	beacon_beam.transparency = 0.4
 	school_root.add_child(beacon_beam)
 	
 	beacon_light = OmniLight3D.new()
-	beacon_light.position = Vector3(0, 2.5, -2.0)
+	beacon_light.position = Vector3(0, 2.5, SCHOOL_PORTICO_Z)
 	beacon_light.light_color = Color(1.0, 0.82, 0.25)
-	beacon_light.light_energy = 2.8
-	beacon_light.omni_range = 16.0
+	beacon_light.light_energy = 3.0
+	beacon_light.omni_range = 18.0
 	school_root.add_child(beacon_light)
 
 # --- PLAYER BICYCLE & PROTAGONIST WITH BACKPACK ---
@@ -469,12 +629,12 @@ func _build_player_bicycle() -> void:
 	bike_frame.name = "BikeFrame"
 	player_root.add_child(bike_frame)
 	
-	var mat_frame = _create_mat(Color(0.12, 0.25, 0.45), 0.4, 0.7) # Dark metallic blue cycle
-	var mat_metal = _create_mat(Color(0.65, 0.65, 0.68), 0.25, 0.85) # Chrome components
-	var mat_tire = _create_mat(Color(0.10, 0.10, 0.12), 0.85) # Black rubber
+	var mat_frame = _create_mat(Color(0.12, 0.25, 0.45), 0.4, 0.7)
+	var mat_metal = _create_mat(Color(0.65, 0.65, 0.68), 0.25, 0.85)
+	var mat_tire = _create_mat(Color(0.10, 0.10, 0.12), 0.85)
 	var mat_saddle = _create_mat(Color(0.18, 0.12, 0.08), 0.7)
 	
-	# Main Diamond Frame Tubes
+	# Diamond Frame
 	var tube_top = CSGBox3D.new()
 	tube_top.size = Vector3(0.06, 0.06, 0.82)
 	tube_top.position = Vector3(0, 0.82, -0.05)
@@ -496,7 +656,6 @@ func _build_player_bicycle() -> void:
 	tube_seat.material = mat_frame
 	bike_frame.add_child(tube_seat)
 	
-	# Saddle
 	var saddle = CSGBox3D.new()
 	saddle.size = Vector3(0.22, 0.08, 0.32)
 	saddle.position = Vector3(0, 0.98, 0.32)
@@ -516,7 +675,6 @@ func _build_player_bicycle() -> void:
 	handlebar.material = mat_metal
 	bike_frame.add_child(handlebar)
 	
-	# Rubber Grips
 	for gx in [-0.31, 0.31]:
 		var grip = CSGBox3D.new()
 		grip.size = Vector3(0.12, 0.07, 0.07)
@@ -524,7 +682,7 @@ func _build_player_bicycle() -> void:
 		grip.material = mat_tire
 		bike_frame.add_child(grip)
 	
-	# Headlight (Casing + Lens + Forward SpotLight3D)
+	# Headlight (SpotLight3D shining ahead)
 	var light_casing = CSGCylinder3D.new()
 	light_casing.radius = 0.075
 	light_casing.height = 0.12
@@ -547,14 +705,7 @@ func _build_player_bicycle() -> void:
 	headlight_spot.spot_angle = 32.0
 	bike_frame.add_child(headlight_spot)
 	
-	# Front Fork & Wheel
-	var fork = CSGBox3D.new()
-	fork.size = Vector3(0.14, 0.72, 0.05)
-	fork.position = Vector3(0, 0.58, -0.44)
-	fork.rotation_degrees = Vector3(14.0, 0, 0)
-	fork.material = mat_metal
-	bike_frame.add_child(fork)
-	
+	# Front Wheel
 	wheel_front = Node3D.new()
 	wheel_front.position = Vector3(0, 0.36, -0.52)
 	bike_frame.add_child(wheel_front)
@@ -576,7 +727,7 @@ func _build_player_bicycle() -> void:
 	wr_tire.material = mat_tire
 	wheel_rear.add_child(wr_tire)
 	
-	# Pedal Crankset
+	# Pedals
 	pedal_crank = Node3D.new()
 	pedal_crank.position = Vector3(0, 0.36, 0.0)
 	bike_frame.add_child(pedal_crank)
@@ -586,27 +737,25 @@ func _build_player_bicycle() -> void:
 	pedal_crank.add_child(crank_arm)
 	
 	# --------------------------------------------------------------------------
-	# PROTAGONIST RIDER CHARACTER (WITH BACKPACK STRAPPED ON BACK)
+	# PROTAGONIST RIDER CHARACTER (WITH 3D BACKPACK STRAPPED ON BACK)
 	# --------------------------------------------------------------------------
 	var mat_skin = _create_mat(Color(0.86, 0.68, 0.54), 0.75)
-	var mat_shirt = _create_mat(Color(0.14, 0.16, 0.22), 0.8) # Protagonist black/dark hoodie
-	var mat_jeans = _create_mat(Color(0.18, 0.28, 0.44), 0.85) # Blue denim jeans
+	var mat_shirt = _create_mat(Color(0.14, 0.16, 0.22), 0.8)
+	var mat_jeans = _create_mat(Color(0.18, 0.28, 0.44), 0.85)
 	var mat_hair = _create_mat(Color(0.08, 0.08, 0.09), 0.9)
-	var mat_backpack = _create_mat(Color(0.10, 0.18, 0.34), 0.75) # Heavy-duty Adventure Backpack
+	var mat_backpack = _create_mat(Color(0.10, 0.18, 0.34), 0.75)
 	
 	var rider_body = Node3D.new()
 	rider_body.position = Vector3(0, 0.95, 0.22)
 	bike_frame.add_child(rider_body)
 	
-	# Torso leaning forward slightly onto handlebars
 	var torso = CSGBox3D.new()
 	torso.size = Vector3(0.38, 0.48, 0.24)
 	torso.position = Vector3(0, 0.24, 0)
-	torso.rotation_degrees = Vector3(18.0, 0, 0) # Leaning forward
+	torso.rotation_degrees = Vector3(18.0, 0, 0)
 	torso.material = mat_shirt
 	rider_body.add_child(torso)
 	
-	# Head
 	var head = CSGBox3D.new()
 	head.size = Vector3(0.24, 0.24, 0.24)
 	head.position = Vector3(0, 0.58, -0.08)
@@ -619,30 +768,25 @@ func _build_player_bicycle() -> void:
 	hair.material = mat_hair
 	rider_body.add_child(hair)
 	
-	# --------------------------------------------------------------------------
-	# 3D BACKPACK STRAPPED ON PROTAGONIST'S BACK (User requirement!)
-	# --------------------------------------------------------------------------
+	# 3D BACKPACK STRAPPED TO RIDER'S BACK
 	rider_backpack = Node3D.new()
 	rider_backpack.name = "RiderBackpack"
 	rider_backpack.position = Vector3(0, 0.26, 0.14)
 	rider_backpack.rotation_degrees = Vector3(18.0, 0, 0)
 	rider_body.add_child(rider_backpack)
 	
-	# Main Bag body
 	var bag_mesh = CSGBox3D.new()
 	bag_mesh.size = Vector3(0.36, 0.44, 0.22)
 	bag_mesh.position = Vector3(0, 0, 0)
 	bag_mesh.material = mat_backpack
 	rider_backpack.add_child(bag_mesh)
 	
-	# Outer pocket
 	var bag_pocket = CSGBox3D.new()
 	bag_pocket.size = Vector3(0.26, 0.22, 0.08)
 	bag_pocket.position = Vector3(0, -0.06, 0.13)
 	bag_pocket.material = _create_mat(Color(0.18, 0.24, 0.42), 0.7)
 	rider_backpack.add_child(bag_pocket)
 	
-	# Water bottle on side
 	var bottle = CSGCylinder3D.new()
 	bottle.radius = 0.04
 	bottle.height = 0.22
@@ -650,7 +794,6 @@ func _build_player_bicycle() -> void:
 	bottle.material = _create_mat(Color(0.2, 0.75, 0.85), 0.4)
 	rider_backpack.add_child(bottle)
 	
-	# Shoulder Straps wrapping to front of torso
 	for sx in [-0.14, 0.14]:
 		var strap = CSGBox3D.new()
 		strap.size = Vector3(0.06, 0.42, 0.24)
@@ -658,7 +801,7 @@ func _build_player_bicycle() -> void:
 		strap.material = _create_mat(Color(0.08, 0.12, 0.20))
 		rider_backpack.add_child(strap)
 	
-	# Arms reaching to handlebar grips
+	# Arms & Legs
 	rider_arm_l = CSGBox3D.new()
 	rider_arm_l.size = Vector3(0.09, 0.46, 0.09)
 	rider_arm_l.position = Vector3(-0.24, 0.28, -0.22)
@@ -673,7 +816,6 @@ func _build_player_bicycle() -> void:
 	rider_arm_r.material = mat_shirt
 	rider_body.add_child(rider_arm_r)
 	
-	# Pedaling Legs
 	rider_leg_l = CSGBox3D.new()
 	rider_leg_l.size = Vector3(0.12, 0.44, 0.12)
 	rider_leg_l.position = Vector3(-0.14, -0.25, -0.08)
@@ -688,28 +830,26 @@ func _build_player_bicycle() -> void:
 	rider_leg_r.material = mat_jeans
 	rider_body.add_child(rider_leg_r)
 
-# --- COMPANIONS WAITING AT BOYS SCHOOL GATE ---
+# --- COMPANIONS WAITING AT BOYS SCHOOL PORTICO ---
 func _build_companions_at_school() -> void:
 	var comp_root = Node3D.new()
 	comp_root.name = "CompanionsRoot"
-	comp_root.position = Vector3(0, 0, SCHOOL_GATE_Z - 3.5)
+	comp_root.position = Vector3(0, 0, SCHOOL_PORTICO_Z)
 	add_child(comp_root)
 	
 	var mat_skin = _create_mat(Color(0.86, 0.68, 0.54), 0.75)
-	var mat_sahil_shirt = _create_mat(Color(0.85, 0.35, 0.15), 0.8) # Orange hoodie
-	var mat_sahil_cap = _create_mat(Color(0.12, 0.35, 0.85), 0.7) # Blue cap
-	var mat_aashu_shirt = _create_mat(Color(0.25, 0.55, 0.85), 0.8) # Blue collared shirt
+	var mat_sahil_shirt = _create_mat(Color(0.85, 0.35, 0.15), 0.8)
+	var mat_sahil_cap = _create_mat(Color(0.12, 0.35, 0.85), 0.7)
+	var mat_aashu_shirt = _create_mat(Color(0.25, 0.55, 0.85), 0.8)
 	var mat_aashu_glass = _create_mat(Color(0.1, 0.1, 0.1), 0.2, 0.9)
 	var mat_jeans = _create_mat(Color(0.15, 0.22, 0.36), 0.85)
-	var mat_bag_sahil = _create_mat(Color(0.35, 0.15, 0.15), 0.8) # Reddish adventure bag
-	var mat_bag_aashu = _create_mat(Color(0.18, 0.38, 0.25), 0.8) # Green army bag
+	var mat_bag_sahil = _create_mat(Color(0.35, 0.15, 0.15), 0.8)
+	var mat_bag_aashu = _create_mat(Color(0.18, 0.38, 0.25), 0.8)
 	
-	# --------------------------------------------------------------------------
-	# SAHIL (Waiting on left with his red bicycle parked)
-	# --------------------------------------------------------------------------
+	# SAHIL (Waiting on left of portico with red bike)
 	comp_sahil = Node3D.new()
 	comp_sahil.name = "CompanionSahil"
-	comp_sahil.position = Vector3(-2.2, 0, 0)
+	comp_sahil.position = Vector3(-2.6, 0, 0)
 	comp_root.add_child(comp_sahil)
 	
 	var s_torso = CSGBox3D.new()
@@ -742,10 +882,9 @@ func _build_companions_at_school() -> void:
 	s_legs.material = mat_jeans
 	comp_sahil.add_child(s_legs)
 	
-	# Sahil's Parked Red Bicycle beside him
 	var s_bike = Node3D.new()
-	s_bike.position = Vector3(-0.7, 0, 0.2)
-	s_bike.rotation_degrees = Vector3(0, 15, 0)
+	s_bike.position = Vector3(-0.8, 0, 0.2)
+	s_bike.rotation_degrees = Vector3(0, 20, 0)
 	comp_sahil.add_child(s_bike)
 	var sb_frame = CSGBox3D.new()
 	sb_frame.size = Vector3(0.06, 0.55, 1.4)
@@ -753,12 +892,10 @@ func _build_companions_at_school() -> void:
 	sb_frame.material = _create_mat(Color(0.85, 0.15, 0.15), 0.5, 0.7)
 	s_bike.add_child(sb_frame)
 	
-	# --------------------------------------------------------------------------
-	# AASHUTOSH (Waiting on right with his blue bicycle)
-	# --------------------------------------------------------------------------
+	# AASHUTOSH (Waiting on right of portico with blue bike)
 	comp_aashu = Node3D.new()
 	comp_aashu.name = "CompanionAashutosh"
-	comp_aashu.position = Vector3(2.2, 0, 0)
+	comp_aashu.position = Vector3(2.6, 0, 0)
 	comp_root.add_child(comp_aashu)
 	
 	var a_torso = CSGBox3D.new()
@@ -791,10 +928,9 @@ func _build_companions_at_school() -> void:
 	a_legs.material = mat_jeans
 	comp_aashu.add_child(a_legs)
 	
-	# Aashutosh's Parked Blue Bicycle beside him
 	var a_bike = Node3D.new()
-	a_bike.position = Vector3(0.7, 0, 0.2)
-	a_bike.rotation_degrees = Vector3(0, -15, 0)
+	a_bike.position = Vector3(0.8, 0, 0.2)
+	a_bike.rotation_degrees = Vector3(0, -20, 0)
 	comp_aashu.add_child(a_bike)
 	var ab_frame = CSGBox3D.new()
 	ab_frame.size = Vector3(0.06, 0.55, 1.4)
@@ -822,14 +958,14 @@ func _build_ui() -> void:
 	mission_banner.add_child(b_hbox)
 	
 	banner_label = Label.new()
-	banner_label.text = "🚲 MISSION: RIDE BICYCLE TO BOYS SCHOOL [बॉयज़ स्कूल पहुँचें]"
+	banner_label.text = "🚲 MISSION: RIDE BICYCLE TO BOYS SCHOOL [बॉयज़ स्कूल मैदान पहुँचें]"
 	banner_label.add_theme_font_size_override("font_size", 16)
 	banner_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))
 	banner_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b_hbox.add_child(banner_label)
 	
 	dist_label = Label.new()
-	dist_label.text = "📍 DISTANCE: 112 M"
+	dist_label.text = "📍 DISTANCE: 124 M"
 	dist_label.add_theme_font_size_override("font_size", 16)
 	dist_label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.6))
 	b_hbox.add_child(dist_label)
@@ -877,7 +1013,6 @@ func _build_ui() -> void:
 	advance_tip.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	sub_vbox.add_child(advance_tip)
 	
-	# Mobile Touch Buttons HUD (Only shown on mobile / touch screen)
 	_build_touch_controls()
 	
 	# Arrival Card (Initially hidden)
@@ -901,7 +1036,7 @@ func _build_ui() -> void:
 	ac_vbox.add_child(ac_title)
 	
 	var ac_desc = Label.new()
-	ac_desc.text = "बॉयज़ स्कूल में तीनों दोस्त अपने-अपने गैजेट्स व सामान के साथ मिले!\nभानगढ़ खंडहर के अंदर गुप्त रास्ते से दाखिल होने का पूरा प्लान तैयार हुआ।"
+	ac_desc.text = "बॉयज़ स्कूल के विशाल मैदान में तीनों दोस्त अपने-अपने गैजेट्स व सामान के साथ मिले!\nभानगढ़ खंडहर के अंदर गुप्त रास्ते से दाखिल होने का पूरा प्लान तैयार हुआ।"
 	ac_desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ac_desc.add_theme_font_size_override("font_size", 14)
 	ac_vbox.add_child(ac_desc)
@@ -922,7 +1057,6 @@ func _build_touch_controls() -> void:
 	
 	var is_touch = DisplayServer.is_touchscreen_available() or OS.has_feature("mobile")
 	if not is_touch:
-		# Keep touch controls hidden on desktop unless user touches screen
 		touch_hud.visible = false
 	
 	# Left Steering Buttons
@@ -950,7 +1084,6 @@ func _build_touch_controls() -> void:
 	btn_r.button_up.connect(func(): touch_right = false)
 	touch_hud.add_child(btn_r)
 	
-	# Bell Button
 	var btn_bell = Button.new()
 	btn_bell.text = "🔔 BELL"
 	btn_bell.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
@@ -1008,7 +1141,6 @@ func _ring_bell() -> void:
 		audio_bell.pitch_scale = randf_range(0.95, 1.08)
 		audio_bell.play()
 
-# --- INPUT HANDLING ---
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode in [KEY_B, KEY_SPACE]:
@@ -1021,12 +1153,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		   (event is InputEventScreenTouch and event.pressed):
 			_advance_dialogue()
 
-# --- PHYSICS PROCESS (BICYCLE RIDING) ---
+# --- PHYSICS PROCESS (BICYCLE RIDING ACROSS ROAD & VAST SCHOOL GROUND) ---
 func _physics_process(delta: float) -> void:
 	if cutscene_active:
 		return
 		
-	# Input gathering (Keyboard + Touch)
 	var steer_input: float = 0.0
 	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT) or touch_left:
 		steer_input += 1.0
@@ -1050,8 +1181,13 @@ func _physics_process(delta: float) -> void:
 	else:
 		cycle_tilt = lerp(cycle_tilt, 0.0, 6.0 * delta)
 		
-	# Clamp player heading so he primarily moves down the street towards Boys School (-Z)
-	rider_heading = clamp(rider_heading, -0.65, 0.65)
+	# On the street (z > -22) keep heading within road, on the ground (z <= -22) allow wider freedom!
+	if player_pos.z > SCHOOL_GATE_Z:
+		rider_heading = clamp(rider_heading, -0.65, 0.65)
+		player_pos.x = clamp(player_pos.x, -3.8, 3.8)
+	else:
+		rider_heading = clamp(rider_heading, -1.2, 1.2)
+		player_pos.x = clamp(player_pos.x, -35.0, 35.0) # Full massive 70m wide playground!
 	
 	# Acceleration & Velocity
 	var forward_dir = Vector3(-sin(rider_heading), 0, -cos(rider_heading)).normalized()
@@ -1068,8 +1204,6 @@ func _physics_process(delta: float) -> void:
 		if audio_cycle and audio_cycle.playing: audio_cycle.stop()
 		
 	player_pos += player_velocity * delta
-	# Clamp X within street sidewalks
-	player_pos.x = clamp(player_pos.x, -3.8, 3.8)
 	
 	# Update 3D Visual Transforms
 	if player_root:
@@ -1092,20 +1226,22 @@ func _physics_process(delta: float) -> void:
 		if wheel_rear: wheel_rear.rotate_x(roll)
 		if pedal_crank: pedal_crank.rotation.x = pedal_phase
 		
-		# Animate rider legs
 		if rider_leg_l: rider_leg_l.rotation.x = sin(pedal_phase) * 0.45 + 0.25
 		if rider_leg_r: rider_leg_r.rotation.x = -sin(pedal_phase) * 0.45 + 0.25
 		
-	# Update Distance to Boys School Gate HUD
-	var dist_m = max(0, int(abs(player_pos.z - SCHOOL_GATE_Z)))
+	# Update Distance to Boys School Portico HUD
+	var dist_m = max(0, int(abs(player_pos.z - SCHOOL_PORTICO_Z)))
 	if dist_label:
-		dist_label.text = "📍 DISTANCE TO BOYS SCHOOL: %d M" % dist_m
+		if player_pos.z > SCHOOL_GATE_Z:
+			dist_label.text = "📍 BOYS SCHOOL GATE: %d M" % max(0, int(abs(player_pos.z - SCHOOL_GATE_Z)))
+		else:
+			dist_label.text = "📍 BOYS SCHOOL PORTICO: %d M [मैदान]" % dist_m
 		
-	# Trigger Arrival when reaching school gate
-	if player_pos.z <= (SCHOOL_GATE_Z + 5.0) and not is_arrived:
+	# Trigger Arrival when reaching school portico
+	if player_pos.z <= (SCHOOL_PORTICO_Z + 5.0) and not is_arrived:
 		_trigger_school_arrival()
 
-# --- ARRIVAL AT BOYS SCHOOL CUTSCENE ---
+# --- ARRIVAL AT BOYS SCHOOL CUTSCENE (WITH FULL HINDI VOICE AUDIO) ---
 func _trigger_school_arrival() -> void:
 	is_arrived = true
 	cutscene_active = true
@@ -1117,11 +1253,11 @@ func _trigger_school_arrival() -> void:
 		touch_hud.visible = false
 		
 	# Decelerate smoothly to halt in front of Sahil and Aashutosh
-	var target_stop = Vector3(0.0, 0.0, SCHOOL_GATE_Z - 1.5)
+	var target_stop = Vector3(0.0, 0.0, SCHOOL_PORTICO_Z + 1.8)
 	var tw_stop = create_tween()
 	tw_stop.tween_property(player_root, "position", target_stop, 1.4).set_trans(Tween.TRANS_QUAD)
 	
-	# Camera smoothly transitions to medium group shot of all 3 friends
+	# Camera transitions to medium shot of friends outside Boys School
 	var tw_cam = create_tween()
 	tw_cam.parallel().tween_property(cam_pivot, "position", target_stop, 1.4)
 	tw_cam.parallel().tween_property(cam, "position", Vector3(0.0, 1.65, 3.8), 1.4)
@@ -1129,14 +1265,11 @@ func _trigger_school_arrival() -> void:
 	
 	await tw_stop.finished
 	
-	# Protagonist dismounts feet
 	if rider_leg_l: rider_leg_l.rotation.x = 0.0
 	if rider_leg_r: rider_leg_r.rotation.x = 0.0
 	
-	# Ring bell on arrival!
 	_ring_bell()
 	
-	# Start dialogue sequence between friends
 	dialogue_idx = 0
 	_display_arrival_dialogue()
 
@@ -1157,6 +1290,12 @@ func _display_arrival_dialogue() -> void:
 		dialogue_label.text = d["text"]
 	if advance_tip:
 		advance_tip.text = "[CLICK / ENTER TO ADVANCE ➔]"
+		
+	# PLAY REAL HINDI NEURAL VOICE LINE!
+	if audio_voice and d.has("audio") and d["audio"]:
+		audio_voice.stop()
+		audio_voice.stream = d["audio"]
+		audio_voice.play()
 		
 	await get_tree().create_timer(0.6).timeout
 	can_advance_dialogue = true
@@ -1179,7 +1318,7 @@ func _finish_arrival_scene() -> void:
 
 func _on_skip_pressed() -> void:
 	if is_arrived: return
-	player_pos = Vector3(0.0, 0.0, SCHOOL_GATE_Z + 4.0)
+	player_pos = Vector3(0.0, 0.0, SCHOOL_PORTICO_Z + 3.0)
 	_trigger_school_arrival()
 
 func _on_proceed_to_bhangarh_pressed() -> void:

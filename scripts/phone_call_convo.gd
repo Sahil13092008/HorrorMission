@@ -47,6 +47,8 @@ var stream_sahil_1: AudioStream
 var stream_player_2: AudioStream
 var stream_sahil_2: AudioStream
 var stream_aashu_2: AudioStream
+var stream_player_3: AudioStream
+var stream_pack_done: AudioStream
 
 func load_stream_safe(path: String) -> AudioStream:
 	if FileAccess.file_exists(path + ".import") and ResourceLoader.exists(path):
@@ -140,6 +142,8 @@ func _ready() -> void:
 	stream_player_2 = load_stream_safe("res://audio/call_player_2.mp3")
 	stream_sahil_2 = load_stream_safe("res://audio/call_sahil_2.mp3")
 	stream_aashu_2 = load_stream_safe("res://audio/call_aashu_2.mp3")
+	stream_player_3 = load_stream_safe("res://audio/call_player_3.mp3")
+	stream_pack_done = load_stream_safe("res://audio/pack_player_done.mp3")
 	
 	dialogues[0]["audio"] = stream_aashu_1
 	dialogues[1]["audio"] = stream_player_1
@@ -147,6 +151,7 @@ func _ready() -> void:
 	dialogues[3]["audio"] = stream_player_2
 	dialogues[4]["audio"] = stream_sahil_2
 	dialogues[5]["audio"] = stream_aashu_2
+	dialogues[6]["audio"] = stream_player_3
 	
 	if proceed_btn:
 		proceed_btn.pressed.connect(_on_proceed_chapter2_pressed)
@@ -334,18 +339,20 @@ func end_phone_call() -> void:
 
 func start_bag_packing_sequence() -> void:
 	switch_to_camera("player")
+	# Position camera directly in front of desk for a clear, dramatic close-up of packing
 	if cam_player:
-		cam_player.position = Vector3(0.0, 1.45, 0.4)
-		cam_player.rotation_degrees = Vector3(-12.0, 0.0, 0.0)
+		cam_player.position = Vector3(0.0, 1.35, -0.72)
+		cam_player.rotation_degrees = Vector3(-22.0, 0.0, 0.0)
 	
-	# Spawn desk gadget props in Room_Player
 	var room_player_node = get_node_or_null("Room_Player")
-	var desk_node = get_node_or_null("Room_Player/Desk")
 	var player_vis = get_node_or_null("Room_Player/PlayerCharacter/VisualModel")
 	
 	var mat_bag = StandardMaterial3D.new()
 	mat_bag.albedo_color = Color(0.12, 0.18, 0.32) # Dark navy blue backpack
 	mat_bag.roughness = 0.8
+	
+	var mat_bag_cavity = StandardMaterial3D.new()
+	mat_bag_cavity.albedo_color = Color(0.06, 0.08, 0.14) # Dark interior
 	
 	var mat_torch = StandardMaterial3D.new()
 	mat_torch.albedo_color = Color(0.1, 0.1, 0.12)
@@ -355,66 +362,102 @@ func start_bag_packing_sequence() -> void:
 	mat_lens.albedo_color = Color(1.0, 0.9, 0.4)
 	mat_lens.emission_enabled = true
 	mat_lens.emission = Color(1.0, 0.9, 0.4)
-	mat_lens.emission_energy_multiplier = 2.0
+	mat_lens.emission_energy_multiplier = 2.5
 	
 	var mat_emf = StandardMaterial3D.new()
 	mat_emf.albedo_color = Color(0.08, 0.45, 0.15)
 	mat_emf.emission_enabled = true
-	mat_emf.emission = Color(0.1, 0.9, 0.2)
-	mat_emf.emission_energy_multiplier = 1.5
+	mat_emf.emission = Color(0.1, 0.95, 0.25)
+	mat_emf.emission_energy_multiplier = 2.0
 	
 	var mat_radio = StandardMaterial3D.new()
 	mat_radio.albedo_color = Color(0.2, 0.2, 0.22)
+	
+	var mat_paper = StandardMaterial3D.new()
+	mat_paper.albedo_color = Color(0.92, 0.88, 0.78)
 	
 	var props_root = Node3D.new()
 	props_root.name = "PackingProps"
 	if room_player_node:
 		room_player_node.add_child(props_root)
 	
-	# Desk Backpack
-	var desk_backpack = CSGBox3D.new()
-	desk_backpack.size = Vector3(0.38, 0.46, 0.28)
-	desk_backpack.position = Vector3(-0.45, 0.92, -1.5)
-	desk_backpack.material = mat_bag
-	props_root.add_child(desk_backpack)
+	# Open Backpack sitting in the center of the desk
+	var bag_root = Node3D.new()
+	bag_root.position = Vector3(0.0, 0.92, -1.48)
+	props_root.add_child(bag_root)
 	
-	# Torch
+	var desk_backpack = CSGBox3D.new()
+	desk_backpack.size = Vector3(0.42, 0.46, 0.28)
+	desk_backpack.material = mat_bag
+	bag_root.add_child(desk_backpack)
+	
+	# Dark interior cavity where items drop
+	var bag_cavity = CSGBox3D.new()
+	bag_cavity.size = Vector3(0.36, 0.38, 0.22)
+	bag_cavity.position = Vector3(0, 0.06, 0)
+	bag_cavity.material = mat_bag_cavity
+	bag_root.add_child(bag_cavity)
+	
+	# Open Top Flap angled backward
+	var bag_flap = CSGBox3D.new()
+	bag_flap.size = Vector3(0.40, 0.04, 0.26)
+	bag_flap.position = Vector3(0, 0.24, -0.14)
+	bag_flap.rotation_degrees = Vector3(-55.0, 0, 0)
+	bag_flap.material = mat_bag
+	bag_root.add_child(bag_flap)
+	
+	# Front pocket
+	var bag_pocket = CSGBox3D.new()
+	bag_pocket.size = Vector3(0.30, 0.24, 0.08)
+	bag_pocket.position = Vector3(0, -0.06, 0.16)
+	bag_pocket.material = StandardMaterial3D.new()
+	bag_pocket.material.albedo_color = Color(0.18, 0.24, 0.40)
+	bag_root.add_child(bag_pocket)
+	
+	# ITEM 1: High-Power Torch (Placed on desk to left of bag)
 	var prop_torch = CSGCylinder3D.new()
-	prop_torch.radius = 0.04
-	prop_torch.height = 0.24
-	prop_torch.position = Vector3(-0.05, 0.92, -1.45)
+	prop_torch.radius = 0.045
+	prop_torch.height = 0.26
+	prop_torch.position = Vector3(-0.48, 0.92, -1.45)
 	prop_torch.rotation_degrees = Vector3(90, 0, 0)
 	prop_torch.material = mat_torch
 	props_root.add_child(prop_torch)
 	
 	var prop_torch_head = CSGCylinder3D.new()
-	prop_torch_head.radius = 0.055
-	prop_torch_head.height = 0.05
-	prop_torch_head.position = Vector3(0, 0.11, 0)
+	prop_torch_head.radius = 0.06
+	prop_torch_head.height = 0.06
+	prop_torch_head.position = Vector3(0, 0.12, 0)
 	prop_torch_head.material = mat_lens
 	prop_torch.add_child(prop_torch_head)
 	
-	# EMF Meter
+	# ITEM 2: EMF Detector (Placed on desk to right of bag)
 	var prop_emf = CSGBox3D.new()
-	prop_emf.size = Vector3(0.12, 0.04, 0.22)
-	prop_emf.position = Vector3(0.20, 0.92, -1.45)
+	prop_emf.size = Vector3(0.14, 0.05, 0.24)
+	prop_emf.position = Vector3(0.48, 0.92, -1.45)
 	prop_emf.material = mat_emf
 	props_root.add_child(prop_emf)
 	
-	# Walkie-Talkie
+	# ITEM 3: Walkie-Talkie with antenna (Placed forward-left)
 	var prop_radio = CSGBox3D.new()
-	prop_radio.size = Vector3(0.09, 0.05, 0.18)
-	prop_radio.position = Vector3(0.42, 0.92, -1.45)
+	prop_radio.size = Vector3(0.10, 0.06, 0.20)
+	prop_radio.position = Vector3(-0.35, 0.92, -1.25)
 	prop_radio.material = mat_radio
 	props_root.add_child(prop_radio)
 	
 	var radio_antenna = CSGCylinder3D.new()
 	radio_antenna.radius = 0.012
-	radio_antenna.height = 0.14
-	radio_antenna.position = Vector3(0.03, 0, -0.12)
+	radio_antenna.height = 0.16
+	radio_antenna.position = Vector3(0.03, 0, -0.13)
 	radio_antenna.rotation_degrees = Vector3(90, 0, 0)
 	radio_antenna.material = mat_torch
 	prop_radio.add_child(radio_antenna)
+	
+	# ITEM 4: Bhangarh Map & Note (Placed forward-right)
+	var prop_map = CSGBox3D.new()
+	prop_map.size = Vector3(0.24, 0.02, 0.32)
+	prop_map.position = Vector3(0.35, 0.92, -1.25)
+	prop_map.material = mat_paper
+	props_root.add_child(prop_map)
 	
 	# Subtitle announcement
 	if subtitle_panel:
@@ -428,41 +471,101 @@ func start_bag_packing_sequence() -> void:
 	if advance_tip:
 		advance_tip.text = "[PACKING GADGETS INTO BACKPACK...]"
 	
-	# Smoothly animate gadgets sliding into the backpack!
-	var tw_pack = create_tween()
-	tw_pack.parallel().tween_property(prop_torch, "position", desk_backpack.position + Vector3(0, 0.1, 0), 0.9)
-	tw_pack.parallel().tween_property(prop_torch, "scale", Vector3.ZERO, 0.9)
-	tw_pack.parallel().tween_property(prop_emf, "position", desk_backpack.position + Vector3(0, 0.1, 0), 1.1)
-	tw_pack.parallel().tween_property(prop_emf, "scale", Vector3.ZERO, 1.1)
-	tw_pack.parallel().tween_property(prop_radio, "position", desk_backpack.position + Vector3(0, 0.1, 0), 1.3)
-	tw_pack.parallel().tween_property(prop_radio, "scale", Vector3.ZERO, 1.3)
+	await get_tree().create_timer(1.0).timeout
 	
-	await tw_pack.finished
+	# --------------------------------------------------------------------------
+	# STEP 1: Pack Torch (Lifts up, floats across desk, drops into bag cavity)
+	# --------------------------------------------------------------------------
+	if dialogue_text:
+		dialogue_text.text = "[1/4] 🔦 हाई-पावर टॉर्च उठाई और बैग के अंदर रखी..."
+	var tw_t = create_tween()
+	tw_t.tween_property(prop_torch, "position", Vector3(-0.48, 1.25, -1.45), 0.35).set_trans(Tween.TRANS_QUAD)
+	tw_t.tween_property(prop_torch, "position", Vector3(-0.08, 1.25, -1.48), 0.45)
+	tw_t.tween_property(prop_torch, "position", Vector3(-0.08, 0.96, -1.48), 0.35).set_trans(Tween.TRANS_BOUNCE)
+	await tw_t.finished
+	if sfx_audio and sfx_pickup:
+		sfx_audio.stream = sfx_pickup
+		sfx_audio.play()
+	await get_tree().create_timer(0.4).timeout
 	
-	# Play zip / pack equip sound
+	# --------------------------------------------------------------------------
+	# STEP 2: Pack EMF Detector (Lifts up, drops into bag next to torch)
+	# --------------------------------------------------------------------------
+	if dialogue_text:
+		dialogue_text.text = "[2/4] 📟 ईएमएफ डिटेक्टर व थर्मल सेंसर बैग के अंदर रखा..."
+	var tw_e = create_tween()
+	tw_e.tween_property(prop_emf, "position", Vector3(0.48, 1.25, -1.45), 0.35).set_trans(Tween.TRANS_QUAD)
+	tw_e.tween_property(prop_emf, "position", Vector3(0.08, 1.25, -1.48), 0.45)
+	tw_e.tween_property(prop_emf, "position", Vector3(0.08, 0.96, -1.48), 0.35).set_trans(Tween.TRANS_BOUNCE)
+	await tw_e.finished
+	if sfx_audio and sfx_pickup:
+		sfx_audio.play()
+	await get_tree().create_timer(0.4).timeout
+	
+	# --------------------------------------------------------------------------
+	# STEP 3: Pack Walkie-Talkie (Lifts up, drops into bag)
+	# --------------------------------------------------------------------------
+	if dialogue_text:
+		dialogue_text.text = "[3/4] 📻 वॉकी-टॉकी व अतिरिक्त बैटरियाँ बैग में रखीं..."
+	var tw_r = create_tween()
+	tw_r.tween_property(prop_radio, "position", Vector3(-0.35, 1.22, -1.25), 0.35).set_trans(Tween.TRANS_QUAD)
+	tw_r.tween_property(prop_radio, "position", Vector3(0.0, 1.22, -1.48), 0.45)
+	tw_r.tween_property(prop_radio, "position", Vector3(0.0, 0.97, -1.48), 0.35).set_trans(Tween.TRANS_BOUNCE)
+	await tw_r.finished
+	if sfx_audio and sfx_pickup:
+		sfx_audio.play()
+	await get_tree().create_timer(0.4).timeout
+	
+	# --------------------------------------------------------------------------
+	# STEP 4: Pack Map & Note (Slides smoothly into front pouch)
+	# --------------------------------------------------------------------------
+	if dialogue_text:
+		dialogue_text.text = "[4/4] 🗺️ भानगढ़ का गुप्त नक्शा व कृपाल की पर्ची सामने वाली जेब में रखी..."
+	var tw_m = create_tween()
+	tw_m.tween_property(prop_map, "position", Vector3(0.35, 1.15, -1.25), 0.35).set_trans(Tween.TRANS_QUAD)
+	tw_m.tween_property(prop_map, "position", Vector3(0.0, 1.15, -1.32), 0.45)
+	tw_m.tween_property(prop_map, "position", Vector3(0.0, 0.90, -1.32), 0.35).set_trans(Tween.TRANS_BOUNCE)
+	await tw_m.finished
+	
+	# Close flap smoothly and zip shut!
+	if dialogue_text:
+		dialogue_text.text = "🔒 [सारे गैजेट्स सुरक्षित रख लिए — बैग की चेन बंद की!]"
+	var tw_flap = create_tween()
+	tw_flap.tween_property(bag_flap, "rotation_degrees", Vector3(0, 0, 0), 0.45).set_trans(Tween.TRANS_QUAD)
+	tw_flap.tween_property(bag_flap, "position", Vector3(0, 0.23, 0.0), 0.2)
+	await tw_flap.finished
+	
+	# Play zipper closing sound effect
 	if sfx_audio:
 		var stream_zip = load_stream_safe("res://audio/fir_stamp.wav")
 		if not stream_zip: stream_zip = load_stream_safe("res://audio/complaint_writing.wav")
 		if stream_zip:
 			sfx_audio.stream = stream_zip
 			sfx_audio.play()
+			
+	await get_tree().create_timer(0.6).timeout
 	
-	# Hide desk backpack and mount full 3D Backpack onto PlayerCharacter's back!
-	desk_backpack.visible = false
+	# Remove desk bag and mount 3D Backpack onto PlayerCharacter's back!
+	bag_root.visible = false
+	prop_torch.visible = false
+	prop_emf.visible = false
+	prop_radio.visible = false
+	prop_map.visible = false
+	
 	if player_vis:
 		var back_pack = CSGBox3D.new()
 		back_pack.name = "EquippedBackpack"
-		back_pack.size = Vector3(0.36, 0.44, 0.22)
+		back_pack.size = Vector3(0.38, 0.46, 0.22)
 		back_pack.position = Vector3(0.0, 0.92, 0.22) # Strapped to back
 		back_pack.material = mat_bag
 		player_vis.add_child(back_pack)
 		
 		# Outer pouch
 		var pouch = CSGBox3D.new()
-		pouch.size = Vector3(0.26, 0.24, 0.08)
+		pouch.size = Vector3(0.28, 0.24, 0.08)
 		pouch.position = Vector3(0.0, -0.05, 0.13)
 		pouch.material = StandardMaterial3D.new()
-		pouch.material.albedo_color = Color(0.18, 0.22, 0.35)
+		pouch.material.albedo_color = Color(0.18, 0.24, 0.42)
 		back_pack.add_child(pouch)
 		
 		# Water Bottle on side
@@ -474,7 +577,13 @@ func start_bag_packing_sequence() -> void:
 		bottle.material.albedo_color = Color(0.2, 0.7, 0.9)
 		back_pack.add_child(bottle)
 	
-	# Player dialogue
+	# Camera pulls back to show Protagonist standing with the backpack on back!
+	var tw_pull = create_tween()
+	tw_pull.parallel().tween_property(cam_player, "position", Vector3(0.0, 1.45, 0.45), 0.9).set_trans(Tween.TRANS_SINE)
+	tw_pull.parallel().tween_property(cam_player, "rotation_degrees", Vector3(-10.0, 0.0, 0.0), 0.9)
+	await tw_pull.finished
+	
+	# Player dialogue + voice audio playing pack_player_done.mp3!
 	if speaker_label:
 		speaker_label.text = "🎒 तू (YOU) — [अपने कमरे से]"
 		speaker_label.modulate = Color(0.35, 0.95, 1.0)
@@ -482,6 +591,12 @@ func start_bag_packing_sequence() -> void:
 		dialogue_text.text = "\"सारे जरूरी गैजेट्स बैग में पैक हो गए! अब बाहर से अपनी साइकिल लेकर तुरंत बॉयज़ स्कूल निकलता हूँ!\""
 	if advance_tip:
 		advance_tip.text = "[CLICK / ENTER TO START CYCLE RIDE ➔]"
+		
+	if voice_audio and stream_pack_done:
+		voice_audio.stop()
+		voice_audio.stream = stream_pack_done
+		voice_audio.play()
+		animate_head_speaking("player")
 	
 	await get_tree().create_timer(1.2).timeout
 	
