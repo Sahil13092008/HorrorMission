@@ -182,6 +182,7 @@ func _ready():
 	if beacon_btn:
 		beacon_btn.pressed.connect(on_enter_bhangarh_clicked)
 
+	_setup_cinematic_graphics()
 	set_tubes_active(true)
 	sfx_ambience.play()
 	start_prologue_sequence()
@@ -248,6 +249,158 @@ func _input(event):
 			on_enter_bhangarh_clicked()
 			get_viewport().set_input_as_handled()
 
+func _setup_cinematic_graphics() -> void:
+	# 1. WorldEnvironment Next-Gen Configuration
+	if world_env and world_env.environment:
+		var env = world_env.environment
+		env.tonemap_mode = Environment.TONE_MAPPER_ACES
+		env.tonemap_exposure = 1.05
+		env.tonemap_white = 1.15
+		
+		# Glowing bloom for fluorescent tube fixtures & supernatural red sky
+		env.glow_enabled = true
+		env.glow_intensity = 0.55
+		env.glow_strength = 0.85
+		env.glow_bloom = 0.22
+		env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+		env.glow_hdr_threshold = 1.0
+		
+		# SSAO deep corner and desk contact shadows
+		env.ssao_enabled = true
+		env.ssao_radius = 1.8
+		env.ssao_intensity = 2.4
+		env.ssao_power = 1.5
+		env.ssao_detail = 0.5
+		
+		# Soft atmospheric light scattering fog
+		env.fog_enabled = true
+		env.fog_light_color = Color(0.70, 0.72, 0.78)
+		env.fog_density = 0.003
+		
+		# Filmic contrast and color grading
+		env.adjustment_enabled = true
+		env.adjustment_brightness = 1.02
+		env.adjustment_contrast = 1.15
+		env.adjustment_saturation = 1.08
+	
+	# 2. Soft Shadow Blurring on Lights
+	if sun_light:
+		sun_light.shadow_enabled = true
+		sun_light.shadow_blur = 1.5
+	if tubelight_1:
+		tubelight_1.shadow_enabled = true
+		tubelight_1.shadow_blur = 1.4
+	if tubelight_2:
+		tubelight_2.shadow_enabled = true
+		tubelight_2.shadow_blur = 1.4
+		
+	# 3. Procedural PBR Noise Textures on Classroom Surfaces
+	_apply_procedural_normals_to_classroom()
+	
+	# 4. Floating Atmospheric Dust Motes in Classroom
+	var dust = CPUParticles3D.new()
+	dust.name = "ClassroomDust"
+	dust.amount = 45
+	dust.lifetime = 5.0
+	dust.preprocess = 2.5
+	dust.randomness = 0.8
+	dust.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	dust.emission_box_extents = Vector3(6.0, 1.8, 6.0)
+	dust.position = Vector3(0.0, 1.9, 0.0)
+	dust.direction = Vector3(0.1, -0.05, 0.05)
+	dust.spread = 45.0
+	dust.gravity = Vector3(0, -0.015, 0)
+	dust.initial_velocity_min = 0.05
+	dust.initial_velocity_max = 0.15
+	
+	var dust_mat = StandardMaterial3D.new()
+	dust_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	dust_mat.albedo_color = Color(1.0, 0.95, 0.85, 0.45)
+	
+	var dust_mesh = SphereMesh.new()
+	dust_mesh.radius = 0.022
+	dust_mesh.height = 0.044
+	dust_mesh.material = dust_mat
+	dust.mesh = dust_mesh
+	add_child(dust)
+	
+	# 5. Cinematic Horror Vignette Overlay on EventUI
+	var ui_node = get_node_or_null("EventUI")
+	if ui_node:
+		var vignette_rect = TextureRect.new()
+		vignette_rect.name = "HorrorVignette"
+		vignette_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+		vignette_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var vig_tex = load("res://textures/vignette.png")
+		if vig_tex:
+			vignette_rect.texture = vig_tex
+			vignette_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			vignette_rect.stretch_mode = TextureRect.STRETCH_SCALE
+			vignette_rect.modulate = Color(1.0, 1.0, 1.0, 0.55)
+			ui_node.add_child(vignette_rect)
+			ui_node.move_child(vignette_rect, 0)
+
+func _apply_procedural_normals_to_classroom() -> void:
+	# Floor Tile Noise
+	var floor_node = get_node_or_null("RoomGeometry/Floor")
+	if floor_node and floor_node.material is StandardMaterial3D:
+		var m = floor_node.material as StandardMaterial3D
+		var fn = FastNoiseLite.new()
+		fn.noise_type = FastNoiseLite.TYPE_CELLULAR
+		fn.frequency = 0.22
+		fn.cellular_distance_function = FastNoiseLite.DISTANCE_MANHATTAN
+		var nt = NoiseTexture2D.new()
+		nt.width = 128
+		nt.height = 128
+		nt.noise = fn
+		nt.as_normal_map = true
+		nt.bump_strength = 2.4
+		m.normal_enabled = true
+		m.normal_texture = nt
+		m.uv1_scale = Vector3(8.0, 8.0, 8.0)
+	
+	# Wood grain for desks and blackboard frame
+	var fn_wood = FastNoiseLite.new()
+	fn_wood.noise_type = FastNoiseLite.TYPE_PERLIN
+	fn_wood.frequency = 0.25
+	var nt_wood = NoiseTexture2D.new()
+	nt_wood.width = 128
+	nt_wood.height = 128
+	nt_wood.noise = fn_wood
+	nt_wood.as_normal_map = true
+	nt_wood.bump_strength = 2.8
+	
+	var bb_frame = get_node_or_null("BlackboardArea/BlackboardFrame")
+	if bb_frame and bb_frame.material is StandardMaterial3D:
+		var m = bb_frame.material as StandardMaterial3D
+		m.normal_enabled = true
+		m.normal_texture = nt_wood
+		m.uv1_scale = Vector3(4.0, 1.0, 4.0)
+
+	var bb_surface = get_node_or_null("BlackboardArea/BoardSurface")
+	if bb_surface and bb_surface.material is StandardMaterial3D:
+		var m = bb_surface.material as StandardMaterial3D
+		var fn_chalk = FastNoiseLite.new()
+		fn_chalk.noise_type = FastNoiseLite.TYPE_SIMPLEX
+		fn_chalk.frequency = 0.35
+		var nt_chalk = NoiseTexture2D.new()
+		nt_chalk.width = 128
+		nt_chalk.height = 128
+		nt_chalk.noise = fn_chalk
+		nt_chalk.as_normal_map = true
+		nt_chalk.bump_strength = 1.8
+		m.normal_enabled = true
+		m.normal_texture = nt_chalk
+		m.uv1_scale = Vector3(6.0, 6.0, 6.0)
+
+	# Desk wood material (shared by all desks)
+	var desk_top = get_node_or_null("Furniture/Desks/Desk_Kripal/Top")
+	if desk_top and desk_top.material is StandardMaterial3D:
+		var m = desk_top.material as StandardMaterial3D
+		m.normal_enabled = true
+		m.normal_texture = nt_wood
+		m.uv1_scale = Vector3(3.0, 3.0, 3.0)
+
 func set_tubes_active(active: bool):
 	if tubelight_1: tubelight_1.visible = active
 	if tubelight_2: tubelight_2.visible = active
@@ -300,6 +453,8 @@ func start_prologue_sequence():
 	sky_tween.parallel().tween_property(sky_mat, "sky_horizon_color", Color(0.9, 0.1, 0.05), 2.0)
 	sky_tween.parallel().tween_property(world_env.environment, "ambient_light_color", Color(0.6, 0.05, 0.05), 2.0)
 	sky_tween.parallel().tween_property(world_env.environment, "ambient_light_energy", 0.35, 2.0)
+	sky_tween.parallel().tween_property(world_env.environment, "fog_light_color", Color(0.42, 0.08, 0.08), 2.0)
+	sky_tween.parallel().tween_property(world_env.environment, "fog_density", 0.007, 2.0)
 
 	subtitle.text = "खिड़की से बाहर देखो... आसमान खूनी लाल हो गया है!"
 	subtitle.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))

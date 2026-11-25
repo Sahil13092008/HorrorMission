@@ -137,6 +137,18 @@ func _build_ui() -> void:
 	ui_root.layer = 10
 	add_child(ui_root)
 	
+	# Cinematic Horror Camera Vignette Overlay
+	var vignette_rect = TextureRect.new()
+	vignette_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vignette_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var vig_tex = load("res://textures/vignette.png")
+	if vig_tex:
+		vignette_rect.texture = vig_tex
+		vignette_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		vignette_rect.stretch_mode = TextureRect.STRETCH_SCALE
+		vignette_rect.modulate = Color(1.0, 1.0, 1.0, 0.65)
+		ui_root.add_child(vignette_rect)
+	
 	# Letterbox Top
 	letterbox_top = ColorRect.new()
 	letterbox_top.color = Color(0, 0, 0, 1)
@@ -369,6 +381,32 @@ func _setup_lighting_and_environments() -> void:
 	blood_sky_env.fog_light_color = Color(0.38, 0.08, 0.08)
 	blood_sky_env.fog_density = 0.016
 	
+	# AAA ACES Filmic Tonemapping for Blood Sky
+	blood_sky_env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	blood_sky_env.tonemap_exposure = 1.05
+	blood_sky_env.tonemap_white = 1.15
+	
+	# Glowing Supernatural Bloom for Anomaly & Streetlights
+	blood_sky_env.glow_enabled = true
+	blood_sky_env.glow_intensity = 0.65
+	blood_sky_env.glow_strength = 0.90
+	blood_sky_env.glow_bloom = 0.28
+	blood_sky_env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	blood_sky_env.glow_hdr_threshold = 1.0
+	
+	# Screen Space Ambient Occlusion for deep contact shadows in forest and corners
+	blood_sky_env.ssao_enabled = true
+	blood_sky_env.ssao_radius = 1.8
+	blood_sky_env.ssao_intensity = 2.4
+	blood_sky_env.ssao_power = 1.5
+	blood_sky_env.ssao_detail = 0.5
+	
+	# Filmic Color Grading
+	blood_sky_env.adjustment_enabled = true
+	blood_sky_env.adjustment_brightness = 1.02
+	blood_sky_env.adjustment_contrast = 1.18
+	blood_sky_env.adjustment_saturation = 1.12
+	
 	morning_sky_env = Environment.new()
 	morning_sky_env.background_mode = Environment.BG_COLOR
 	morning_sky_env.background_color = Color(0.68, 0.84, 0.98)
@@ -379,6 +417,22 @@ func _setup_lighting_and_environments() -> void:
 	morning_sky_env.fog_light_color = Color(0.85, 0.9, 0.95)
 	morning_sky_env.fog_density = 0.005
 	
+	# AAA ACES Filmic Tonemapping for Morning Sky
+	morning_sky_env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	morning_sky_env.tonemap_exposure = 1.08
+	morning_sky_env.tonemap_white = 1.20
+	morning_sky_env.glow_enabled = true
+	morning_sky_env.glow_intensity = 0.40
+	morning_sky_env.glow_bloom = 0.15
+	morning_sky_env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	morning_sky_env.ssao_enabled = true
+	morning_sky_env.ssao_radius = 1.6
+	morning_sky_env.ssao_intensity = 2.0
+	morning_sky_env.adjustment_enabled = true
+	morning_sky_env.adjustment_brightness = 1.04
+	morning_sky_env.adjustment_contrast = 1.12
+	morning_sky_env.adjustment_saturation = 1.08
+	
 	world_env = WorldEnvironment.new()
 	world_env.environment = blood_sky_env
 	add_child(world_env)
@@ -388,6 +442,7 @@ func _setup_lighting_and_environments() -> void:
 	blood_sky_light.light_energy = 1.3
 	blood_sky_light.rotation_degrees = Vector3(-35, 45, 0)
 	blood_sky_light.shadow_enabled = true
+	blood_sky_light.shadow_blur = 1.5
 	add_child(blood_sky_light)
 	
 	sun_light = DirectionalLight3D.new()
@@ -395,6 +450,7 @@ func _setup_lighting_and_environments() -> void:
 	sun_light.light_energy = 1.4
 	sun_light.rotation_degrees = Vector3(-38, -40, 0)
 	sun_light.shadow_enabled = true
+	sun_light.shadow_blur = 1.4
 	sun_light.visible = false
 	add_child(sun_light)
 	
@@ -516,6 +572,79 @@ func _create_mat(col: Color, roughness: float = 0.8, metallic: float = 0.0, emis
 		m.emission_energy_multiplier = emission_eng
 	return m
 
+# --- PROCEDURAL PBR TEXTURES (ASPHALT, SIDEWALK, SOIL, BARK) ---
+func _create_asphalt_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.12, 0.12, 0.14)
+	mat.roughness = 0.74
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	fn.frequency = 0.14
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 3.2
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(8.0, 8.0, 8.0)
+	return mat
+
+func _create_sidewalk_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.26, 0.24, 0.22)
+	mat.roughness = 0.82
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_PERLIN
+	fn.frequency = 0.18
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 2.4
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(6.0, 6.0, 6.0)
+	return mat
+
+func _create_forest_soil_material(col: Color = Color(0.08, 0.07, 0.05), uv_scale: float = 8.0) -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = col
+	mat.roughness = 0.92
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	fn.frequency = 0.16
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 3.5
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(uv_scale, uv_scale, uv_scale)
+	return mat
+
+func _create_tree_bark_material(col: Color) -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = col
+	mat.roughness = 0.88
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_PERLIN
+	fn.frequency = 0.25
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 3.8
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(2.0, 6.0, 2.0)
+	return mat
+
 # --- 3D SETS BUILDER ---
 func _build_all_3d_sets() -> void:
 	_build_act1_blood_sky_road()
@@ -533,8 +662,8 @@ func _build_act1_blood_sky_road() -> void:
 	set_blood_road.position = Vector3(0, 0, 0)
 	add_child(set_blood_road)
 	
-	var mat_road = _create_mat(Color(0.12, 0.12, 0.14), 0.9)
-	var mat_sidewalk = _create_mat(Color(0.24, 0.22, 0.2), 0.85)
+	var mat_road = _create_asphalt_material()
+	var mat_sidewalk = _create_sidewalk_material()
 	var mat_pole = _create_mat(Color(0.2, 0.2, 0.22), 0.5, 0.7)
 	var mat_glow = _create_mat(Color(1.0, 0.85, 0.4), 0.2, 0.0, Color(1.0, 0.8, 0.3), 3.0)
 	
@@ -657,15 +786,41 @@ func _build_act2_dense_forest() -> void:
 	var floor_mesh = CSGBox3D.new()
 	floor_mesh.size = Vector3(60.0, 0.2, 70.0)
 	floor_mesh.position = Vector3(0, -0.1, 0)
-	floor_mesh.material = _create_mat(Color(0.06, 0.05, 0.04), 0.95)
+	floor_mesh.material = _create_forest_soil_material(Color(0.06, 0.05, 0.04), 10.0)
 	set_dense_forest.add_child(floor_mesh)
 	
 	# Dirt trail down the middle
 	var trail = CSGBox3D.new()
 	trail.size = Vector3(4.2, 0.05, 70.0)
 	trail.position = Vector3(0, 0.02, 0)
-	trail.material = _create_mat(Color(0.11, 0.09, 0.06), 0.95)
+	trail.material = _create_forest_soil_material(Color(0.12, 0.10, 0.07), 4.0)
 	set_dense_forest.add_child(trail)
+	
+	# Eerie Forest Ground Fog Drifting Along Trail
+	var forest_fog = CPUParticles3D.new()
+	forest_fog.amount = 24
+	forest_fog.lifetime = 6.0
+	forest_fog.preprocess = 2.0
+	forest_fog.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	forest_fog.emission_box_extents = Vector3(16.0, 0.5, 30.0)
+	forest_fog.position = Vector3(0.0, 0.35, 0.0)
+	forest_fog.direction = Vector3(0.2, 0.0, 0.8)
+	forest_fog.spread = 45.0
+	forest_fog.gravity = Vector3(0, 0, 0)
+	forest_fog.initial_velocity_min = 0.2
+	forest_fog.initial_velocity_max = 0.6
+	
+	var fog_mat = StandardMaterial3D.new()
+	fog_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	fog_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	fog_mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	fog_mat.albedo_color = Color(0.45, 0.08, 0.10, 0.14)
+	
+	var fog_mesh = QuadMesh.new()
+	fog_mesh.size = Vector2(4.8, 4.8)
+	fog_mesh.material = fog_mat
+	forest_fog.mesh = fog_mesh
+	set_dense_forest.add_child(forest_fog)
 	
 	# Trees placed strictly to the sides (leaving trail & clearing completely open!)
 	var tree_coords = []
@@ -700,6 +855,34 @@ func _build_act2_dense_forest() -> void:
 	ring.rotation_degrees = Vector3(25, 45, 0)
 	ring.material = _create_mat(Color(0.8, 0.2, 1.0), 0.1, 0.0, Color(0.9, 0.3, 1.0), 5.0)
 	anomaly_pivot.add_child(ring)
+	
+	# Supernatural floating energy embers around anomaly
+	var anomaly_motes = CPUParticles3D.new()
+	anomaly_motes.amount = 40
+	anomaly_motes.lifetime = 3.2
+	anomaly_motes.preprocess = 1.5
+	anomaly_motes.randomness = 0.7
+	anomaly_motes.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	anomaly_motes.emission_sphere_radius = 2.4
+	anomaly_motes.direction = Vector3(0, 1, 0)
+	anomaly_motes.spread = 180.0
+	anomaly_motes.gravity = Vector3(0, 0.15, 0)
+	anomaly_motes.initial_velocity_min = 0.2
+	anomaly_motes.initial_velocity_max = 0.7
+	
+	var mote_mat = StandardMaterial3D.new()
+	mote_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+	mote_mat.albedo_color = Color(0.35, 0.9, 1.0, 0.95)
+	mote_mat.emission_enabled = true
+	mote_mat.emission = Color(0.3, 0.95, 1.0)
+	mote_mat.emission_energy_multiplier = 4.5
+	
+	var mote_mesh = SphereMesh.new()
+	mote_mesh.radius = 0.035
+	mote_mesh.height = 0.07
+	mote_mesh.material = mote_mat
+	anomaly_motes.mesh = mote_mesh
+	anomaly_pivot.add_child(anomaly_motes)
 	
 	forest_anomaly_light = OmniLight3D.new()
 	forest_anomaly_light.light_color = Color(0.25, 0.8, 1.0)
@@ -2399,7 +2582,7 @@ func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_
 
 func _create_detailed_forest_tree(is_morning: bool = false) -> Node3D:
 	var tree = Node3D.new()
-	var mat_trunk = _create_mat(Color(0.24, 0.15, 0.09) if not is_morning else Color(0.3, 0.2, 0.12))
+	var mat_trunk = _create_tree_bark_material(Color(0.24, 0.15, 0.09) if not is_morning else Color(0.3, 0.2, 0.12))
 	var mat_leaf = _create_mat(Color(0.1, 0.22, 0.12) if not is_morning else Color(0.15, 0.42, 0.18))
 	
 	var trunk = CSGCylinder3D.new()
