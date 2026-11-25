@@ -1792,28 +1792,16 @@ func _build_companions_on_ground() -> void:
 		mat_sahil_shirt.uv1_scale = Vector3(2.5, 2.5, 2.5)
 	mat_sahil_shirt.roughness = 0.65
 	
-	var mat_sahil_face = StandardMaterial3D.new()
-	mat_sahil_face.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	var tex_sahil_face = load("res://textures/face_sahil_decal.png")
-	if tex_sahil_face:
-		mat_sahil_face.albedo_texture = tex_sahil_face
-	mat_sahil_face.roughness = 0.55
-	
 	var mat_sahil_hair = _create_mat(Color(0.10, 0.10, 0.12), 0.85)
 	var mat_sahil_jeans = _create_mat(Color(0.40, 0.44, 0.48), 0.82) # Faded grey relaxed jeans
 	var mat_kalawa = _create_mat(Color(0.95, 0.45, 0.08), 0.6)
 	var mat_kara = _create_mat(Color(0.85, 0.88, 0.92), 0.25, 0.85)
+	var mat_eye_dark = _create_mat(Color(0.10, 0.10, 0.12), 0.8)
+	var mat_eye_white = _create_mat(Color(0.95, 0.95, 0.95), 0.8)
 	
-	# Aashutosh's authentic Olive-Brown Shirt + Wavy Hair + Face Decal
+	# Aashutosh's authentic Olive-Brown Shirt + Wavy Hair
 	var mat_aashu_shirt = _create_mat(Color(0.46, 0.36, 0.24), 0.70) # Earthy olive-brown casual shirt
 	var mat_aashu_undershirt = _create_mat(Color(0.95, 0.95, 0.95), 0.8)
-	var mat_aashu_face = StandardMaterial3D.new()
-	mat_aashu_face.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	var tex_aashu_face = load("res://textures/face_aashutosh_decal.png")
-	if tex_aashu_face:
-		mat_aashu_face.albedo_texture = tex_aashu_face
-	mat_aashu_face.roughness = 0.55
-	
 	var mat_aashu_hair = _create_mat(Color(0.14, 0.11, 0.09), 0.85) # Espresso wavy blowout hair
 	var mat_aashu_jeans = _create_mat(Color(0.18, 0.24, 0.35), 0.82) # Indigo blue denim
 	
@@ -1838,12 +1826,24 @@ func _build_companions_on_ground() -> void:
 	s_head.material = mat_skin
 	comp_sahil.add_child(s_head)
 	
-	# Sahil's real face decal on 3D head
-	var s_face_decal = CSGBox3D.new()
-	s_face_decal.size = Vector3(0.22, 0.22, 0.005)
-	s_face_decal.position = Vector3(0, 1.62, 0.123)
-	s_face_decal.material = mat_sahil_face
-	comp_sahil.add_child(s_face_decal)
+	# Sahil's stylized 3D facial details
+	var s_eye_l = CSGBox3D.new()
+	s_eye_l.size = Vector3(0.045, 0.035, 0.02)
+	s_eye_l.position = Vector3(-0.06, 1.63, 0.12)
+	s_eye_l.material = mat_eye_dark
+	comp_sahil.add_child(s_eye_l)
+	
+	var s_eye_r = CSGBox3D.new()
+	s_eye_r.size = Vector3(0.045, 0.035, 0.02)
+	s_eye_r.position = Vector3(0.06, 1.63, 0.12)
+	s_eye_r.material = mat_eye_dark
+	comp_sahil.add_child(s_eye_r)
+	
+	var s_brow = CSGBox3D.new()
+	s_brow.size = Vector3(0.18, 0.02, 0.02)
+	s_brow.position = Vector3(0, 1.67, 0.122)
+	s_brow.material = mat_eye_dark
+	comp_sahil.add_child(s_brow)
 	
 	# Sahil's neat black cropped hair
 	var s_hair = CSGBox3D.new()
@@ -1915,12 +1915,24 @@ func _build_companions_on_ground() -> void:
 	a_head.material = mat_skin
 	comp_aashu.add_child(a_head)
 	
-	# Aashutosh's real face decal on 3D head
-	var a_face_decal = CSGBox3D.new()
-	a_face_decal.size = Vector3(0.22, 0.22, 0.005)
-	a_face_decal.position = Vector3(0, 1.62, 0.123)
-	a_face_decal.material = mat_aashu_face
-	comp_aashu.add_child(a_face_decal)
+	# Aashutosh's stylized 3D facial details
+	var a_eye_l = CSGBox3D.new()
+	a_eye_l.size = Vector3(0.045, 0.035, 0.02)
+	a_eye_l.position = Vector3(-0.06, 1.63, 0.12)
+	a_eye_l.material = mat_eye_dark
+	comp_aashu.add_child(a_eye_l)
+	
+	var a_eye_r = CSGBox3D.new()
+	a_eye_r.size = Vector3(0.045, 0.035, 0.02)
+	a_eye_r.position = Vector3(0.06, 1.63, 0.12)
+	a_eye_r.material = mat_eye_dark
+	comp_aashu.add_child(a_eye_r)
+	
+	var a_brow = CSGBox3D.new()
+	a_brow.size = Vector3(0.18, 0.02, 0.02)
+	a_brow.position = Vector3(0, 1.67, 0.122)
+	a_brow.material = mat_eye_dark
+	comp_aashu.add_child(a_brow)
 	
 	# Aashutosh's voluminous wavy blowout hair with side sweep
 	var a_hair_sweep = CSGBox3D.new()

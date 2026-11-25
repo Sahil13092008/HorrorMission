@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" path="res://textures/avatar_player.png" id="5_avatar_p"]
 [ext_resource type="Texture2D" path="res://textures/avatar_sahil.png" id="6_avatar_s"]
 [ext_resource type="Texture2D" path="res://textures/avatar_aashutosh.png" id="7_avatar_a"]
+[ext_resource type="Texture2D" uid="uid://cglwe3516l38q" path="res://textures/tex_sahil_shirt.png" id="8_sahil_shirt"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat_BloodStorm"]
 sky_top_color = Color(0.42, 0.04, 0.04, 1)
@@ -96,13 +97,25 @@ emission_energy_multiplier = 5.0
 albedo_color = Color(0.20, 0.55, 0.45, 1)
 
 [sub_resource type="StandardMaterial3D" id="Mat_RiderSahil"]
-albedo_color = Color(0.20, 0.35, 0.75, 1)
+albedo_color = Color(0.96, 0.96, 0.96, 1)
+albedo_texture = ExtResource("8_sahil_shirt")
+uv1_scale = Vector3(2.5, 2.5, 2.5)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Mat_Sahil_Pants"]
+albedo_color = Color(0.40, 0.44, 0.48, 1)
+roughness = 0.80
 
 [sub_resource type="StandardMaterial3D" id="Mat_RiderBackpack"]
 albedo_color = Color(0.95, 0.78, 0.15, 1)
 
 [sub_resource type="StandardMaterial3D" id="Mat_RiderAashu"]
-albedo_color = Color(0.85, 0.48, 0.18, 1)
+albedo_color = Color(0.46, 0.36, 0.24, 1)
+roughness = 0.70
+
+[sub_resource type="StandardMaterial3D" id="Mat_Aashu_Pants"]
+albedo_color = Color(0.18, 0.24, 0.35, 1)
+roughness = 0.82
 
 [sub_resource type="StandardMaterial3D" id="Mat_Skin"]
 albedo_color = Color(0.85, 0.68, 0.52, 1)
@@ -549,14 +562,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.05, 0)
 transform = Transform3D(1, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, 0, -0.22, -0.1)
 radius = 0.07
 height = 0.45
-material = SubResource("Mat_RiderSahil")
+material = SubResource("Mat_Sahil_Pants")
 [node name="LegR" type="Node3D" parent="BicycleSquad/SahilBike/RiderSahil"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.05, 0)
 [node name="Thigh" type="CSGCylinder3D" parent="BicycleSquad/SahilBike/RiderSahil/LegR"]
 transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, -0.22, 0.1)
 radius = 0.07
 height = 0.45
-material = SubResource("Mat_RiderSahil")
+material = SubResource("Mat_Sahil_Pants")
 
 [node name="AashuBike" type="Node3D" parent="BicycleSquad"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0, 0.6)
@@ -642,14 +655,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.05, 0)
 transform = Transform3D(1, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, 0, -0.22, -0.1)
 radius = 0.07
 height = 0.45
-material = SubResource("Mat_RiderAashu")
+material = SubResource("Mat_Aashu_Pants")
 [node name="LegR" type="Node3D" parent="BicycleSquad/AashuBike/RiderAashu"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.05, 0)
 [node name="Thigh" type="CSGCylinder3D" parent="BicycleSquad/AashuBike/RiderAashu/LegR"]
 transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, -0.22, 0.1)
 radius = 0.07
 height = 0.45
-material = SubResource("Mat_RiderAashu")
+material = SubResource("Mat_Aashu_Pants")
 
 [node name="CutsceneUI" type="CanvasLayer" parent="."]
 

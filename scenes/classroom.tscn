@@ -13,8 +13,6 @@
 [ext_resource type="AudioStream" uid="uid://b5emd1i5d1yia" path="res://audio/door_creak.wav" id="11_door_creak"]
 [ext_resource type="AudioStream" uid="uid://b46l3eklxe0kb" path="res://audio/radar_ping.wav" id="12_radar_ping"]
 [ext_resource type="Texture2D" uid="uid://cglwe3516l38q" path="res://textures/tex_sahil_shirt.png" id="13_sahil_shirt"]
-[ext_resource type="Texture2D" uid="uid://eis6vyvwgbiv" path="res://textures/face_sahil_decal.png" id="14_sahil_face"]
-[ext_resource type="Texture2D" uid="uid://bedswgkiolexk" path="res://textures/face_aashutosh_decal.png" id="15_aashu_face"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.45, 0.6, 0.8, 1)
@@ -278,16 +276,6 @@ roughness = 0.60
 albedo_color = Color(0.85, 0.88, 0.92, 1)
 metallic = 0.85
 roughness = 0.25
-
-[sub_resource type="StandardMaterial3D" id="Mat_Sahil_FaceDecal"]
-transparency = 1
-albedo_texture = ExtResource("14_sahil_face")
-roughness = 0.55
-
-[sub_resource type="StandardMaterial3D" id="Mat_Aashu_FaceDecal"]
-transparency = 1
-albedo_texture = ExtResource("15_aashu_face")
-roughness = 0.55
 
 [sub_resource type="StandardMaterial3D" id="Mat_Kripal_Coat"]
 albedo_color = Color(0.44, 0.40, 0.28, 1)
@@ -741,11 +729,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
 size = Vector3(0.26, 0.28, 0.26)
 material = SubResource("Mat_Skin")
 
-[node name="FaceDecal" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.133)
-size = Vector3(0.24, 0.25, 0.005)
-material = SubResource("Mat_Sahil_FaceDecal")
-
 [node name="Jaw" type="CSGBox3D" parent="Characters/Sahil/HeadNode"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)
 size = Vector3(0.22, 0.11, 0.22)
@@ -1011,11 +994,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0)
 [node name="HeadBase" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
 size = Vector3(0.26, 0.28, 0.26)
 material = SubResource("Mat_Skin")
-
-[node name="FaceDecal" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0.133)
-size = Vector3(0.24, 0.25, 0.005)
-material = SubResource("Mat_Aashu_FaceDecal")
 
 [node name="Jaw" type="CSGBox3D" parent="Characters/Aashutosh/HeadNode"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11, 0.02)

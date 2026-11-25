@@ -758,11 +758,11 @@ func _build_act1_blood_sky_road() -> void:
 	char_group_walk.position = Vector3(0, 0, 24.0)
 	set_blood_road.add_child(char_group_walk)
 	
-	char_sahil_walk = _build_rigged_human("Sahil", Color(0.2, 0.6, 0.3), Color(0.18, 0.18, 0.22), true) # Cricket bat
+	char_sahil_walk = _build_rigged_human("Sahil", Color(0.85, 0.85, 0.85), Color(0.40, 0.44, 0.48), true) # Sahil: Plaid checked shirt, faded grey denim, Kalawa/Kara & bat
 	char_sahil_walk.position = Vector3(-1.4, 0, -1.0)
 	char_group_walk.add_child(char_sahil_walk)
 	
-	char_aashu_walk = _build_rigged_human("Aashutosh", Color(0.68, 0.42, 0.2), Color(0.22, 0.22, 0.25))
+	char_aashu_walk = _build_rigged_human("Aashutosh", Color(0.46, 0.36, 0.24), Color(0.18, 0.24, 0.35)) # Aashutosh: Olive-brown shirt, white undershirt, wavy hair & indigo blue jeans
 	char_aashu_walk.position = Vector3(-0.4, 0, -0.5)
 	char_group_walk.add_child(char_aashu_walk)
 	
@@ -2478,6 +2478,20 @@ func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_
 	var mat_pant = _create_mat(pant_col)
 	var mat_shoe = _create_mat(Color(0.12, 0.12, 0.14))
 	
+	# Authentic real-photo outfits for Sahil & Aashutosh
+	if c_name == "Sahil":
+		var tex_sahil = load("res://textures/tex_sahil_shirt.png")
+		if tex_sahil:
+			mat_shirt.albedo_texture = tex_sahil
+			mat_shirt.uv1_scale = Vector3(2.5, 2.5, 2.5)
+		mat_shirt.roughness = 0.65
+		mat_hair = _create_mat(Color(0.10, 0.09, 0.08))
+		mat_pant = _create_mat(Color(0.40, 0.44, 0.48), 0.8) # Faded grey relaxed denim
+	elif c_name == "Aashutosh":
+		mat_shirt = _create_mat(Color(0.46, 0.36, 0.24), 0.70) # Earthy olive-brown casual shirt
+		mat_hair = _create_mat(Color(0.14, 0.11, 0.09)) # Espresso wavy hair
+		mat_pant = _create_mat(Color(0.18, 0.24, 0.35), 0.8) # Indigo blue denim
+	
 	var body = Node3D.new()
 	body.name = "Body"
 	root.add_child(body)
@@ -2488,11 +2502,58 @@ func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_
 	head.material = mat_skin
 	body.add_child(head)
 	
+	# Stylized 3D facial features (clean aesthetic without flat photo stickers)
+	var mat_facial_dark = _create_mat(Color(0.12, 0.10, 0.09))
+	var eye_l = CSGBox3D.new()
+	eye_l.size = Vector3(0.05, 0.04, 0.015)
+	eye_l.position = Vector3(-0.075, 0.02, 0.172)
+	eye_l.material = mat_facial_dark
+	head.add_child(eye_l)
+	
+	var eye_r = CSGBox3D.new()
+	eye_r.size = Vector3(0.05, 0.04, 0.015)
+	eye_r.position = Vector3(0.075, 0.02, 0.172)
+	eye_r.material = mat_facial_dark
+	head.add_child(eye_r)
+	
+	var brow_l = CSGBox3D.new()
+	brow_l.size = Vector3(0.07, 0.02, 0.015)
+	brow_l.position = Vector3(-0.075, 0.055, 0.173)
+	brow_l.material = mat_facial_dark
+	head.add_child(brow_l)
+	
+	var brow_r = CSGBox3D.new()
+	brow_r.size = Vector3(0.07, 0.02, 0.015)
+	brow_r.position = Vector3(0.075, 0.055, 0.173)
+	brow_r.material = mat_facial_dark
+	head.add_child(brow_r)
+	
+	var nose = CSGBox3D.new()
+	nose.size = Vector3(0.035, 0.06, 0.03)
+	nose.position = Vector3(0, -0.015, 0.18)
+	nose.material = mat_skin
+	head.add_child(nose)
+	
+	var mouth = CSGBox3D.new()
+	mouth.size = Vector3(0.08, 0.018, 0.015)
+	mouth.position = Vector3(0, -0.075, 0.172)
+	mouth.material = _create_mat(Color(0.65, 0.38, 0.38))
+	head.add_child(mouth)
+	
 	var hair = CSGBox3D.new()
 	hair.size = Vector3(0.38, 0.16, 0.38)
 	hair.position = Vector3(0, 1.84, 0)
 	hair.material = mat_hair
 	body.add_child(hair)
+	
+	# Aashutosh's voluminous wavy blowout hair with side sweep
+	if c_name == "Aashutosh":
+		var hair_sweep = CSGBox3D.new()
+		hair_sweep.size = Vector3(0.40, 0.14, 0.40)
+		hair_sweep.position = Vector3(0.05, 0.06, 0.02)
+		hair_sweep.rotation_degrees = Vector3(0, 0, -10.0)
+		hair_sweep.material = mat_hair
+		hair.add_child(hair_sweep)
 	
 	if has_glasses:
 		var glasses = CSGBox3D.new()
@@ -2506,6 +2567,14 @@ func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_
 	torso.position = Vector3(0, 1.15, 0)
 	torso.material = mat_shirt
 	body.add_child(torso)
+	
+	# Aashutosh's white undershirt peeking out of open collar
+	if c_name == "Aashutosh":
+		var undershirt = CSGBox3D.new()
+		undershirt.size = Vector3(0.16, 0.20, 0.02)
+		undershirt.position = Vector3(0, 0.22, 0.172)
+		undershirt.material = _create_mat(Color(0.95, 0.95, 0.95))
+		torso.add_child(undershirt)
 	
 	if has_backpack:
 		var bag = CSGBox3D.new()
@@ -2533,6 +2602,20 @@ func _build_rigged_human(c_name: String, shirt_col: Color, pant_col: Color, has_
 	arm_r.position = Vector3(0, -0.3, 0)
 	arm_r.material = mat_shirt
 	arm_r_pivot.add_child(arm_r)
+	
+	# Sahil's sacred thread (Kalawa) & silver Kara on right wrist
+	if c_name == "Sahil":
+		var kalawa = CSGBox3D.new()
+		kalawa.size = Vector3(0.16, 0.035, 0.16)
+		kalawa.position = Vector3(0, -0.50, 0)
+		kalawa.material = _create_mat(Color(0.95, 0.45, 0.08), 0.6)
+		arm_r_pivot.add_child(kalawa)
+		
+		var kara = CSGBox3D.new()
+		kara.size = Vector3(0.165, 0.025, 0.165)
+		kara.position = Vector3(0, -0.54, 0)
+		kara.material = _create_mat(Color(0.85, 0.88, 0.92), 0.25, 0.85)
+		arm_r_pivot.add_child(kara)
 	
 	if has_bat:
 		var bat = CSGBox3D.new()

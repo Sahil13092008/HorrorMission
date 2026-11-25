@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/phone_call_convo.gd" id="1_script"]
 [ext_resource type="AudioStream" path="res://audio/ambience.wav" id="2_ambience"]
+[ext_resource type="Texture2D" uid="uid://cglwe3516l38q" path="res://textures/tex_sahil_shirt.png" id="3_sahil_shirt"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_Floor"]
 albedo_color = Color(0.32, 0.34, 0.36, 1)
@@ -164,28 +165,26 @@ roughness = 0.7
 
 
 [sub_resource type="StandardMaterial3D" id="Mat_Sahil_Jacket"]
-albedo_color = Color(0.14, 0.16, 0.19, 1)
+albedo_color = Color(0.96, 0.96, 0.96, 1)
+albedo_texture = ExtResource("3_sahil_shirt")
+uv1_scale = Vector3(2.5, 2.5, 2.5)
 roughness = 0.65
 
-
 [sub_resource type="StandardMaterial3D" id="Mat_Sahil_Cargo"]
-albedo_color = Color(0.22, 0.24, 0.27, 1)
-roughness = 0.75
-
+albedo_color = Color(0.40, 0.44, 0.48, 1)
+roughness = 0.8
 
 [sub_resource type="StandardMaterial3D" id="Mat_Sahil_Cap"]
 albedo_color = Color(0.75, 0.18, 0.18, 1)
 roughness = 0.6
 
-
 [sub_resource type="StandardMaterial3D" id="Mat_Aashu_Hoodie"]
-albedo_color = Color(0.58, 0.13, 0.16, 1)
-roughness = 0.75
-
+albedo_color = Color(0.46, 0.36, 0.24, 1)
+roughness = 0.70
 
 [sub_resource type="StandardMaterial3D" id="Mat_Aashu_Jeans"]
-albedo_color = Color(0.20, 0.30, 0.46, 1)
-roughness = 0.8
+albedo_color = Color(0.18, 0.24, 0.35, 1)
+roughness = 0.82
 
 
 [sub_resource type="StandardMaterial3D" id="Mat_Glasses_Frame"]
