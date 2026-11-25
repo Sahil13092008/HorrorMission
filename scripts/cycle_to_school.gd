@@ -208,27 +208,59 @@ func _setup_audio() -> void:
 	arrival_dialogues[2]["audio"] = stream_aashu_arr
 	arrival_dialogues[3]["audio"] = stream_sahil_pln
 
-# --- ENVIRONMENT & LIGHTING ---
+# --- ENVIRONMENT & CINEMATIC NEXT-GEN LIGHTING ---
 func _setup_lighting_and_sky() -> void:
 	var env = Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color(0.14, 0.11, 0.18)
+	env.background_color = Color(0.08, 0.07, 0.12)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.60, 0.48, 0.42)
-	env.ambient_light_energy = 0.95
+	env.ambient_light_color = Color(0.42, 0.40, 0.50)
+	env.ambient_light_energy = 0.85
+	
+	# Atmospheric Eerie Night Fog with Light Scattering
 	env.fog_enabled = true
-	env.fog_light_color = Color(0.26, 0.18, 0.24)
-	env.fog_density = 0.007
+	env.fog_light_color = Color(0.18, 0.16, 0.24)
+	env.fog_density = 0.0075
+	env.fog_aerial_perspective = 0.45
+	env.fog_sky_affect = 0.65
+	
+	# AAA ACES Filmic Tonemapping
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_exposure = 1.06
+	env.tonemap_white = 1.15
+	
+	# Soft Light Glow / Bloom for Streetlights & Headlights
+	env.glow_enabled = true
+	env.glow_intensity = 0.55
+	env.glow_strength = 0.85
+	env.glow_bloom = 0.22
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	env.glow_hdr_threshold = 1.05
+	
+	# Screen Space Ambient Occlusion (SSAO) for deep contact shadows in corners
+	env.ssao_enabled = true
+	env.ssao_radius = 1.8
+	env.ssao_intensity = 2.4
+	env.ssao_power = 1.5
+	env.ssao_detail = 0.5
+	
+	# Filmic Color Grading (Dark cinematic contrast & rich night colors)
+	env.adjustment_enabled = true
+	env.adjustment_brightness = 1.02
+	env.adjustment_contrast = 1.16
+	env.adjustment_saturation = 1.10
 	
 	world_env = WorldEnvironment.new()
 	world_env.environment = env
 	add_child(world_env)
 	
+	# Chilling Silver Moonlight with Soft Realistic Shadows
 	sun_light = DirectionalLight3D.new()
-	sun_light.light_color = Color(1.0, 0.75, 0.50)
-	sun_light.light_energy = 1.25
-	sun_light.rotation_degrees = Vector3(-28.0, 42.0, 0.0)
+	sun_light.light_color = Color(0.82, 0.88, 1.0)
+	sun_light.light_energy = 0.95
+	sun_light.rotation_degrees = Vector3(-32.0, 48.0, 0.0)
 	sun_light.shadow_enabled = true
+	sun_light.shadow_blur = 1.6
 	add_child(sun_light)
 	
 	cam_pivot = Node3D.new()
@@ -254,6 +286,116 @@ func _create_mat(col: Color, roughness: float = 0.8, metallic: float = 0.0, emis
 		m.emission_energy_multiplier = emission_eng
 	return m
 
+# --- PROCEDURAL PBR TEXTURES (ASPHALT, BRICKS, CLAY, SIDEWALK) ---
+func _create_asphalt_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.12, 0.12, 0.14)
+	mat.roughness = 0.74
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	fn.frequency = 0.14
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 3.2
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(8.0, 8.0, 8.0)
+	return mat
+
+func _create_sidewalk_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.30, 0.28, 0.26)
+	mat.roughness = 0.82
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_PERLIN
+	fn.frequency = 0.18
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 2.4
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(6.0, 6.0, 6.0)
+	return mat
+
+func _create_brick_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.65, 0.26, 0.20)
+	mat.roughness = 0.86
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_CELLULAR
+	fn.frequency = 0.22
+	fn.cellular_distance_function = FastNoiseLite.DISTANCE_MANHATTAN
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 4.2
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(4.0, 4.0, 4.0)
+	return mat
+
+func _create_clay_ground_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.50, 0.38, 0.26)
+	mat.roughness = 0.92
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	fn.frequency = 0.15
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 3.0
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(10.0, 10.0, 10.0)
+	return mat
+
+func _create_turf_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.18, 0.40, 0.14)
+	mat.roughness = 0.90
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	fn.frequency = 0.20
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 2.8
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(10.0, 10.0, 10.0)
+	return mat
+
+func _create_slogan_wall_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.88, 0.86, 0.82)
+	mat.roughness = 0.80
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_PERLIN
+	fn.frequency = 0.16
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 2.6
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(4.0, 4.0, 4.0)
+	return mat
+
 # --- TOWN STREET NETWORK WITH REAL TURNS ---
 # Segment 1: Home Road (Z: 65 down to -5, X: 0)
 # Turn 1: Chowk at (0, 0, -5) -> Turn Left to -X
@@ -272,13 +414,13 @@ func _build_town_streets_with_turns() -> void:
 	base_ground.material = _create_mat(Color(0.20, 0.18, 0.16), 0.95)
 	road_root.add_child(base_ground)
 	
-	var mat_road = _create_mat(Color(0.14, 0.14, 0.16), 0.9)
-	var mat_sidewalk = _create_mat(Color(0.28, 0.26, 0.24), 0.85)
-	var mat_dash = _create_mat(Color(0.92, 0.85, 0.25), 0.7)
-	var mat_pole = _create_mat(Color(0.25, 0.25, 0.28), 0.4, 0.6)
-	var mat_bulb = _create_mat(Color(1.0, 0.9, 0.5), 0.2, 0.0, Color(1.0, 0.85, 0.4), 3.5)
-	var mat_hedge = _create_mat(Color(0.12, 0.32, 0.14), 0.9)
-	var mat_wall = _create_mat(Color(0.44, 0.42, 0.40), 0.85)
+	var mat_road = _create_asphalt_material()
+	var mat_sidewalk = _create_sidewalk_material()
+	var mat_dash = _create_mat(Color(0.95, 0.88, 0.25), 0.5)
+	var mat_pole = _create_mat(Color(0.22, 0.22, 0.25), 0.4, 0.7)
+	var mat_bulb = _create_mat(Color(1.0, 0.92, 0.55), 0.2, 0.0, Color(1.0, 0.88, 0.45), 4.5)
+	var mat_hedge = _create_turf_material()
+	var mat_wall = _create_slogan_wall_material()
 	var mat_shop = _create_mat(Color(0.35, 0.45, 0.55), 0.8)
 	
 	# --------------------------------------------------------------------------
@@ -325,6 +467,8 @@ func _build_town_streets_with_turns() -> void:
 			lamp_light.light_color = Color(1.0, 0.88, 0.65)
 			lamp_light.light_energy = 2.4
 			lamp_light.omni_range = 14.0
+			lamp_light.shadow_enabled = true
+			lamp_light.shadow_blur = 1.3
 			road_root.add_child(lamp_light)
 			
 			# House facade
@@ -369,6 +513,8 @@ func _build_town_streets_with_turns() -> void:
 	chowk_light.light_color = Color(1.0, 0.92, 0.70)
 	chowk_light.light_energy = 3.2
 	chowk_light.omni_range = 16.0
+	chowk_light.shadow_enabled = true
+	chowk_light.shadow_blur = 1.3
 	road_root.add_child(chowk_light)
 	
 	# --------------------------------------------------------------------------
@@ -490,15 +636,15 @@ func _build_boys_school_and_ground() -> void:
 	school_root.name = "BoysSchoolComplex"
 	add_child(school_root)
 	
-	var mat_brick = _create_mat(Color(0.68, 0.28, 0.22), 0.8)
+	var mat_brick = _create_brick_material()
 	var mat_stone_cream = _create_mat(Color(0.92, 0.88, 0.80), 0.65)
 	var mat_iron_gate = _create_mat(Color(0.12, 0.12, 0.14), 0.4, 0.8)
-	var mat_clay_ground = _create_mat(Color(0.52, 0.40, 0.28), 0.95) # Sports playground soil
-	var mat_turf = _create_mat(Color(0.20, 0.44, 0.16), 0.9)
+	var mat_clay_ground = _create_clay_ground_material()
+	var mat_turf = _create_turf_material()
 	var mat_track = _create_mat(Color(0.64, 0.28, 0.20), 0.95)
 	var mat_pitch = _create_mat(Color(0.72, 0.62, 0.46), 0.9)
 	var mat_tin_roof = _create_mat(Color(0.38, 0.42, 0.45), 0.4, 0.7)
-	var mat_slogan_wall = _create_mat(Color(0.88, 0.86, 0.82), 0.7)
+	var mat_slogan_wall = _create_slogan_wall_material()
 	
 	# --------------------------------------------------------------------------
 	# 1. GRAND SCHOOL MAIN GATE (At Z = -85.0, X = -70.0)
@@ -607,6 +753,23 @@ func _build_boys_school_and_ground() -> void:
 	inner_play.position = Vector3(gate_x, -0.04, ground_z_center)
 	inner_play.material = mat_clay_ground
 	school_root.add_child(inner_play)
+	
+	# Ground-level atmospheric mist / fog wisps in the open school field
+	var field_mist = CPUParticles3D.new()
+	field_mist.amount = 35
+	field_mist.lifetime = 6.0
+	field_mist.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	field_mist.emission_box_extents = Vector3(45.0, 0.6, 45.0)
+	field_mist.position = Vector3(gate_x, 0.45, ground_z_center)
+	field_mist.direction = Vector3(1, 0, 0.25)
+	field_mist.spread = 30.0
+	field_mist.gravity = Vector3(0, 0, 0)
+	field_mist.initial_velocity_min = 0.4
+	field_mist.initial_velocity_max = 1.0
+	field_mist.scale_amount_min = 1.6
+	field_mist.scale_amount_max = 3.6
+	field_mist.color = Color(0.85, 0.90, 1.0, 0.10)
+	school_root.add_child(field_mist)
 	
 	# --------------------------------------------------------------------------
 	# 3. DETAILED SCHOOL FEATURES ON THE GROUND
@@ -748,6 +911,8 @@ func _build_boys_school_and_ground() -> void:
 		flood_light.light_color = Color(1.0, 0.96, 0.88)
 		flood_light.light_energy = 3.6
 		flood_light.omni_range = 35.0
+		flood_light.shadow_enabled = true
+		flood_light.shadow_blur = 1.6
 		school_root.add_child(flood_light)
 	
 	# --------------------------------------------------------------------------
@@ -866,10 +1031,30 @@ func _build_player_bicycle() -> void:
 	headlight_spot = SpotLight3D.new()
 	headlight_spot.position = Vector3(0, 0.98, -0.56)
 	headlight_spot.light_color = Color(1.0, 0.96, 0.85)
-	headlight_spot.light_energy = 3.6
-	headlight_spot.spot_range = 28.0
-	headlight_spot.spot_angle = 32.0
+	headlight_spot.light_energy = 4.2
+	headlight_spot.spot_range = 32.0
+	headlight_spot.spot_angle = 34.0
+	headlight_spot.spot_attenuation = 1.3
+	headlight_spot.shadow_enabled = true
+	headlight_spot.shadow_blur = 1.3
 	bike_frame.add_child(headlight_spot)
+	
+	# Floating atmospheric dust motes illuminated in headlight beam
+	var dust = CPUParticles3D.new()
+	dust.amount = 30
+	dust.lifetime = 2.4
+	dust.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	dust.emission_box_extents = Vector3(1.0, 0.7, 3.2)
+	dust.position = Vector3(0, 0.95, -3.5)
+	dust.direction = Vector3(0, 1, 0)
+	dust.spread = 45.0
+	dust.gravity = Vector3(0, -0.04, 0)
+	dust.initial_velocity_min = 0.04
+	dust.initial_velocity_max = 0.16
+	dust.scale_amount_min = 0.03
+	dust.scale_amount_max = 0.07
+	dust.color = Color(1.0, 0.96, 0.80, 0.40)
+	bike_frame.add_child(dust)
 	
 	# Wheels
 	wheel_front = Node3D.new()
@@ -1092,6 +1277,18 @@ func _build_ui() -> void:
 	ui_root.name = "CycleHUD"
 	ui_root.layer = 120
 	add_child(ui_root)
+	
+	# Cinematic Horror Camera Vignette Overlay
+	var vignette_rect = TextureRect.new()
+	vignette_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vignette_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var vig_tex = load("res://textures/vignette.png")
+	if vig_tex:
+		vignette_rect.texture = vig_tex
+		vignette_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		vignette_rect.stretch_mode = TextureRect.STRETCH_SCALE
+		vignette_rect.modulate = Color(1.0, 1.0, 1.0, 0.65)
+		ui_root.add_child(vignette_rect)
 	
 	mission_banner = PanelContainer.new()
 	mission_banner.set_anchors_preset(Control.PRESET_TOP_WIDE)
