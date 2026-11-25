@@ -396,6 +396,645 @@ func _create_slogan_wall_material() -> StandardMaterial3D:
 	mat.uv1_scale = Vector3(4.0, 4.0, 4.0)
 	return mat
 
+# --- PROCEDURAL ARCHITECTURAL MATERIALS ---
+func _create_weathered_plaster_material(base_color: Color) -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = base_color
+	mat.roughness = 0.84
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_PERLIN
+	fn.frequency = 0.18
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 2.4
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(4.0, 4.0, 4.0)
+	return mat
+
+func _create_shutter_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.48, 0.50, 0.54)
+	mat.metallic = 0.82
+	mat.roughness = 0.45
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	fn.frequency = 0.35
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 3.6
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(1.0, 16.0, 1.0) # Horizontal roller shutter slats
+	return mat
+
+func _create_water_tank_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.12, 0.12, 0.14)
+	mat.roughness = 0.52
+	mat.metallic = 0.15
+	return mat
+
+func _create_tin_roof_material() -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.38, 0.42, 0.45)
+	mat.roughness = 0.60
+	mat.metallic = 0.65
+	var fn = FastNoiseLite.new()
+	fn.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	fn.frequency = 0.28
+	var nt = NoiseTexture2D.new()
+	nt.width = 128
+	nt.height = 128
+	nt.noise = fn
+	nt.as_normal_map = true
+	nt.bump_strength = 3.2
+	mat.normal_enabled = true
+	mat.normal_texture = nt
+	mat.uv1_scale = Vector3(12.0, 1.0, 12.0)
+	return mat
+
+# --- PROCEDURAL 3D ARCHITECTURAL GENERATORS ---
+func _build_detailed_neighborhood_house(pos: Vector3, side: int, house_idx: int) -> Node3D:
+	var house_node = Node3D.new()
+	house_node.position = pos
+	house_node.rotation_degrees = Vector3(0, 90 if side == -1 else -90, 0)
+	
+	var wall_colors = [
+		Color(0.88, 0.85, 0.78),
+		Color(0.88, 0.76, 0.70),
+		Color(0.72, 0.84, 0.82),
+		Color(0.86, 0.82, 0.68),
+		Color(0.76, 0.84, 0.74),
+		Color(0.84, 0.80, 0.76)
+	]
+	var base_col = wall_colors[house_idx % wall_colors.size()]
+	var mat_wall = _create_weathered_plaster_material(base_col)
+	var mat_trim = _create_mat(base_col.darkened(0.25), 0.7)
+	var mat_concrete = _create_sidewalk_material()
+	var mat_wood = _create_mat(Color(0.35, 0.20, 0.10), 0.6)
+	var mat_iron = _create_mat(Color(0.18, 0.18, 0.20), 0.35, 0.8)
+	var mat_glass_dark = _create_mat(Color(0.10, 0.16, 0.25), 0.15, 0.6)
+	var mat_glass_warm = _create_mat(Color(1.0, 0.88, 0.45), 0.2, 0.0, Color(1.0, 0.82, 0.35), 2.4)
+	var mat_tank = _create_water_tank_material()
+	
+	var width = 6.4
+	var depth = 9.2
+	var gf_height = 3.4
+	var ff_height = 3.2
+	var total_height = gf_height + ff_height
+	
+	# 1. Ground Plinth & Ground Floor Body
+	var gf = CSGBox3D.new()
+	gf.size = Vector3(width, gf_height, depth)
+	gf.position = Vector3(0, gf_height * 0.5, 0)
+	gf.material = mat_wall
+	house_node.add_child(gf)
+	
+	# Front Entrance Porch / Chhajja
+	var porch = CSGBox3D.new()
+	porch.size = Vector3(2.4, 0.18, 1.2)
+	porch.position = Vector3(-1.0, 2.5, depth * 0.5 + 0.6)
+	porch.material = mat_concrete
+	house_node.add_child(porch)
+	
+	# Front Wooden Entrance Door
+	var door = CSGBox3D.new()
+	door.size = Vector3(1.4, 2.3, 0.08)
+	door.position = Vector3(-1.0, 1.15, depth * 0.5 + 0.05)
+	door.material = mat_wood
+	house_node.add_child(door)
+	
+	# Front Door Step
+	var step = CSGBox3D.new()
+	step.size = Vector3(1.8, 0.2, 0.8)
+	step.position = Vector3(-1.0, 0.1, depth * 0.5 + 0.4)
+	step.material = mat_concrete
+	house_node.add_child(step)
+	
+	# Small Porch Lamp
+	var porch_light = OmniLight3D.new()
+	porch_light.position = Vector3(-1.0, 2.4, depth * 0.5 + 0.4)
+	porch_light.light_color = Color(1.0, 0.85, 0.55)
+	porch_light.light_energy = 1.2
+	porch_light.omni_range = 5.0
+	house_node.add_child(porch_light)
+	
+	# GF Window with security grill
+	var gf_win = CSGBox3D.new()
+	gf_win.size = Vector3(1.6, 1.4, 0.08)
+	gf_win.position = Vector3(1.4, 1.8, depth * 0.5 + 0.05)
+	gf_win.material = mat_glass_dark if (house_idx % 2 == 0) else mat_glass_warm
+	house_node.add_child(gf_win)
+	
+	# GF Window Chhajja
+	var gf_chhajja = CSGBox3D.new()
+	gf_chhajja.size = Vector3(1.9, 0.12, 0.45)
+	gf_chhajja.position = Vector3(1.4, 2.55, depth * 0.5 + 0.22)
+	gf_chhajja.rotation_degrees = Vector3(15, 0, 0)
+	gf_chhajja.material = mat_concrete
+	house_node.add_child(gf_chhajja)
+	
+	# 2. First Floor Body
+	var ff = CSGBox3D.new()
+	ff.size = Vector3(width, ff_height, depth)
+	ff.position = Vector3(0, gf_height + ff_height * 0.5, 0)
+	ff.material = mat_wall
+	house_node.add_child(ff)
+	
+	# Belt molding dividing floors
+	var belt = CSGBox3D.new()
+	belt.size = Vector3(width + 0.25, 0.22, depth + 0.25)
+	belt.position = Vector3(0, gf_height, 0)
+	belt.material = mat_trim
+	house_node.add_child(belt)
+	
+	# Cantilevered Balcony Slab
+	var balcony_slab = CSGBox3D.new()
+	balcony_slab.size = Vector3(width - 1.2, 0.22, 1.6)
+	balcony_slab.position = Vector3(0, gf_height + 0.11, depth * 0.5 + 0.8)
+	balcony_slab.material = mat_concrete
+	house_node.add_child(balcony_slab)
+	
+	# Balcony Railing (Front & Sides)
+	var rail_front = CSGBox3D.new()
+	rail_front.size = Vector3(width - 1.2, 0.95, 0.06)
+	rail_front.position = Vector3(0, gf_height + 0.65, depth * 0.5 + 1.55)
+	rail_front.material = mat_iron
+	house_node.add_child(rail_front)
+	
+	var rail_left = CSGBox3D.new()
+	rail_left.size = Vector3(0.06, 0.95, 1.5)
+	rail_left.position = Vector3(-(width - 1.2) * 0.5, gf_height + 0.65, depth * 0.5 + 0.8)
+	rail_left.material = mat_iron
+	house_node.add_child(rail_left)
+	
+	var rail_right = CSGBox3D.new()
+	rail_right.size = Vector3(0.06, 0.95, 1.5)
+	rail_right.position = Vector3((width - 1.2) * 0.5, gf_height + 0.65, depth * 0.5 + 0.8)
+	rail_right.material = mat_iron
+	house_node.add_child(rail_right)
+	
+	# Balcony Door & Upper Bedroom Window
+	var ff_door = CSGBox3D.new()
+	ff_door.size = Vector3(1.1, 2.1, 0.08)
+	ff_door.position = Vector3(-1.0, gf_height + 1.15, depth * 0.5 + 0.05)
+	ff_door.material = mat_wood
+	house_node.add_child(ff_door)
+	
+	var ff_win = CSGBox3D.new()
+	ff_win.size = Vector3(1.6, 1.4, 0.08)
+	ff_win.position = Vector3(1.2, gf_height + 1.6, depth * 0.5 + 0.05)
+	ff_win.material = mat_glass_warm
+	house_node.add_child(ff_win)
+	
+	# 3. Rooftop Terrace Parapet Wall & Mumty
+	var roof_y = total_height
+	var parapet_f = CSGBox3D.new()
+	parapet_f.size = Vector3(width, 0.75, 0.18)
+	parapet_f.position = Vector3(0, roof_y + 0.38, depth * 0.5)
+	parapet_f.material = mat_trim
+	house_node.add_child(parapet_f)
+	
+	var parapet_b = CSGBox3D.new()
+	parapet_b.size = Vector3(width, 0.75, 0.18)
+	parapet_b.position = Vector3(0, roof_y + 0.38, -depth * 0.5)
+	parapet_b.material = mat_trim
+	house_node.add_child(parapet_b)
+	
+	# Rooftop Mumty (Staircase Room)
+	var mumty = CSGBox3D.new()
+	mumty.size = Vector3(2.4, 2.2, 2.6)
+	mumty.position = Vector3(-1.5, roof_y + 1.1, -1.8)
+	mumty.material = mat_wall
+	house_node.add_child(mumty)
+	
+	# 4. Black Sintex Water Tank (Iconic Indian rooftop element)
+	var tank = CSGCylinder3D.new()
+	tank.radius = 0.55
+	tank.height = 1.3
+	tank.position = Vector3(1.4, roof_y + 0.65, -1.8)
+	tank.material = mat_tank
+	house_node.add_child(tank)
+	
+	var tank_lid = CSGCylinder3D.new()
+	tank_lid.radius = 0.35
+	tank_lid.height = 0.18
+	tank_lid.position = Vector3(1.4, roof_y + 1.35, -1.8)
+	tank_lid.material = mat_tank
+	house_node.add_child(tank_lid)
+	
+	# 5. TV Dish Antenna
+	var dish_pole = CSGCylinder3D.new()
+	dish_pole.radius = 0.03
+	dish_pole.height = 1.2
+	dish_pole.position = Vector3(1.8, roof_y + 0.6, 2.2)
+	dish_pole.material = mat_iron
+	house_node.add_child(dish_pole)
+	
+	var dish = CSGSphere3D.new()
+	dish.radius = 0.38
+	dish.radial_segments = 8
+	dish.position = Vector3(1.8, roof_y + 1.1, 2.2)
+	dish.rotation_degrees = Vector3(45, -30, 0)
+	dish.scale = Vector3(1.0, 1.0, 0.2)
+	dish.material = _create_mat(Color(0.85, 0.85, 0.88), 0.3, 0.6)
+	house_node.add_child(dish)
+	
+	# 6. Front Boundary Wall & Gate
+	var bw_left = CSGBox3D.new()
+	bw_left.size = Vector3(2.0, 1.1, 0.18)
+	bw_left.position = Vector3(-2.0, 0.55, depth * 0.5 + 1.8)
+	bw_left.material = mat_wall
+	house_node.add_child(bw_left)
+	
+	var bw_right = CSGBox3D.new()
+	bw_right.size = Vector3(2.0, 1.1, 0.18)
+	bw_right.position = Vector3(2.0, 0.55, depth * 0.5 + 1.8)
+	bw_right.material = mat_wall
+	house_node.add_child(bw_right)
+	
+	var b_gate = CSGBox3D.new()
+	b_gate.size = Vector3(1.8, 1.0, 0.06)
+	b_gate.position = Vector3(0, 0.52, depth * 0.5 + 1.8)
+	b_gate.material = mat_iron
+	house_node.add_child(b_gate)
+	
+	return house_node
+
+func _build_detailed_indian_shop(pos: Vector3, z_side: int, shop_idx: int) -> Node3D:
+	var shop_node = Node3D.new()
+	shop_node.position = pos
+	shop_node.rotation_degrees = Vector3(0, 0 if z_side == -1 else 180, 0)
+	
+	var shop_width = 8.5
+	var shop_depth = 5.6
+	var gf_height = 3.6
+	var ff_height = 3.0
+	var total_height = gf_height + ff_height
+	
+	var plaster_colors = [
+		Color(0.86, 0.82, 0.72),
+		Color(0.78, 0.82, 0.86),
+		Color(0.88, 0.78, 0.72),
+		Color(0.82, 0.86, 0.78),
+		Color(0.85, 0.85, 0.85)
+	]
+	var base_col = plaster_colors[shop_idx % plaster_colors.size()]
+	var mat_wall = _create_weathered_plaster_material(base_col)
+	var mat_shutter = _create_shutter_material()
+	var mat_concrete = _create_sidewalk_material()
+	var mat_awning = _create_tin_roof_material()
+	var mat_warm_interior = _create_mat(Color(1.0, 0.85, 0.45), 0.2, 0.0, Color(1.0, 0.80, 0.40), 2.5)
+	var mat_glass_dark = _create_mat(Color(0.12, 0.16, 0.22), 0.15, 0.6)
+	
+	# 1. Main 2-story building block
+	var bldg = CSGBox3D.new()
+	bldg.size = Vector3(shop_width, total_height, shop_depth)
+	bldg.position = Vector3(0, total_height * 0.5, 0)
+	bldg.material = mat_wall
+	shop_node.add_child(bldg)
+	
+	# Parapet trim on roof
+	var parapet = CSGBox3D.new()
+	parapet.size = Vector3(shop_width + 0.2, 0.6, shop_depth + 0.2)
+	parapet.position = Vector3(0, total_height + 0.3, 0)
+	parapet.material = _create_mat(base_col.darkened(0.2), 0.7)
+	shop_node.add_child(parapet)
+	
+	# Rooftop Sintex tank
+	var tank = CSGCylinder3D.new()
+	tank.radius = 0.5
+	tank.height = 1.2
+	tank.position = Vector3(2.2, total_height + 0.6, -1.2)
+	tank.material = _create_water_tank_material()
+	shop_node.add_child(tank)
+	
+	# 2. Upper Floor Windows (Residential/Storage above shop)
+	for wx in [-2.4, 2.4]:
+		var win = CSGBox3D.new()
+		win.size = Vector3(1.6, 1.4, 0.08)
+		win.position = Vector3(wx, gf_height + 1.5, shop_depth * 0.5 + 0.05)
+		win.material = mat_warm_interior if (shop_idx % 2 == 1) else mat_glass_dark
+		shop_node.add_child(win)
+		
+		var win_chhajja = CSGBox3D.new()
+		win_chhajja.size = Vector3(1.9, 0.1, 0.45)
+		win_chhajja.position = Vector3(wx, gf_height + 2.25, shop_depth * 0.5 + 0.22)
+		win_chhajja.rotation_degrees = Vector3(15, 0, 0)
+		win_chhajja.material = mat_concrete
+		shop_node.add_child(win_chhajja)
+		
+	# 3. Ground Floor Shop Entrance & Roller Shutters (Two Bays)
+	var bay1_frame = CSGBox3D.new()
+	bay1_frame.size = Vector3(3.4, 2.8, 0.12)
+	bay1_frame.position = Vector3(-1.9, 1.4, shop_depth * 0.5 + 0.06)
+	bay1_frame.material = _create_mat(Color(0.2, 0.2, 0.22), 0.4, 0.7)
+	shop_node.add_child(bay1_frame)
+	
+	var shutter1 = CSGBox3D.new()
+	shutter1.size = Vector3(3.1, 2.6, 0.08)
+	shutter1.position = Vector3(-1.9, 1.4, shop_depth * 0.5 + 0.08)
+	shutter1.material = mat_shutter
+	shop_node.add_child(shutter1)
+	
+	var bay2_frame = CSGBox3D.new()
+	bay2_frame.size = Vector3(3.4, 2.8, 0.12)
+	bay2_frame.position = Vector3(1.9, 1.4, shop_depth * 0.5 + 0.06)
+	bay2_frame.material = _create_mat(Color(0.2, 0.2, 0.22), 0.4, 0.7)
+	shop_node.add_child(bay2_frame)
+	
+	var shutter2 = CSGBox3D.new()
+	shutter2.size = Vector3(3.1, 1.4, 0.08)
+	shutter2.position = Vector3(1.9, 2.0, shop_depth * 0.5 + 0.08)
+	shutter2.material = mat_shutter
+	shop_node.add_child(shutter2)
+	
+	# Warm shop counter spilling light
+	var counter_light = CSGBox3D.new()
+	counter_light.size = Vector3(3.0, 0.7, 0.1)
+	counter_light.position = Vector3(1.9, 0.65, shop_depth * 0.5 + 0.06)
+	counter_light.material = mat_warm_interior
+	shop_node.add_child(counter_light)
+	
+	# Front Steps (चबूतरा)
+	var steps = CSGBox3D.new()
+	steps.size = Vector3(shop_width, 0.25, 1.2)
+	steps.position = Vector3(0, 0.12, shop_depth * 0.5 + 0.6)
+	steps.material = mat_concrete
+	shop_node.add_child(steps)
+	
+	# 4. Overhanging Sloped Tin Shed / Awning (छप्पर)
+	var awning = CSGBox3D.new()
+	awning.size = Vector3(shop_width + 0.4, 0.08, 1.9)
+	awning.position = Vector3(0, 3.2, shop_depth * 0.5 + 0.95)
+	awning.rotation_degrees = Vector3(16, 0, 0)
+	awning.material = mat_awning
+	shop_node.add_child(awning)
+	
+	# Hanging Bulb Light under the Awning
+	var shop_lamp = OmniLight3D.new()
+	shop_lamp.position = Vector3(1.2, 2.8, shop_depth * 0.5 + 1.2)
+	shop_lamp.light_color = Color(1.0, 0.88, 0.62)
+	shop_lamp.light_energy = 2.4
+	shop_lamp.omni_range = 8.5
+	shop_lamp.shadow_enabled = true
+	shop_lamp.shadow_blur = 1.3
+	shop_node.add_child(shop_lamp)
+	
+	# 5. Prominent Hindi Shop Signboard
+	var sign_board = CSGBox3D.new()
+	sign_board.size = Vector3(7.2, 1.1, 0.1)
+	sign_board.position = Vector3(0, 3.8, shop_depth * 0.5 + 0.1)
+	
+	var board_colors = [
+		Color(0.85, 0.15, 0.15),
+		Color(0.08, 0.45, 0.22),
+		Color(0.12, 0.35, 0.75),
+		Color(0.85, 0.55, 0.10),
+		Color(0.55, 0.15, 0.55),
+		Color(0.15, 0.55, 0.65)
+	]
+	var b_col = board_colors[shop_idx % board_colors.size()]
+	sign_board.material = _create_mat(b_col, 0.5)
+	shop_node.add_child(sign_board)
+	
+	var shop_names = [
+		"🛒  गुप्ता किराना & जनरल स्टोर\n[GUPTA PROVISION STORE]",
+		"☕  शर्मा जी टी स्टॉल & स्नैक्स\n[SHARMA TEA & HOT REFRESHMENTS]",
+		"💊  श्री बालाजी 24x7 मेडिकल स्टोर\n[BALAJI PHARMA & HEALTHCARE]",
+		"📚  आनंद स्टेशनरी & फोटोकॉपी\n[ANAND BOOKS & XEROX CENTRE]",
+		"📱  वर्मा इलेक्ट्रॉनिक्स & मोबाइल\n[VERMA MOBILES & REPAIRS]",
+		"🥖  जनता बेकरी, स्वीट्स & डेयरी\n[JANTA SWEETS & BAKERY]"
+	]
+	
+	var lbl = Label3D.new()
+	lbl.text = shop_names[shop_idx % shop_names.size()]
+	lbl.font_size = 24
+	lbl.modulate = Color(1.0, 0.96, 0.35)
+	lbl.outline_modulate = Color(0.05, 0.05, 0.08)
+	lbl.outline_size = 6
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.position = Vector3(0, 3.8, shop_depth * 0.5 + 0.16)
+	shop_node.add_child(lbl)
+	
+	return shop_node
+
+func _build_detailed_boys_school(pos: Vector3) -> Node3D:
+	var school_node = Node3D.new()
+	school_node.position = pos
+	
+	var b_width = 58.0
+	var b_height = 12.0
+	var b_depth = 16.0
+	
+	var mat_cream_wall = _create_weathered_plaster_material(Color(0.92, 0.89, 0.82))
+	var mat_brick = _create_brick_material()
+	var mat_concrete = _create_sidewalk_material()
+	var mat_iron = _create_mat(Color(0.15, 0.15, 0.18), 0.35, 0.85)
+	var mat_glass_dark = _create_mat(Color(0.12, 0.18, 0.28), 0.15, 0.6)
+	var mat_glass_warm = _create_mat(Color(0.85, 0.95, 1.0), 0.2, 0.0, Color(0.80, 0.95, 1.0), 1.8)
+	var mat_tank = _create_water_tank_material()
+	var mat_gold = _create_mat(Color(0.95, 0.80, 0.25), 0.3, 0.5)
+	
+	# 1. Main 2-Story Building Mass
+	var main_body = CSGBox3D.new()
+	main_body.size = Vector3(b_width, b_height, b_depth)
+	main_body.position = Vector3(0, b_height * 0.5, 0)
+	main_body.material = mat_cream_wall
+	school_node.add_child(main_body)
+	
+	# Heritage Terracotta Brick Plinth (Base Band, 1.4m high)
+	var plinth = CSGBox3D.new()
+	plinth.size = Vector3(b_width + 0.3, 1.4, b_depth + 0.3)
+	plinth.position = Vector3(0, 0.7, 0)
+	plinth.material = mat_brick
+	school_node.add_child(plinth)
+	
+	# Mid-floor Brick Belt Course
+	var mid_belt = CSGBox3D.new()
+	mid_belt.size = Vector3(b_width + 0.4, 0.5, b_depth + 0.4)
+	mid_belt.position = Vector3(0, 6.0, 0)
+	mid_belt.material = mat_brick
+	school_node.add_child(mid_belt)
+	
+	# Roof Cornice Band
+	var roof_belt = CSGBox3D.new()
+	roof_belt.size = Vector3(b_width + 0.5, 0.6, b_depth + 0.5)
+	roof_belt.position = Vector3(0, b_height - 0.3, 0)
+	roof_belt.material = mat_brick
+	school_node.add_child(roof_belt)
+	
+	# Rooftop Balustrade / Crenellated Parapet
+	var roof_parapet = CSGBox3D.new()
+	roof_parapet.size = Vector3(b_width + 0.2, 1.1, 0.3)
+	roof_parapet.position = Vector3(0, b_height + 0.55, b_depth * 0.5)
+	roof_parapet.material = mat_cream_wall
+	school_node.add_child(roof_parapet)
+	
+	# 2. Grand Central Entrance Portico with Monumental Pillars
+	var portico_w = 16.0
+	var portico_d = 4.8
+	var portico_h = 11.2
+	
+	var portico_roof = CSGBox3D.new()
+	portico_roof.size = Vector3(portico_w, 0.6, portico_d)
+	portico_roof.position = Vector3(0, portico_h, b_depth * 0.5 + portico_d * 0.5)
+	portico_roof.material = mat_concrete
+	school_node.add_child(portico_roof)
+	
+	# 4 Monumental Pillars
+	for px in [-6.5, -2.2, 2.2, 6.5]:
+		var col = CSGBox3D.new()
+		col.size = Vector3(1.1, portico_h, 1.1)
+		col.position = Vector3(px, portico_h * 0.5, b_depth * 0.5 + portico_d - 0.6)
+		col.material = mat_brick
+		school_node.add_child(col)
+		
+		var col_cap = CSGBox3D.new()
+		col_cap.size = Vector3(1.35, 0.4, 1.35)
+		col_cap.position = Vector3(px, portico_h - 0.2, b_depth * 0.5 + portico_d - 0.6)
+		col_cap.material = mat_cream_wall
+		school_node.add_child(col_cap)
+		
+		var col_base = CSGBox3D.new()
+		col_base.size = Vector3(1.35, 0.6, 1.35)
+		col_base.position = Vector3(px, 0.3, b_depth * 0.5 + portico_d - 0.6)
+		col_base.material = mat_cream_wall
+		school_node.add_child(col_base)
+		
+	# Grand Entrance Stepped Plinth
+	for step_i in range(4):
+		var step_box = CSGBox3D.new()
+		var step_w = portico_w - (step_i * 1.0)
+		var step_d = 1.4 + (3 - step_i) * 0.8
+		var step_h = 0.25
+		step_box.size = Vector3(step_w, step_h, step_d)
+		step_box.position = Vector3(0, (step_i + 0.5) * step_h, b_depth * 0.5 + portico_d + step_d * 0.5 - 0.6)
+		step_box.material = mat_concrete
+		school_node.add_child(step_box)
+		
+	# Grand Double Entrance Door
+	var main_door = CSGBox3D.new()
+	main_door.size = Vector3(3.6, 3.8, 0.12)
+	main_door.position = Vector3(0, 2.5, b_depth * 0.5 + 0.06)
+	main_door.material = _create_mat(Color(0.28, 0.16, 0.08), 0.5)
+	school_node.add_child(main_door)
+	
+	# Entrance Portico Hanging Lamp
+	var portico_lamp = OmniLight3D.new()
+	portico_lamp.position = Vector3(0, portico_h - 0.8, b_depth * 0.5 + portico_d * 0.5)
+	portico_lamp.light_color = Color(1.0, 0.92, 0.70)
+	portico_lamp.light_energy = 3.2
+	portico_lamp.omni_range = 14.0
+	portico_lamp.shadow_enabled = true
+	portico_lamp.shadow_blur = 1.4
+	school_node.add_child(portico_lamp)
+	
+	# 3. Classroom Windows with Weather Chhajjas
+	var win_x_coords = [-23.0, -17.0, -11.0, 11.0, 17.0, 23.0]
+	var win_y_coords = [3.4, 8.2]
+	var win_counter = 0
+	
+	for wx in win_x_coords:
+		for wy in win_y_coords:
+			win_counter += 1
+			var w_frame = CSGBox3D.new()
+			w_frame.size = Vector3(3.0, 2.4, 0.18)
+			w_frame.position = Vector3(wx, wy, b_depth * 0.5 + 0.08)
+			w_frame.material = _create_mat(Color(0.22, 0.22, 0.25), 0.5)
+			school_node.add_child(w_frame)
+			
+			var w_glass = CSGBox3D.new()
+			w_glass.size = Vector3(2.7, 2.1, 0.1)
+			w_glass.position = Vector3(wx, wy, b_depth * 0.5 + 0.12)
+			var is_lit = (win_counter in [2, 5, 8, 11])
+			w_glass.material = mat_glass_warm if is_lit else mat_glass_dark
+			school_node.add_child(w_glass)
+			
+			var chhajja = CSGBox3D.new()
+			chhajja.size = Vector3(3.3, 0.14, 0.65)
+			chhajja.position = Vector3(wx, wy + 1.35, b_depth * 0.5 + 0.35)
+			chhajja.rotation_degrees = Vector3(18, 0, 0)
+			chhajja.material = mat_concrete
+			school_node.add_child(chhajja)
+			
+	# 4. Grand School Signboard (विद्यालय का नामपट्ट)
+	var sign_panel = CSGBox3D.new()
+	sign_panel.size = Vector3(14.5, 1.8, 0.15)
+	sign_panel.position = Vector3(0, portico_h + 1.2, b_depth * 0.5 + 0.1)
+	sign_panel.material = _create_mat(Color(0.08, 0.15, 0.38), 0.4)
+	school_node.add_child(sign_panel)
+	
+	var sign_border = CSGBox3D.new()
+	sign_border.size = Vector3(14.7, 2.0, 0.1)
+	sign_border.position = Vector3(0, portico_h + 1.2, b_depth * 0.5 + 0.06)
+	sign_border.material = mat_gold
+	school_node.add_child(sign_border)
+	
+	var school_name_lbl = Label3D.new()
+	school_name_lbl.text = "🏫 शासकीय उत्कृष्ट बालक उच्चतर माध्यमिक विद्यालय\n[GOVT. EXCELLENCE BOYS HIGHER SECONDARY SCHOOL — PANSEMAL]\n★ स्थापना: 1968 ★"
+	school_name_lbl.font_size = 22
+	school_name_lbl.modulate = Color(1.0, 0.92, 0.35)
+	school_name_lbl.outline_modulate = Color(0.02, 0.05, 0.15)
+	school_name_lbl.outline_size = 5
+	school_name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	school_name_lbl.position = Vector3(0, portico_h + 1.2, b_depth * 0.5 + 0.2)
+	school_node.add_child(school_name_lbl)
+	
+	# 5. Central Clock Tower & Rooftop Features
+	var clock_pediment = CSGBox3D.new()
+	clock_pediment.size = Vector3(6.5, 3.5, 3.2)
+	clock_pediment.position = Vector3(0, b_height + 1.75, 0)
+	clock_pediment.material = mat_brick
+	school_node.add_child(clock_pediment)
+	
+	var clock_face = CSGCylinder3D.new()
+	clock_face.radius = 1.15
+	clock_face.height = 0.16
+	clock_face.position = Vector3(0, b_height + 1.8, 1.65)
+	clock_face.rotation_degrees = Vector3(90, 0, 0)
+	clock_face.material = _create_mat(Color(0.96, 0.96, 0.96), 0.2, 0.0, Color(1.0, 0.95, 0.85), 0.8)
+	school_node.add_child(clock_face)
+	
+	var clock_rim = CSGTorus3D.new()
+	clock_rim.inner_radius = 1.15
+	clock_rim.outer_radius = 1.25
+	clock_rim.position = Vector3(0, b_height + 1.8, 1.7)
+	clock_rim.rotation_degrees = Vector3(90, 0, 0)
+	clock_rim.material = mat_gold
+	school_node.add_child(clock_rim)
+	
+	var flagpole = CSGCylinder3D.new()
+	flagpole.radius = 0.04
+	flagpole.height = 3.8
+	flagpole.position = Vector3(0, b_height + 5.2, 0)
+	flagpole.material = mat_iron
+	school_node.add_child(flagpole)
+	
+	# Dual Rooftop Commercial Sintex Water Tanks
+	for tx in [-18.0, 18.0]:
+		var tank_stand = CSGBox3D.new()
+		tank_stand.size = Vector3(2.2, 1.0, 2.2)
+		tank_stand.position = Vector3(tx, b_height + 0.5, -3.0)
+		tank_stand.material = mat_brick
+		school_node.add_child(tank_stand)
+		
+		var s_tank = CSGCylinder3D.new()
+		s_tank.radius = 0.85
+		s_tank.height = 1.8
+		s_tank.position = Vector3(tx, b_height + 1.9, -3.0)
+		s_tank.material = mat_tank
+		school_node.add_child(s_tank)
+		
+	return school_node
+
 # --- TOWN STREET NETWORK WITH REAL TURNS ---
 # Segment 1: Home Road (Z: 65 down to -5, X: 0)
 # Turn 1: Chowk at (0, 0, -5) -> Turn Left to -X
@@ -449,7 +1088,8 @@ func _build_town_streets_with_turns() -> void:
 		road_root.add_child(sw1)
 		
 		# Street lamps and houses along Road 1
-		for lz in [50, 32, 14]:
+		var house_idx = 0 if side == -1 else 10
+		for lz in [56, 38, 20]:
 			var pole = CSGBox3D.new()
 			pole.size = Vector3(0.14, 5.2, 0.14)
 			pole.position = Vector3(side * 5.2, 2.6, float(lz))
@@ -471,12 +1111,10 @@ func _build_town_streets_with_turns() -> void:
 			lamp_light.shadow_blur = 1.3
 			road_root.add_child(lamp_light)
 			
-			# House facade
-			var house = CSGBox3D.new()
-			house.size = Vector3(5.5, 4.2, 10.0)
-			house.position = Vector3(side * 9.8, 2.1, float(lz))
-			house.material = _create_mat(Color(0.85, 0.82, 0.75))
+			# Detailed 2-Story Indian Residential House with Balcony, Parapet, Sintex Tank, Warm Lights & Dish Antenna
+			var house = _build_detailed_neighborhood_house(Vector3(side * 12.0, 0, float(lz)), side, house_idx)
 			road_root.add_child(house)
+			house_idx += 1
 	
 	# --------------------------------------------------------------------------
 	# TURN 1: CHOWK / T-JUNCTION (At Z = -5, X = 0)
@@ -542,21 +1180,12 @@ func _build_town_streets_with_turns() -> void:
 		sw2.material = mat_sidewalk
 		road_root.add_child(sw2)
 		
-		# Town shops (किराना, चाय, स्टेशनरी)
-		for sx in [-18, -35, -52]:
-			var shop = CSGBox3D.new()
-			shop.size = Vector3(9.5, 3.8, 4.5)
-			shop.position = Vector3(float(sx), 1.9, -5.0 + (z_side * 9.5))
-			shop.material = mat_shop
+		# Detailed Indian Town Bazaar Shops with Metal Shutters, Awnings & Hindi Signboards
+		var s_idx = 0 if z_side == -1 else 3
+		for sx in [-18, -36, -54]:
+			var shop = _build_detailed_indian_shop(Vector3(float(sx), 0, -5.0 + (z_side * 10.5)), z_side, s_idx)
 			road_root.add_child(shop)
-			
-			# Warm shop lamp
-			var shop_light = OmniLight3D.new()
-			shop_light.position = Vector3(float(sx), 3.2, -5.0 + (z_side * 5.2))
-			shop_light.light_color = Color(1.0, 0.85, 0.6)
-			shop_light.light_energy = 2.0
-			shop_light.omni_range = 10.0
-			road_root.add_child(shop_light)
+			s_idx += 1
 	
 	# --------------------------------------------------------------------------
 	# TURN 2: SCHOOL CORNER / T-JUNCTION (At X = -70, Z = -5)
@@ -916,31 +1545,10 @@ func _build_boys_school_and_ground() -> void:
 		school_root.add_child(flood_light)
 	
 	# --------------------------------------------------------------------------
-	# 4. GRAND 2-STORY SCHOOL BUILDING (Standing at back of ground, Z = -172m)
+	# 4. GRAND 2-STORY BOYS SCHOOL HERITAGE BUILDING (Z = -172m)
 	# --------------------------------------------------------------------------
-	var bldg = CSGBox3D.new()
-	bldg.size = Vector3(56.0, 11.5, 16.0)
-	bldg.position = Vector3(gate_x, 5.75, -172.0)
-	bldg.material = mat_brick
-	school_root.add_child(bldg)
-	
-	# Classroom windows
-	for wx in [-22.0, -15.0, -8.0, 8.0, 15.0, 22.0]:
-		for wy in [3.2, 7.8]:
-			var win = CSGBox3D.new()
-			win.size = Vector3(2.6, 2.2, 0.15)
-			win.position = Vector3(gate_x + wx, wy, -163.9)
-			win.material = _create_mat(Color(0.15, 0.25, 0.40), 0.2, 0.6)
-			school_root.add_child(win)
-			
-	# School Clock
-	var clock = CSGCylinder3D.new()
-	clock.radius = 0.95
-	clock.height = 0.15
-	clock.position = Vector3(gate_x, 9.2, -163.8)
-	clock.rotation_degrees = Vector3(90, 0, 0)
-	clock.material = _create_mat(Color(0.96, 0.96, 0.96), 0.3)
-	school_root.add_child(clock)
+	var school_building = _build_detailed_boys_school(Vector3(gate_x, 0, -172.0))
+	school_root.add_child(school_building)
 	
 	# Golden Waypoint Beacon rising from the meeting point on the ground!
 	beacon_beam = CSGCylinder3D.new()
