@@ -467,16 +467,19 @@ func _build_detailed_neighborhood_house(pos: Vector3, side: int, house_idx: int)
 	house_node.rotation_degrees = Vector3(0, 90 if side == -1 else -90, 0)
 	
 	var wall_colors = [
-		Color(0.88, 0.85, 0.78),
-		Color(0.88, 0.76, 0.70),
-		Color(0.72, 0.84, 0.82),
-		Color(0.86, 0.82, 0.68),
-		Color(0.76, 0.84, 0.74),
-		Color(0.84, 0.80, 0.76)
+		Color(0.82, 0.38, 0.20), # 0: Rich Terracotta / Brick Orange
+		Color(0.22, 0.52, 0.88), # 1: Vibrant Jodhpur Royal Blue
+		Color(0.92, 0.72, 0.18), # 2: Warm Indian Mustard Yellow
+		Color(0.28, 0.70, 0.44), # 3: Fresh Pistachio / Mint Green
+		Color(0.88, 0.38, 0.52), # 4: Jaipur Rose Pink
+		Color(0.18, 0.64, 0.70), # 5: Deep Indian Ocean Teal
+		Color(0.80, 0.50, 0.24), # 6: Warm Ochre Sandstone
+		Color(0.58, 0.38, 0.75)  # 7: Lavender / Indigo Violet
 	]
 	var base_col = wall_colors[house_idx % wall_colors.size()]
 	var mat_wall = _create_weathered_plaster_material(base_col)
-	var mat_trim = _create_mat(base_col.darkened(0.25), 0.7)
+	var trim_col = Color(0.96, 0.96, 0.94) if (house_idx % wall_colors.size() in [0, 1, 4, 5, 7]) else Color(0.35, 0.18, 0.12)
+	var mat_trim = _create_mat(trim_col, 0.6)
 	var mat_concrete = _create_sidewalk_material()
 	var mat_wood = _create_mat(Color(0.35, 0.20, 0.10), 0.6)
 	var mat_iron = _create_mat(Color(0.18, 0.18, 0.20), 0.35, 0.8)
@@ -680,11 +683,12 @@ func _build_detailed_indian_shop(pos: Vector3, z_side: int, shop_idx: int) -> No
 	var total_height = gf_height + ff_height
 	
 	var plaster_colors = [
-		Color(0.86, 0.82, 0.72),
-		Color(0.78, 0.82, 0.86),
-		Color(0.88, 0.78, 0.72),
-		Color(0.82, 0.86, 0.78),
-		Color(0.85, 0.85, 0.85)
+		Color(0.94, 0.74, 0.15), # 0: Sunflower Yellow (Gupta Kirana)
+		Color(0.84, 0.32, 0.22), # 1: Deep Terracotta Chai Red (Sharma Tea)
+		Color(0.20, 0.65, 0.60), # 2: Clinical Mint Green (Balaji Medical)
+		Color(0.18, 0.45, 0.85), # 3: Vibrant Royal Blue (Anand Stationery)
+		Color(0.52, 0.32, 0.72), # 4: Modern Violet (Verma Electronics)
+		Color(0.85, 0.52, 0.22)  # 5: Warm Golden Biscuit (Janta Bakery)
 	]
 	var base_col = plaster_colors[shop_idx % plaster_colors.size()]
 	var mat_wall = _create_weathered_plaster_material(base_col)

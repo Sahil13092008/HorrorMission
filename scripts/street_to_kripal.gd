@@ -315,6 +315,8 @@ func _ready() -> void:
 	
 	_set_checkpoint_control_mode("adventure")
 	_save_default_limb_transforms()
+	_setup_cinematic_graphics()
+	_enhance_street_buildings()
 	
 	start_school_exit_intro()
 
@@ -1450,3 +1452,410 @@ func _set_checkpoint_control_mode(mode: String) -> void:
 	var cm = get_node_or_null("/root/CheckpointManager")
 	if cm and cm.has_method("set_control_mode"):
 		cm.set_control_mode(mode)
+
+# ==============================================================================
+# CINEMATIC GRAPHICS & ARCHITECTURAL DETAILING (SCHOOL TO KRIPAL ROUTE)
+# ==============================================================================
+
+var _shared_wall_normal: NoiseTexture2D = null
+var _shared_shutter_normal: NoiseTexture2D = null
+var _shared_wood_normal: NoiseTexture2D = null
+var _shared_road_normal: NoiseTexture2D = null
+
+func _init_procedural_normal_textures() -> void:
+	if _shared_wall_normal == null:
+		var fn_wall = FastNoiseLite.new()
+		fn_wall.noise_type = FastNoiseLite.TYPE_SIMPLEX
+		fn_wall.frequency = 0.18
+		_shared_wall_normal = NoiseTexture2D.new()
+		_shared_wall_normal.width = 128
+		_shared_wall_normal.height = 128
+		_shared_wall_normal.noise = fn_wall
+		_shared_wall_normal.as_normal_map = true
+		_shared_wall_normal.bump_strength = 2.2
+		
+	if _shared_shutter_normal == null:
+		var fn_shutter = FastNoiseLite.new()
+		fn_shutter.noise_type = FastNoiseLite.TYPE_PERLIN
+		fn_shutter.frequency = 0.45
+		_shared_shutter_normal = NoiseTexture2D.new()
+		_shared_shutter_normal.width = 128
+		_shared_shutter_normal.height = 128
+		_shared_shutter_normal.noise = fn_shutter
+		_shared_shutter_normal.as_normal_map = true
+		_shared_shutter_normal.bump_strength = 3.2
+
+	if _shared_wood_normal == null:
+		var fn_wood = FastNoiseLite.new()
+		fn_wood.noise_type = FastNoiseLite.TYPE_PERLIN
+		fn_wood.frequency = 0.28
+		_shared_wood_normal = NoiseTexture2D.new()
+		_shared_wood_normal.width = 128
+		_shared_wood_normal.height = 128
+		_shared_wood_normal.noise = fn_wood
+		_shared_wood_normal.as_normal_map = true
+		_shared_wood_normal.bump_strength = 2.4
+
+	if _shared_road_normal == null:
+		var fn_road = FastNoiseLite.new()
+		fn_road.noise_type = FastNoiseLite.TYPE_SIMPLEX
+		fn_road.frequency = 0.24
+		_shared_road_normal = NoiseTexture2D.new()
+		_shared_road_normal.width = 128
+		_shared_road_normal.height = 128
+		_shared_road_normal.noise = fn_road
+		_shared_road_normal.as_normal_map = true
+		_shared_road_normal.bump_strength = 1.8
+
+func _create_pbr_wall_mat(color: Color, uv_scale: float = 3.5, roughness: float = 0.82) -> StandardMaterial3D:
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = color
+	mat.roughness = roughness
+	if _shared_wall_normal:
+		mat.normal_enabled = true
+		mat.normal_texture = _shared_wall_normal
+		mat.uv1_scale = Vector3(uv_scale, uv_scale, uv_scale)
+	return mat
+
+func _setup_cinematic_graphics() -> void:
+	_init_procedural_normal_textures()
+	
+	# 1. WorldEnvironment Next-Gen Configuration
+	var world_env = get_node_or_null("WorldEnvironment")
+	if world_env and world_env.environment:
+		var env = world_env.environment
+		env.tonemap_mode = Environment.TONE_MAPPER_ACES
+		env.tonemap_exposure = 1.05
+		env.tonemap_white = 1.15
+		env.glow_enabled = true
+		env.glow_intensity = 0.55
+		env.glow_bloom = 0.22
+		env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+		env.glow_hdr_threshold = 1.0
+		env.ssao_enabled = true
+		env.ssao_radius = 1.8
+		env.ssao_intensity = 2.4
+		env.ssao_power = 1.5
+		env.fog_enabled = true
+		env.fog_light_color = Color(0.06, 0.08, 0.14)
+		env.fog_density = 0.020
+		env.adjustment_enabled = true
+		env.adjustment_contrast = 1.06
+		env.adjustment_saturation = 1.12
+		
+	# 2. Moonlight Shadows
+	if moonlight:
+		moonlight.shadow_enabled = true
+		moonlight.shadow_blur = 1.5
+		moonlight.light_energy = 0.35
+		
+	# 3. Drifting Storm Ground Mist Particles across the street
+	var existing_mist = get_node_or_null("StreetGroundMist")
+	if not existing_mist:
+		var mist = CPUParticles3D.new()
+		mist.name = "StreetGroundMist"
+		mist.amount = 55
+		mist.lifetime = 6.0
+		mist.preprocess = 3.0
+		mist.randomness = 0.85
+		mist.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+		mist.emission_box_extents = Vector3(12.0, 0.3, 130.0)
+		mist.position = Vector3(0.0, 0.35, -125.0)
+		mist.direction = Vector3(0.35, 0.02, 0.1)
+		mist.spread = 25.0
+		mist.gravity = Vector3(0, 0.005, 0)
+		mist.initial_velocity_min = 0.25
+		mist.initial_velocity_max = 0.65
+		
+		var mist_mat = StandardMaterial3D.new()
+		mist_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+		mist_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mist_mat.albedo_color = Color(0.68, 0.74, 0.88, 0.14)
+		
+		var mist_mesh = SphereMesh.new()
+		mist_mesh.radius = 0.75
+		mist_mesh.height = 0.4
+		mist_mesh.material = mist_mat
+		mist.mesh = mist_mesh
+		add_child(mist)
+		
+	# 4. Cinematic Horror Vignette Overlay on StreetUI
+	var ui_node = get_node_or_null("StreetUI")
+	if ui_node and not ui_node.get_node_or_null("HorrorVignette"):
+		var vignette_rect = TextureRect.new()
+		vignette_rect.name = "HorrorVignette"
+		vignette_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+		vignette_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var vig_tex = load("res://textures/vignette.png")
+		if vig_tex:
+			vignette_rect.texture = vig_tex
+			vignette_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			vignette_rect.stretch_mode = TextureRect.STRETCH_SCALE
+			vignette_rect.modulate = Color(1.0, 1.0, 1.0, 0.52)
+			ui_node.add_child(vignette_rect)
+			ui_node.move_child(vignette_rect, 0)
+
+func _enhance_street_buildings() -> void:
+	_init_procedural_normal_textures()
+	
+	# Concrete Chhajja (Sunshade) Material
+	var mat_chhajja = StandardMaterial3D.new()
+	mat_chhajja.albedo_color = Color(0.92, 0.90, 0.85)
+	mat_chhajja.roughness = 0.75
+	if _shared_wall_normal:
+		mat_chhajja.normal_enabled = true
+		mat_chhajja.normal_texture = _shared_wall_normal
+		mat_chhajja.uv1_scale = Vector3(2.0, 2.0, 2.0)
+		
+	# Corrugated Iron Shutter Material
+	var mat_shutter = StandardMaterial3D.new()
+	mat_shutter.albedo_color = Color(0.55, 0.58, 0.62)
+	mat_shutter.metallic = 0.75
+	mat_shutter.roughness = 0.38
+	if _shared_shutter_normal:
+		mat_shutter.normal_enabled = true
+		mat_shutter.normal_texture = _shared_shutter_normal
+		mat_shutter.uv1_scale = Vector3(1.0, 6.0, 1.0)
+		
+	# Teak Wood Door Material
+	var mat_door = StandardMaterial3D.new()
+	mat_door.albedo_color = Color(0.38, 0.20, 0.12)
+	mat_door.roughness = 0.55
+	if _shared_wood_normal:
+		mat_door.normal_enabled = true
+		mat_door.normal_texture = _shared_wood_normal
+		mat_door.uv1_scale = Vector3(2.0, 2.0, 2.0)
+		
+	# Sintex Water Tank Material
+	var mat_sintex = StandardMaterial3D.new()
+	mat_sintex.albedo_color = Color(0.12, 0.13, 0.15)
+	mat_sintex.roughness = 0.75
+	
+	# Warm Glowing Window Material
+	var mat_win_warm = StandardMaterial3D.new()
+	mat_win_warm.albedo_color = Color(1.0, 0.88, 0.55)
+	mat_win_warm.emission_enabled = true
+	mat_win_warm.emission = Color(1.0, 0.85, 0.45)
+	mat_win_warm.emission_energy_multiplier = 2.4
+
+	# Individual Building Color & Styling Dictionary
+	var building_specs = {
+		"SahilHouse": {
+			"wall_col": Color(0.20, 0.52, 0.88), # Vibrant Jodhpur Royal Blue
+			"trim_col": Color(0.96, 0.96, 0.94),
+			"has_chhajjas": true
+		},
+		"CityLibrary": {
+			"wall_col": Color(0.78, 0.56, 0.32), # Warm Sandstone Ochre
+			"trim_col": Color(0.94, 0.90, 0.82),
+			"has_chhajjas": true
+		},
+		"PlayerHouse": {
+			"wall_col": Color(0.92, 0.72, 0.18), # Warm Indian Turmeric Yellow
+			"trim_col": Color(0.45, 0.22, 0.14),
+			"has_chhajjas": true
+		},
+		"SangamCinema": {
+			"wall_col": Color(0.55, 0.15, 0.22), # Deep Bollywood Burgundy
+			"trim_col": Color(0.96, 0.85, 0.25),
+			"has_chhajjas": false
+		},
+		"SweetsNamkeenShop": {
+			"wall_col": Color(0.94, 0.50, 0.14), # Saffron Sweet Shop Orange
+			"trim_col": Color(0.96, 0.94, 0.90),
+			"has_chhajjas": false
+		},
+		"AashutoshHouse": {
+			"wall_col": Color(0.26, 0.70, 0.44), # Fresh Pistachio Mint Green
+			"trim_col": Color(0.96, 0.96, 0.94),
+			"has_chhajjas": true
+		},
+		"CityClinic": {
+			"wall_col": Color(0.86, 0.94, 0.96), # Hospital Pale Mint White
+			"trim_col": Color(0.18, 0.60, 0.32),
+			"has_chhajjas": true
+		},
+		"SuperBazar": {
+			"wall_col": Color(0.86, 0.30, 0.28), # Modern Coral Red
+			"trim_col": Color(0.96, 0.96, 0.94),
+			"has_chhajjas": false
+		},
+		"PatidarBakery": {
+			"wall_col": Color(0.88, 0.62, 0.28), # Warm Golden Biscuit
+			"trim_col": Color(0.42, 0.24, 0.15),
+			"has_chhajjas": false
+		},
+		"SanjeevaniMedical": {
+			"wall_col": Color(0.20, 0.65, 0.58), # Clinical Sea Green
+			"trim_col": Color(0.94, 0.96, 0.94),
+			"has_chhajjas": false
+		},
+		"SBI_Bank": {
+			"wall_col": Color(0.08, 0.26, 0.68), # Authentic SBI Royal Blue
+			"trim_col": Color(0.96, 0.96, 0.96),
+			"has_chhajjas": true
+		},
+		"SharmaGarage": {
+			"wall_col": Color(0.36, 0.40, 0.44), # Industrial Slate Grey
+			"trim_col": Color(0.24, 0.26, 0.28),
+			"has_chhajjas": false
+		},
+		"ElectronicsShop": {
+			"wall_col": Color(0.50, 0.30, 0.70), # Tech Violet
+			"trim_col": Color(0.92, 0.88, 0.96),
+			"has_chhajjas": false
+		},
+		"HeadPostOffice": {
+			"wall_col": Color(0.82, 0.18, 0.18), # Indian Postal Crimson Red
+			"trim_col": Color(0.88, 0.78, 0.55),
+			"has_chhajjas": true
+		},
+		"TownHall": {
+			"wall_col": Color(0.82, 0.68, 0.45), # Heritage Sandstone Ochre
+			"trim_col": Color(0.96, 0.95, 0.92),
+			"has_chhajjas": true
+		},
+		"PansemalPoliceStation": {
+			"wall_col": Color(0.78, 0.62, 0.42), # Police Sandstone Khaki
+			"trim_col": Color(0.12, 0.28, 0.72),
+			"has_chhajjas": true
+		}
+	}
+	
+	# Apply styling across Pansemal Town Houses
+	var town_houses = get_node_or_null("EnvironmentProps/PansemalTownHouses")
+	if town_houses:
+		for b_name in building_specs:
+			var b_node = town_houses.get_node_or_null(b_name)
+			if b_node:
+				var spec = building_specs[b_name]
+				var mat_wall = _create_pbr_wall_mat(spec["wall_col"])
+				var mat_trim = _create_pbr_wall_mat(spec["trim_col"], 2.0, 0.70)
+				
+				# Style Main Building Box
+				var b_main = b_node.get_node_or_null("Building")
+				if b_main and b_main is CSGBox3D:
+					b_main.material = mat_wall
+					
+				# Style Parapet Wall
+				var b_parapet = b_node.get_node_or_null("Parapet")
+				if b_parapet and b_parapet is CSGBox3D:
+					b_parapet.material = mat_trim
+					
+				# Style Shutters with PBR Corrugated Metal
+				var shutter = b_node.get_node_or_null("Shutter")
+				if shutter and shutter is CSGBox3D:
+					shutter.material = mat_shutter
+				var wide_shutter = b_node.get_node_or_null("WideShutter")
+				if wide_shutter and wide_shutter is CSGBox3D:
+					wide_shutter.material = mat_shutter
+					
+				# Style Doors with Teak Wood PBR
+				var door = b_node.get_node_or_null("Door")
+				if door and door is CSGBox3D:
+					door.material = mat_door
+					
+				# Style Windows with warm interior emission
+				for win_name in ["Win", "Win1", "Win2", "Win3"]:
+					var win = b_node.get_node_or_null(win_name)
+					if win and win is CSGBox3D:
+						win.material = mat_win_warm
+						
+				# Add architectural chhajjas (concrete sunshades) over windows if flagged
+				if spec["has_chhajjas"]:
+					for win_name in ["Win", "Win1", "Win2", "Win3"]:
+						var win = b_node.get_node_or_null(win_name)
+						if win and win is CSGBox3D and not win.get_node_or_null("Chhajja"):
+							var chhajja = CSGBox3D.new()
+							chhajja.name = "Chhajja"
+							chhajja.size = Vector3(win.size.x + 0.35, 0.08, win.size.z + 0.35)
+							chhajja.position = Vector3(0.12 if win.position.x > 0 else -0.12, win.size.y * 0.5 + 0.08, 0)
+							chhajja.material = mat_chhajja
+							chhajja.use_collision = false
+							win.add_child(chhajja)
+
+	# Style St. Augustine School
+	var school = get_node_or_null("EnvironmentProps/PansemalTownHouses/StAugustineSchool")
+	if school:
+		var mat_school_brick = _create_pbr_wall_mat(Color(0.82, 0.35, 0.20), 4.0)
+		var mat_school_trim = _create_pbr_wall_mat(Color(0.96, 0.92, 0.82), 2.0, 0.65)
+		for part_name in ["MainBuilding", "LeftWing", "RightWing", "ClockTower"]:
+			var part = school.get_node_or_null(part_name)
+			if part and part is CSGBox3D:
+				part.material = mat_school_brick
+		var portico = school.get_node_or_null("EntrancePortico")
+		if portico and portico is CSGBox3D:
+			portico.material = mat_school_trim
+		for pillar_name in ["PorticoPillarL", "PorticoPillarR"]:
+			var pillar = school.get_node_or_null(pillar_name)
+			if pillar and pillar is CSGBox3D:
+				pillar.material = mat_school_trim
+		# Add sunshades over school windows
+		for win_name in ["WinF1L", "WinF1R", "WinF2L", "WinF2R", "WinLeftWing", "WinRightWing"]:
+			var win = school.get_node_or_null(win_name)
+			if win and win is CSGBox3D and not win.get_node_or_null("Chhajja"):
+				var chhajja = CSGBox3D.new()
+				chhajja.name = "Chhajja"
+				chhajja.size = Vector3(win.size.x + 0.4, 0.09, win.size.z + 0.4)
+				chhajja.position = Vector3(0, win.size.y * 0.5 + 0.08, 0.15)
+				chhajja.material = mat_chhajja
+				chhajja.use_collision = false
+				win.add_child(chhajja)
+
+	# Style Kripal's House ($KripalHouse) with signature Indian Ocean Teal and details
+	var kh = get_node_or_null("KripalHouse")
+	if kh:
+		var mat_kh_wall = _create_pbr_wall_mat(Color(0.18, 0.62, 0.68), 3.5) # Deep Indian Ocean Emerald Teal
+		var mat_kh_parapet = _create_pbr_wall_mat(Color(0.96, 0.95, 0.92), 2.0, 0.68) # Clean Cream Trim
+		var mat_kh_brick = _create_pbr_wall_mat(Color(0.82, 0.42, 0.22), 3.0) # Terracotta boundary & pillars
+		
+		var house_struct = kh.get_node_or_null("HouseStructure")
+		if house_struct and house_struct is CSGBox3D:
+			house_struct.material = mat_kh_wall
+			
+		var terrace_cabin = kh.get_node_or_null("TerraceCabin")
+		if terrace_cabin and terrace_cabin is CSGBox3D:
+			terrace_cabin.material = mat_kh_wall
+			
+		var roof_parapet = kh.get_node_or_null("RoofParapet")
+		if roof_parapet and roof_parapet is CSGBox3D:
+			roof_parapet.material = mat_kh_parapet
+			
+		for b_wall in ["BoundaryWallL", "BoundaryWallR", "GatePillarL", "GatePillarR"]:
+			var wall_node = kh.get_node_or_null(b_wall)
+			if wall_node and wall_node is CSGBox3D:
+				wall_node.material = mat_kh_brick
+				
+		var porch_roof = kh.get_node_or_null("PorchRoof")
+		if porch_roof and porch_roof is CSGBox3D:
+			porch_roof.material = mat_kh_brick
+			
+		var door_frame = kh.get_node_or_null("DoorFrame")
+		if door_frame and door_frame is CSGBox3D:
+			door_frame.material = mat_kh_parapet
+			
+		# Windows with warm interior lighting and concrete chhajjas (sunshades)
+		for win_name in ["Window1", "Window2", "WindowF2_1", "WindowF2_2"]:
+			var win = kh.get_node_or_null(win_name)
+			if win and win is CSGBox3D:
+				win.material = mat_win_warm
+				if not win.get_node_or_null("Chhajja"):
+					var chhajja = CSGBox3D.new()
+					chhajja.name = "Chhajja"
+					chhajja.size = Vector3(0.45, 0.08, win.size.z + 0.35)
+					chhajja.position = Vector3(-0.15, win.size.y * 0.5 + 0.08, 0)
+					chhajja.rotation_degrees = Vector3(0, 0, 8.0) # Slanted down to deflect rain
+					chhajja.material = mat_chhajja
+					chhajja.use_collision = false
+					win.add_child(chhajja)
+					
+		# Rooftop Sintex tank
+		var tank = kh.get_node_or_null("SintexTank")
+		if tank and tank is CSGCylinder3D:
+			tank.material = mat_sintex
+			
+		# Carved entrance door
+		var door_mesh = kh.get_node_or_null("DoorHinge/MainDoor")
+		if door_mesh and door_mesh is CSGBox3D:
+			door_mesh.material = mat_door
+

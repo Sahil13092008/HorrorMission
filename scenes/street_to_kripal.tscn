@@ -38,11 +38,23 @@ sky_material = SubResource("SkyMat_Street")
 background_mode = 2
 sky = SubResource("Sky_Street")
 ambient_light_source = 2
-ambient_light_color = Color(0.12, 0.14, 0.22, 1)
-ambient_light_energy = 0.42
+ambient_light_color = Color(0.14, 0.16, 0.24, 1)
+ambient_light_energy = 0.45
+tonemap_mode = 3
+tonemap_exposure = 1.05
+glow_enabled = true
+glow_intensity = 0.55
+glow_bloom = 0.22
+glow_blend_mode = 0
+ssao_enabled = true
+ssao_radius = 1.8
+ssao_intensity = 2.4
 fog_enabled = true
 fog_light_color = Color(0.06, 0.08, 0.14, 1)
-fog_density = 0.022
+fog_density = 0.020
+adjustment_enabled = true
+adjustment_contrast = 1.06
+adjustment_saturation = 1.12
 
 [sub_resource type="CapsuleShape3D" id="Capsule_Player"]
 radius = 0.35
@@ -138,16 +150,16 @@ emission = Color(1, 0.95, 0.75, 1)
 emission_energy_multiplier = 4.0
 
 [sub_resource type="StandardMaterial3D" id="Mat_HouseWall1"]
-albedo_color = Color(0.75, 0.70, 0.62, 1)
-roughness = 0.85
+albedo_color = Color(0.82, 0.38, 0.20, 1)
+roughness = 0.82
 
 [sub_resource type="StandardMaterial3D" id="Mat_HouseWall2"]
-albedo_color = Color(0.68, 0.45, 0.35, 1)
-roughness = 0.85
+albedo_color = Color(0.92, 0.70, 0.18, 1)
+roughness = 0.82
 
 [sub_resource type="StandardMaterial3D" id="Mat_HouseWall3"]
-albedo_color = Color(0.45, 0.58, 0.68, 1)
-roughness = 0.85
+albedo_color = Color(0.22, 0.52, 0.88, 1)
+roughness = 0.82
 
 [sub_resource type="StandardMaterial3D" id="Mat_CarPaint"]
 albedo_color = Color(0.92, 0.93, 0.95, 1)
@@ -176,7 +188,7 @@ emission_enabled = true
 emission = Color(1, 0.1, 0.1, 1)
 emission_energy_multiplier = 4.0
 [sub_resource type="StandardMaterial3D" id="Mat_PoliceStation"]
-albedo_color = Color(0.68, 0.52, 0.38, 1)
+albedo_color = Color(0.78, 0.62, 0.42, 1)
 roughness = 0.65
 
 [sub_resource type="StandardMaterial3D" id="Mat_PoliceBlue"]
@@ -196,7 +208,7 @@ emission = Color(0.1, 0.4, 1, 1)
 emission_energy_multiplier = 4.5
 
 [sub_resource type="StandardMaterial3D" id="Mat_KripalHouse"]
-albedo_color = Color(0.65, 0.72, 0.80, 1)
+albedo_color = Color(0.18, 0.62, 0.68, 1)
 roughness = 0.75
 
 [sub_resource type="StandardMaterial3D" id="Mat_WindowWarm"]
@@ -329,12 +341,12 @@ metallic = 0.45
 roughness = 0.50
 
 [sub_resource type="StandardMaterial3D" id="Mat_SchoolBrick"]
-albedo_color = Color(0.60, 0.32, 0.25, 1)
-roughness = 0.85
+albedo_color = Color(0.82, 0.35, 0.20, 1)
+roughness = 0.82
 
 [sub_resource type="StandardMaterial3D" id="Mat_SchoolTrim"]
-albedo_color = Color(0.85, 0.82, 0.76, 1)
-roughness = 0.70
+albedo_color = Color(0.96, 0.92, 0.82, 1)
+roughness = 0.65
 
 [sub_resource type="StandardMaterial3D" id="Mat_SchoolRoof"]
 albedo_color = Color(0.16, 0.20, 0.26, 1)
@@ -485,9 +497,10 @@ environment = SubResource("Environment_Street")
 
 [node name="Moonlight" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 10, 20, 10)
-light_color = Color(0.50, 0.60, 0.80, 1)
-light_energy = 0.25
-shadow_enabled = false
+light_color = Color(0.55, 0.65, 0.85, 1)
+light_energy = 0.35
+shadow_enabled = true
+shadow_blur = 1.5
 
 [node name="LightningLight" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 0, 25, 0)
